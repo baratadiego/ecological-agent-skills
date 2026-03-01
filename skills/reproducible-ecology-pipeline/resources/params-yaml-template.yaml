@@ -1,0 +1,84 @@
+# params.yaml — Standard Parameter Manifest Template
+# Copy this file to your project root and fill in all values before analysis.
+# Never hard-code parameter values in scripts; always reference this file.
+
+project:
+  name: "my-ecology-study"
+  version: "1.0.0"
+  created: "YYYY-MM-DD"
+  author: "Your Name"
+  repository: "https://github.com/yourrepo/yourproject"
+
+random_seeds:
+  global: 42
+  spatial_cv: 42
+  background_sampling: 42
+  bootstrap: 42
+
+data:
+  occurrence_source: "GBIF download YYYY-MM-DD"
+  occurrence_doi: "https://doi.org/10.15468/dl.XXXXX"
+  predictor_source: "WorldClim v2.1"
+  predictor_resolution: "2.5 arcmin"
+  predictor_version: "2.1"
+  study_area_source: "IBGE biome boundaries 2019"
+  baseline_period: ["2000-01-01", "2020-12-31"]
+
+spatial:
+  project_crs: "EPSG:4326"
+  analysis_crs: "EPSG:31982"
+  raster_resolution_m: 1000
+  resampling_method: "bilinear"
+  study_area_buffer_km: 100
+
+data_cleaning:
+  coordinate_uncertainty_max_m: 10000
+  spatial_thinning_distance_km: 10
+  duplicate_temporal_buffer_days: 7
+  missing_value_threshold: 0.20
+  taxonomy_backbone: "GBIF Backbone v2023"
+  coordinate_cleaner_flags:
+    - capitals
+    - centroids
+    - gbif
+    - zeros
+    - validity
+
+modeling:
+  algorithms:
+    - maxnet
+    - brt
+    - random_forest
+  cv_method: "spatial_block"
+  cv_folds: 5
+  cv_block_size_km: 300
+  background_n: 10000
+  background_method: "random_within_M"
+  collinearity_vif_threshold: 5
+  collinearity_r_threshold: 0.70
+  primary_metric: "TSS"
+  threshold_method: "MaxTSS"
+  ensemble_method: "weighted_mean_TSS"
+
+hyperparameters:
+  maxnet:
+    regularization_multiplier: [0.5, 1.0, 2.0, 3.0]
+    feature_classes: ["LQP", "LQPH"]
+  brt:
+    n_trees: [500, 1000, 2000]
+    learning_rate: [0.01, 0.001]
+    tree_complexity: [3, 5]
+    bag_fraction: 0.75
+  random_forest:
+    n_trees: 500
+    mtry: "auto"
+    min_node_size: 5
+
+software:
+  r_version: "4.X.X"
+  key_packages:
+    terra: "X.X.X"
+    sf: "X.X.X"
+    biomod2: "X.X.X"
+    blockCV: "X.X.X"
+    dismo: "X.X.X"

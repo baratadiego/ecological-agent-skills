@@ -1,0 +1,7 @@
+lulc_code,lulc_name,n_pixels,mean_es,total_es,erosion_control_mean,pollination_mean
+1,Dense forest,24100,178.2,4294420,0.9999,1.0
+2,Secondary forest,11800,68.4,807120,0.995,0.85
+3,Cerrado,4300,52.1,224030,0.99,0.75
+4,Pasture,68200,18.3,1248060,0.85,0.2
+5,Cropland,36700,12.1,444070,0.7,0.1
+6,Urban,28900,3.2,92480,0.0,0.0

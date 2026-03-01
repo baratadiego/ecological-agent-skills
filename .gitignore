@@ -1,0 +1,71 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.venv/
+venv/
+env/
+.env
+
+# R
+.Rhistory
+.RData
+.Rproj.user/
+*.Rproj
+renv/library/
+renv/.cache/
+
+# Conda
+.conda/
+
+# Data outputs (keep test data, ignore generated outputs)
+outputs/
+results/
+figures/
+maps/
+*.tif
+*.geotiff
+*.shp
+*.shx
+*.dbf
+*.prj
+*.cpg
+
+# Keep test CSVs (explicitly tracked)
+!tests/data/*.csv
+
+# Logs and temp files
+*.log
+*.tmp
+*.bak
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# MaxEnt outputs
+*.lambdas
+*.html
+plots/
+
+# Docs build
+_site/
