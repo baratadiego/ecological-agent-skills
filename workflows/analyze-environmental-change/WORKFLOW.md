@@ -57,3 +57,17 @@ Invoke when the user wants to analyse temporal trends in environmental condition
 - Anomaly time series
 - Change classification map
 - Recovery metrics (if applicable)
+
+---
+
+## Decision Points
+
+| Condition | Diagnosis | Recommended Action |
+|---|---|---|
+| Mann-Kendall tau < 0.1 despite visual trend | Trend masked by high inter-annual variance | Apply pre-whitening (remove autocorrelation before MK test); report Sen's slope with 95% CI instead of tau alone |
+| BFAST detects > 5 breakpoints | Oversegmentation of time series | Increase `h` parameter (minimum segment length as fraction of series); inspect breakpoints for plausibility |
+| Time series < 10 years | Insufficient length for reliable trend detection | Report descriptive statistics (mean, SD, range) only; state limitation; do not report Mann-Kendall as significant |
+| Missing data > 20% in any season | Seasonal decomposition unreliable | Impute with STL or linear interpolation before decomposition; document imputation in methods |
+| Breakpoint coincides with sensor change or data gap | Artefact, not ecological signal | Verify against independent data source (e.g., Landsat vs MODIS comparison); exclude artefact breakpoints |
+| STL trend component shows oscillation at period equal to satellite revisit | Orbital artefact leaking into trend | Apply Fourier pre-filtering; use MODIS 16-day composites instead of 8-day |
+| Recovery rate > 100% (NDVI exceeds pre-disturbance level) | Regrowth exceeds baseline; possible change in land use | Verify with high-resolution imagery; investigate if secondary vegetation is replacing degraded pasture |

@@ -58,3 +58,17 @@ Invoke when the user has repeated presence/absence survey data and wants to esti
 - Model selection table (AICc, ΔAIC, weights)
 - Covariate effect estimates
 - Goodness-of-fit results
+
+---
+
+## Decision Points
+
+| Condition | Diagnosis | Recommended Action |
+|---|---|---|
+| GoF test fails (p < 0.05) | Violation of closure assumption or unmodelled heterogeneity | Add detection covariate; consider mixture models (heterogeneity in detection); verify closure window |
+| naive_p > 0.5 but estimated p̂ < 0.1 | Multicollinearity in detection covariates inflating estimates | Check pairwise correlation among detection covariates; reduce model; use VIF screening |
+| AIC-best model has ψ̂ ≈ 1.0 with high SE | Numerical convergence issue (perfect detection or near-saturation) | Simplify model; check for sites with detection at every occasion; constrain starting values |
+| k (number of surveys) < 3 | Low power to separate ψ from p | Report power analysis alongside estimates; collect more survey occasions in future |
+| Detection probability varies strongly by observer | Unmodelled observer effect | Include observer ID as categorical detection covariate |
+| ĉ > 1.5 (overdispersion) | Extra-binomial variance; GoF indicates poor fit | Use QAICc instead of AICc for model selection; report ĉ in methods |
+| All sites have detection at every occasion | 100% naive occupancy | Consider whether closure is violated or species is truly ubiquitous; occupancy model may be unnecessary |

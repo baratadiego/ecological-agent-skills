@@ -56,3 +56,17 @@ Invoke when the user wants to describe or compare species assemblages across sit
 - PERMANOVA results table
 - Indicator species list
 - Cluster dendrogram
+
+---
+
+## Decision Points
+
+| Condition | Diagnosis | Recommended Action |
+|---|---|---|
+| NMDS stress > 0.20 | Poor ordination fit in 2D | Increase to 3D; alternatively use PCoA (metric) or PCA after Hellinger transformation |
+| PERMANOVA significant but R² < 0.05 | Statistically significant but ecologically trivial effect | Report R² (effect size) prominently alongside p-value; contextualise effect magnitude |
+| Species with > 80% zeros in matrix dominating ordination | Rare species creating artefacts | Apply Hellinger transformation; remove singletons or use Bray-Curtis on untransformed data |
+| Groups fully overlap in ordination space | Environmental gradient is weak or wrong variables tested | Test additional environmental covariates; check if grouping factor is ecologically meaningful |
+| SIMPER output does not match ecological expectations | Potential data entry error or taxonomic issues | Verify species identity and abundance values; check for transposed rows/columns |
+| PERMANOVA significant but PERMDISP also significant | Cannot distinguish composition vs. dispersion differences | Report both; use betadisper plot; consider within-group diversity analysis |
+| Rarefaction curves not asymptoting | Insufficient sampling effort | Report sampling completeness (Chao1 completeness); caveat diversity comparisons |

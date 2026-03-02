@@ -52,3 +52,17 @@ Invoke when the user wants to quantify, map, or compare ecosystem services acros
 - ES summary table by land cover class
 - Trade-off matrix and visualisation
 - Statistical comparison of ES across classes
+
+---
+
+## Decision Points
+
+| Condition | Diagnosis | Recommended Action |
+|---|---|---|
+| Land cover classification accuracy < 85% | Propagated classification error in ES estimates | Conduct uncertainty analysis using accuracy matrix; report ES ranges, not point estimates |
+| ES trade-off correlation > 0.8 between two services | Possible confounding by same land cover class driving both | Partial out land cover effect; test whether trade-off holds within land cover classes |
+| InVEST model output contains NoData in > 30% of area | Input layer misalignment (CRS, extent, or resolution mismatch) | Recheck CRS and extent of all inputs; use `terra::compareGeom()` to verify alignment |
+| Monetary valuation requested but local market data unavailable | Benefit transfer required; high uncertainty | Apply benefit transfer with explicit unit value uncertainty (±50% range); flag limitation prominently |
+| Provisioning and regulating services conflict across scenarios | Synergy/trade-off analysis needed | Use Pareto frontier visualisation; do not rank services without considering trade-offs |
+| ES values identical across all land cover classes | Model insensitive to land cover differences | Check if land cover classes are aggregated too broadly; inspect model parameters for land-cover-specific values |
+| Water yield model shows negative values | Model misconfiguration or negative ET correction | Verify PET inputs and calibration; check if precipitation minus AET is negative in any pixel |

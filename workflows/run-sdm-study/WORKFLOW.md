@@ -83,3 +83,17 @@ Invoke when the user wants to model species distributions, predict habitat suita
 ## Reporting Standard
 
 Follow the **ODMAP protocol** (Zurell et al. 2020) for methods reporting.
+
+---
+
+## Decision Points
+
+| Condition | Diagnosis | Recommended Action |
+|---|---|---|
+| AUC < 0.70 after calibration | Model has no predictive power | Revise predictor set; increase calibration effort (extend RM × FC grid); verify coordinate quality |
+| n_occurrences < 30 after thinning | Insufficient data for reliable SDM | Document and do not publish SDM results; consider target-group background or literature review only |
+| MOP = 0 in > 40% of projected area | Severe extrapolation beyond calibration data | Restrict interpretation to calibration area; add explicit caveat in abstract and figure caption |
+| delta_AICc < 2 for multiple models | Model selection uncertainty | Report ensemble of all equivalent models; do not pick a single "best" model arbitrarily |
+| MESS < 0 in core suitable area | Novel environmental combinations in projection | Flag in figure caption; consider masking MESS < 0 pixels in main figure |
+| Selected RM is at grid boundary (0.5 or 6) | Grid too narrow; optimal value outside range | Extend RM grid in that direction and re-run calibration |
+| Training AUC >> block CV AUC (gap > 0.15) | Spatial autocorrelation inflating training AUC | Report block CV AUC as primary metric; do not report training AUC as validation |

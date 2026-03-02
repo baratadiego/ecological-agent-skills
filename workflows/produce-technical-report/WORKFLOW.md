@@ -97,3 +97,17 @@ Appendix: Reproducibility package
 | Community ecology | vegan documentation; Oksanen et al. |
 | Impact assessment | CEQ NEPA guidelines or local equivalent |
 | Ecosystem services | IPBES assessment framework |
+
+---
+
+## Decision Points
+
+| Condition | Diagnosis | Recommended Action |
+|---|---|---|
+| Analysis not reproducible from params.yaml alone | Missing parameter documentation | Complete params.yaml before finalising report; add all missing parameters and run again |
+| Figures generated with different software versions | Version lock not enforced | Record all package versions in session_info.txt; use renv/conda lockfile for environment reproducibility |
+| Statistical results change with different random seed | Stochastic component not fixed | Set and document seed in params.yaml; report sensitivity of results to seed variation |
+| External reviewer cannot reproduce key figure | Code sharing incomplete | Ensure all scripts are included; verify all input data paths are documented and data is accessible |
+| Report references unpublished dataset | Citation incomplete for peer review | Obtain dataset DOI (Zenodo, Dryad, GBIF) or write data availability statement before submission |
+| Methods section length exceeds journal limit | Too much methodological detail in main text | Move detailed parameters to Supplementary Methods; use ODMAP table format for SDMs |
+| Discussion cites model predictions without uncertainty | Overconfident interpretation | Always pair predictions with uncertainty estimates; use conditional language ("model suggests", "under assumptions") |

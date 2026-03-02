@@ -1,4 +1,4 @@
-name: eco-skills
+name: ecological-agent-skills
 channels:
   - conda-forge
   - defaults

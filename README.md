@@ -1,6 +1,6 @@
-# antigravity-eco-skills
+# ecological-agent-skills
 
-A curated skill library for **quantitative ecology** workflows, compatible with the [Antigravity](https://github.com/antigravity-awesome-skills) agent framework.
+A curated skill library for **quantitative ecology** workflows, compatible with the [Antigravity](https://github.com/ecological-agent-skills) agent framework.
 
 This repository provides 12 modular skills and 8 multi-step workflows covering the full spectrum of quantitative ecology: from raw data ingestion and geoprocessing to species distribution modeling, occupancy analysis, community ecology, ecological impact assessment, and reproducible reporting.
 
@@ -11,7 +11,7 @@ This repository provides 12 modular skills and 8 multi-step workflows covering t
 These skills are designed for use with **Antigravity**-compatible agents (e.g., Gemini CLI, Claude Code, or any agent that supports the `.agent/skills/` convention).
 
 Install paths:
-- **Antigravity / Gemini CLI:** `~/.gemini/antigravity/skills/`
+- **Antigravity / Gemini CLI:** `~/.gemini/ecological-agent-skills/skills/`
 - **Generic agent:** `.agent/skills/` (project root)
 - **Claude Code:** reference via system prompt or MCP configuration
 
@@ -20,7 +20,7 @@ Install paths:
 ## Repository Structure
 
 ```
-antigravity-eco-skills/
+ecological-agent-skills/
 ├── README.md
 ├── CATALOG.md                    ← skill index with metadata
 ├── skills/                       ← 12 modular skills

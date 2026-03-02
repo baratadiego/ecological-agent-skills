@@ -1,4 +1,4 @@
-# Skill Catalog — antigravity-eco-skills
+# Skill Catalog — ecological-agent-skills
 
 A quick-reference index for all 12 skills. Each row summarises the skill's domain, when to invoke it, expected inputs, expected outputs, and which workflows depend on it.
 
@@ -145,3 +145,40 @@ A quick-reference index for all 12 skills. Each row summarises the skill's domai
 | analyze-environmental-change | ✓ | ✓ | | | | | | | ✓ | ✓ | | ✓ |
 | assess-ecosystem-services | ✓ | ✓ | ✓ | | | | | | | | ✓ | ✓ |
 | produce-technical-report | | | | | | | | | | | | ✓ |
+| run-multispecies-screening | ✓ | ✓ | | ✓ | ✓ | ✓ | | | | | | |
+
+---
+
+## New Resources Added in v1.1.0
+
+### skills/species-distribution-modeling/
+| File | Description |
+|---|---|
+| `resources/maxent-calibration-guide.md` | RM × FC grid, OR_AICc criterion, kuenm vs ENMeval comparison |
+| `resources/climate-scenario-preparation.md` | CHELSA/WorldClim sources, SSPs, mandatory preparation pipeline |
+| `scripts/tune_maxnet.R` | ENMeval calibration grid search (35 models), OR_AICc selection, best_maxnet.rds |
+| `scripts/prepare_future_layers.R` | Reproject, crop, compareGeom, layer-name verification for future stacks |
+
+### skills/predictive-modeling-best-practices/
+| File | Description |
+|---|---|
+| `resources/sampling-bias-correction.md` | Target-group background, KDE weighting, environmental filtering, decision table |
+
+### skills/model-validation-and-uncertainty/
+| File | Description |
+|---|---|
+| `resources/extrapolation-risk-guide.md` | MOP, ExDet (NT1/NT2), MESS — comparison table, thresholds, masking protocol |
+| `scripts/extrapolation_risk.R` | MOP + MESS computation, summary CSV, extrapolation plots, severity warnings |
+
+### skills/ecological-data-foundation/
+| File | Description |
+|---|---|
+| `resources/gbif-data-citation-guide.md` | DOI retrieval, occ_search vs occ_download, ODMAP O4 reporting |
+| `scripts/download_from_gbif.R` | Single + batch GBIF download with DOI, rgbif, filters, metadata |
+| `scripts/download_from_gbif.py` | Python equivalent via pygbif |
+
+### workflows/
+| File | Description |
+|---|---|
+| `run-multispecies-screening/WORKFLOW.md` | 9th workflow — rapid multi-species SDM screening with priority classification |
+| All 8 existing WORKFLOWs | Added `## Decision Points` section with condition → diagnosis → action tables |

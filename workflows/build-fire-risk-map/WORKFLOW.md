@@ -63,3 +63,17 @@ Invoke when the user wants to map fire risk or fire susceptibility for a landsca
 - Model performance table
 - Risk summary by land cover class
 - Uncertainty map
+
+---
+
+## Decision Points
+
+| Condition | Diagnosis | Recommended Action |
+|---|---|---|
+| VIF > 10 among predictors | Severe multicollinearity | Remove the redundant layer with highest VIF; recalculate VIF after each removal |
+| Fire history data < 10 years | Insufficient temporal coverage for reliable frequency estimates | Flag in metadata; use longer MODIS record if available; weight recent years more heavily |
+| Block CV AUC < 0.65 | Spatial autocorrelation inflating naive AUC; model has limited spatial transferability | Report block CV AUC as primary; investigate whether training area is too small |
+| Risk map shows hotspots near data gaps | Edge effects or extrapolation artefacts at raster boundaries | Apply focal mean smoothing (3×3 or 5×5 window); mask no-data buffer zones |
+| Temporal mismatch between predictor layers (different years) | Predictors reflect different time periods; potential confounding | Standardise all layers to same time period; document year of each layer in metadata |
+| BRT and Random Forest disagree strongly in high-risk areas | Model uncertainty is high where it matters most | Report ensemble mean AND standard deviation; flag high-disagreement areas in maps |
+| Fire risk map shows uniform high risk across entire area | Model underfits or predictors lack spatial contrast | Increase model complexity; check if predictors have sufficient spatial variation in study area |
