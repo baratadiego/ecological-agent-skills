@@ -1,0 +1,509 @@
+{
+  "skills": [
+    {
+      "skill_id": "biostatistics-workbench",
+      "display_name": "Biostatistics Workbench",
+      "version": "1.0.0",
+      "domain": ["statistics", "GLM", "GLMM", "hypothesis testing", "model selection"],
+      "trigger_keywords": [
+        "statistical test", "GLM", "GLMM", "mixed model", "linear model",
+        "effect size", "confidence interval", "AIC", "model selection",
+        "normality test", "assumption check", "regression", "ANOVA",
+        "p-value", "overdispersion", "residual diagnostics"
+      ],
+      "min_inputs": {
+        "response_variable": "required",
+        "predictor_variables": "required",
+        "random_effects_structure": "conditional",
+        "study_design_description": "recommended"
+      },
+      "primary_outputs": [
+        "model_summary.txt",
+        "model_selection_table.csv",
+        "assumption_diagnostics/",
+        "effect_sizes.csv",
+        "stats_report.md"
+      ],
+      "depends_on_skills": [
+        "ecological-data-foundation"
+      ],
+      "called_by_workflows": [
+        "assess-ecological-impact",
+        "analyze-community-structure",
+        "run-occupancy-analysis"
+      ],
+      "decision_points": {
+        "n_min_glm": 20,
+        "n_recommended_glm": 50,
+        "action_if_overdispersion": "switch to negative binomial or quasi family",
+        "action_if_residuals_fail": "transform response or use non-parametric alternative"
+      },
+      "skill_md_path": "skills/biostatistics-workbench/SKILL.md"
+    },
+    {
+      "skill_id": "community-ecology-ordination",
+      "display_name": "Community Ecology Ordination",
+      "version": "1.0.0",
+      "domain": ["community ecology", "ordination", "multivariate", "diversity", "beta diversity"],
+      "trigger_keywords": [
+        "species composition", "community structure", "NMDS", "PCA ordination",
+        "PERMANOVA", "beta diversity", "alpha diversity", "species richness",
+        "Bray-Curtis", "assemblage", "species matrix", "diversity index",
+        "indicator species", "cluster analysis", "dissimilarity"
+      ],
+      "min_inputs": {
+        "species_site_matrix_csv": "required",
+        "site_environmental_metadata_csv": "recommended",
+        "grouping_variable": "recommended"
+      },
+      "primary_outputs": [
+        "ordination_plot.png",
+        "diversity_metrics.csv",
+        "beta_diversity_matrix.csv",
+        "permanova_results.txt",
+        "cluster_dendrogram.png",
+        "community_report.md"
+      ],
+      "depends_on_skills": [
+        "ecological-data-foundation"
+      ],
+      "called_by_workflows": [
+        "analyze-community-structure"
+      ],
+      "decision_points": {
+        "n_sites_min": 5,
+        "n_sites_recommended": 10,
+        "nmds_stress_max_acceptable": 0.20,
+        "action_if_stress_above_threshold": "increase NMDS dimensions to 3 or reduce species set",
+        "action_if_permanova_r2_low": "report effect size and discuss ecological significance"
+      },
+      "skill_md_path": "skills/community-ecology-ordination/SKILL.md"
+    },
+    {
+      "skill_id": "ecological-data-foundation",
+      "display_name": "Ecological Data Foundation",
+      "version": "1.0.0",
+      "domain": ["data cleaning", "occurrence records", "data validation", "QA", "Darwin Core"],
+      "trigger_keywords": [
+        "clean data", "validate records", "occurrence data", "duplicate removal",
+        "coordinate cleaning", "outlier detection", "data preparation",
+        "data ingestion", "merge datasets", "standardise fields",
+        "GBIF download", "Darwin Core", "data quality", "flagged records",
+        "taxonomic harmonisation", "data foundation"
+      ],
+      "min_inputs": {
+        "raw_occurrence_or_survey_data": "required",
+        "data_dictionary_or_protocol": "recommended",
+        "environmental_layers": "optional",
+        "existing_metadata_record": "optional"
+      },
+      "primary_outputs": [
+        "data_clean.csv",
+        "qa_report.md",
+        "schema.yaml",
+        "metadata.xml",
+        "flagged_records.csv"
+      ],
+      "depends_on_skills": [],
+      "called_by_workflows": [
+        "run-sdm-study",
+        "run-occupancy-analysis",
+        "assess-ecological-impact",
+        "analyze-community-structure",
+        "analyze-environmental-change",
+        "assess-ecosystem-services",
+        "run-multispecies-screening"
+      ],
+      "decision_points": {
+        "n_records_min_for_sdm": 30,
+        "action_if_duplicates_exceed_20pct": "investigate source bias before proceeding",
+        "action_if_coordinates_fail_cleaning": "flag and exclude; document in qa_report.md"
+      },
+      "skill_md_path": "skills/ecological-data-foundation/SKILL.md"
+    },
+    {
+      "skill_id": "ecological-impact-assessment",
+      "display_name": "Ecological Impact Assessment",
+      "version": "1.0.0",
+      "domain": ["BACI", "impact assessment", "fragmentation", "landscape ecology", "pressure index"],
+      "trigger_keywords": [
+        "BACI", "before after control impact", "impact assessment",
+        "disturbance effect", "land use change", "fragmentation",
+        "landscape metrics", "pressure index", "threat index",
+        "intervention effect", "management effectiveness",
+        "before after comparison", "control impact"
+      ],
+      "min_inputs": {
+        "indicator_time_series_csv": "required",
+        "disturbance_event_date": "required",
+        "land_cover_maps": "conditional",
+        "pressure_layers": "optional"
+      },
+      "primary_outputs": [
+        "baci_results.csv",
+        "fragmentation_metrics.csv",
+        "pressure_index.tif",
+        "impact_synthesis.md",
+        "impact_plots/"
+      ],
+      "depends_on_skills": [
+        "ecological-data-foundation",
+        "geoprocessing-for-ecology"
+      ],
+      "called_by_workflows": [
+        "assess-ecological-impact"
+      ],
+      "decision_points": {
+        "n_sites_min_per_group": 5,
+        "n_time_periods_min": 3,
+        "action_if_baci_ns": "compute post-hoc power; report effect size with CI",
+        "action_if_permdisp_significant": "report PERMDISP alongside PERMANOVA; discuss heterogeneity"
+      },
+      "skill_md_path": "skills/ecological-impact-assessment/SKILL.md"
+    },
+    {
+      "skill_id": "ecosystem-services-assessment",
+      "display_name": "Ecosystem Services Assessment",
+      "version": "1.0.0",
+      "domain": ["ecosystem services", "InVEST", "trade-offs", "land cover", "PES"],
+      "trigger_keywords": [
+        "ecosystem services", "ES assessment", "InVEST", "carbon stock",
+        "water yield", "soil erosion", "biodiversity service",
+        "trade-off analysis", "PES", "payments for ecosystem services",
+        "ES mapping", "ES valuation", "natural capital", "RUSLE",
+        "habitat quality", "pollination service"
+      ],
+      "min_inputs": {
+        "land_cover_map": "required",
+        "biophysical_data": "required",
+        "study_area_polygon": "required",
+        "socioeconomic_data": "optional"
+      },
+      "primary_outputs": [
+        "es_indicator_maps/",
+        "es_summary_table.csv",
+        "tradeoff_matrix.csv",
+        "tradeoff_plot.png",
+        "es_report.md"
+      ],
+      "depends_on_skills": [
+        "ecological-data-foundation",
+        "geoprocessing-for-ecology"
+      ],
+      "called_by_workflows": [
+        "assess-ecosystem-services"
+      ],
+      "decision_points": {
+        "land_cover_accuracy_min": 85,
+        "action_if_accuracy_below": "perform uncertainty analysis; include classification error in ES estimates",
+        "action_if_invest_nodata_exceeds_30pct": "check CRS and extent alignment before rerunning"
+      },
+      "skill_md_path": "skills/ecosystem-services-assessment/SKILL.md"
+    },
+    {
+      "skill_id": "environmental-time-series",
+      "display_name": "Environmental Time Series Analysis",
+      "version": "1.0.0",
+      "domain": ["time series", "trend detection", "BFAST", "remote sensing", "anomaly detection"],
+      "trigger_keywords": [
+        "time series", "trend analysis", "NDVI trend", "EVI", "LST",
+        "Mann-Kendall", "BFAST", "breakpoint", "structural change",
+        "anomaly detection", "seasonal decomposition", "recovery trajectory",
+        "regime shift", "temporal trend", "pixel-wise trend",
+        "Sen slope", "STL decomposition"
+      ],
+      "min_inputs": {
+        "time_indexed_variable": "required",
+        "time_series_frequency": "required",
+        "disturbance_event_date": "conditional",
+        "baseline_period": "recommended"
+      },
+      "primary_outputs": [
+        "trend_results.csv",
+        "seasonal_decomposition.png",
+        "breakpoints.csv",
+        "anomaly_series.csv",
+        "recovery_metrics.csv",
+        "timeseries_report.md"
+      ],
+      "depends_on_skills": [
+        "ecological-data-foundation",
+        "geoprocessing-for-ecology"
+      ],
+      "called_by_workflows": [
+        "analyze-environmental-change",
+        "build-fire-risk-map"
+      ],
+      "decision_points": {
+        "n_time_steps_min": 10,
+        "action_if_autocorrelation_detected": "apply pre-whitening before Mann-Kendall test",
+        "action_if_bfast_breakpoints_exceed_5": "increase h parameter; check for artefacts"
+      },
+      "skill_md_path": "skills/environmental-time-series/SKILL.md"
+    },
+    {
+      "skill_id": "geoprocessing-for-ecology",
+      "display_name": "Geoprocessing for Ecology",
+      "version": "1.0.0",
+      "domain": ["geoprocessing", "CRS", "raster", "vector", "spatial extraction", "remote sensing"],
+      "trigger_keywords": [
+        "reproject", "CRS", "coordinate reference system", "clip raster",
+        "mask raster", "spatial extraction", "extract values", "buffer",
+        "raster stack", "resample", "spatial join", "overlay",
+        "geoprocessing", "GeoTIFF", "shapefile", "GDAL",
+        "study area mask", "crop raster", "align rasters"
+      ],
+      "min_inputs": {
+        "occurrence_or_sample_points": "required",
+        "study_area_polygon": "required",
+        "environmental_rasters": "required",
+        "land_cover_layer": "optional"
+      },
+      "primary_outputs": [
+        "layers_reprojected/",
+        "predictors_stack.tif",
+        "points_with_env.csv",
+        "study_area_buffered.gpkg",
+        "spatial_qa_report.md"
+      ],
+      "depends_on_skills": [
+        "ecological-data-foundation"
+      ],
+      "called_by_workflows": [
+        "run-sdm-study",
+        "assess-ecological-impact",
+        "assess-ecosystem-services",
+        "build-fire-risk-map",
+        "run-multispecies-screening"
+      ],
+      "decision_points": {
+        "action_if_crs_mismatch": "reproject all layers to common CRS before any spatial operation",
+        "action_if_resolution_mismatch": "resample to coarsest resolution; document choice in decision_log.md",
+        "action_if_extent_mismatch": "clip all layers to study area extent"
+      },
+      "skill_md_path": "skills/geoprocessing-for-ecology/SKILL.md"
+    },
+    {
+      "skill_id": "model-validation-and-uncertainty",
+      "display_name": "Model Validation and Uncertainty",
+      "version": "1.0.0",
+      "domain": ["model validation", "AUC", "calibration", "uncertainty", "extrapolation risk", "MOP"],
+      "trigger_keywords": [
+        "model performance", "AUC", "ROC curve", "model validation",
+        "calibration curve", "uncertainty", "extrapolation risk",
+        "MOP analysis", "MESS", "ExDet", "overfitting",
+        "cross-validation performance", "TSS", "sensitivity", "specificity",
+        "ensemble uncertainty", "prediction interval", "bootstrap uncertainty"
+      ],
+      "min_inputs": {
+        "fitted_model_object": "required",
+        "validation_dataset": "required",
+        "training_cv_predictions": "required",
+        "prediction_surface": "conditional"
+      },
+      "primary_outputs": [
+        "performance_metrics.csv",
+        "calibration_plot.png",
+        "roc_curve.png",
+        "sensitivity_report.md",
+        "uncertainty_map.tif",
+        "validation_report.md"
+      ],
+      "depends_on_skills": [
+        "predictive-modeling-best-practices"
+      ],
+      "called_by_workflows": [
+        "run-sdm-study",
+        "run-multispecies-screening",
+        "assess-ecosystem-services"
+      ],
+      "decision_points": {
+        "auc_min_acceptable": 0.70,
+        "tss_min_acceptable": 0.40,
+        "mop_zero_pct_warning_threshold": 30,
+        "action_if_auc_below": "revise predictors; expand calibration grid; report as unreliable",
+        "action_if_mop_zero_exceeds_threshold": "restrict projection extent; add explicit caveats"
+      },
+      "skill_md_path": "skills/model-validation-and-uncertainty/SKILL.md"
+    },
+    {
+      "skill_id": "occupancy-and-detection",
+      "display_name": "Occupancy and Detection Modeling",
+      "version": "1.0.0",
+      "domain": ["occupancy", "detection probability", "unmarked", "monitoring", "imperfect detection"],
+      "trigger_keywords": [
+        "occupancy model", "detection probability", "imperfect detection",
+        "occupancy estimation", "unmarked", "MacKenzie", "psi",
+        "detection history", "repeated visits", "site occupancy",
+        "dynamic occupancy", "colonisation", "extinction probability",
+        "goodness of fit", "MacKenzie-Bailey", "c-hat"
+      ],
+      "min_inputs": {
+        "detection_history_matrix": "required",
+        "site_covariates_csv": "recommended",
+        "observation_covariates_csv": "recommended",
+        "n_seasons": "conditional"
+      },
+      "primary_outputs": [
+        "occupancy_estimates.csv",
+        "detection_estimates.csv",
+        "model_selection_table.csv",
+        "covariate_effects.csv",
+        "gof_report.md",
+        "occupancy_map.tif"
+      ],
+      "depends_on_skills": [
+        "ecological-data-foundation"
+      ],
+      "called_by_workflows": [
+        "run-occupancy-analysis"
+      ],
+      "decision_points": {
+        "n_sites_min": 15,
+        "n_sites_recommended": 30,
+        "n_visits_min": 3,
+        "c_hat_threshold": 1.5,
+        "action_if_gof_fails": "add detection covariate or relax closure assumption",
+        "action_if_c_hat_above_threshold": "use QAICc for model selection; report overdispersion"
+      },
+      "skill_md_path": "skills/occupancy-and-detection/SKILL.md"
+    },
+    {
+      "skill_id": "predictive-modeling-best-practices",
+      "display_name": "Predictive Modeling Best Practices",
+      "version": "1.0.0",
+      "domain": ["predictive modeling", "collinearity", "cross-validation", "hyperparameter tuning", "data leakage"],
+      "trigger_keywords": [
+        "collinearity", "VIF", "predictor selection", "feature selection",
+        "cross-validation strategy", "spatial CV", "block CV",
+        "hyperparameter tuning", "overfitting", "data leakage",
+        "sampling bias", "background points", "pseudo-absence",
+        "model design", "predictor reduction", "ENMeval tuning",
+        "regularisation", "spatial autocorrelation"
+      ],
+      "min_inputs": {
+        "feature_matrix_csv": "required",
+        "target_variable": "required",
+        "spatial_coordinates": "recommended",
+        "candidate_model_list": "optional"
+      },
+      "primary_outputs": [
+        "cv_strategy.md",
+        "collinearity_report.csv",
+        "selected_predictors.txt",
+        "tuning_results.csv",
+        "leakage_audit.md",
+        "modeling_plan.md"
+      ],
+      "depends_on_skills": [
+        "ecological-data-foundation",
+        "geoprocessing-for-ecology"
+      ],
+      "called_by_workflows": [
+        "run-sdm-study",
+        "run-multispecies-screening"
+      ],
+      "decision_points": {
+        "vif_max_acceptable": 10,
+        "pearson_correlation_max": 0.70,
+        "action_if_vif_above_threshold": "remove predictor with highest VIF iteratively until all below threshold",
+        "action_if_spatial_autocorrelation": "use spatial block CV instead of random CV"
+      },
+      "skill_md_path": "skills/predictive-modeling-best-practices/SKILL.md"
+    },
+    {
+      "skill_id": "reproducible-ecology-pipeline",
+      "display_name": "Reproducible Ecology Pipeline",
+      "version": "1.0.0",
+      "domain": ["reproducibility", "provenance", "audit trail", "renv", "targets", "DVC"],
+      "trigger_keywords": [
+        "reproducibility", "audit trail", "data provenance", "decision log",
+        "file manifest", "session info", "software environment",
+        "renv", "targets", "DVC", "MLflow", "parameter manifest",
+        "reproducible workflow", "version control", "project initialisation",
+        "checksums", "pipeline logging"
+      ],
+      "min_inputs": {
+        "project_directory": "required",
+        "analysis_scripts": "recommended",
+        "model_parameter_files": "recommended",
+        "qa_reports_from_upstream_skills": "recommended"
+      },
+      "primary_outputs": [
+        "reproducibility_checklist.md",
+        "parameter_manifest.yaml",
+        "decision_log.md",
+        "software_environment.txt",
+        "data_provenance.md",
+        "file_manifest.md"
+      ],
+      "depends_on_skills": [],
+      "called_by_workflows": [
+        "run-sdm-study",
+        "run-occupancy-analysis",
+        "assess-ecological-impact",
+        "analyze-community-structure",
+        "analyze-environmental-change",
+        "assess-ecosystem-services",
+        "produce-technical-report"
+      ],
+      "decision_points": {
+        "action_if_not_reproducible_from_params": "complete parameter manifest before finalising any report",
+        "action_if_seed_sensitive_results": "document random seed explicitly in parameter_manifest.yaml"
+      },
+      "skill_md_path": "skills/reproducible-ecology-pipeline/SKILL.md"
+    },
+    {
+      "skill_id": "species-distribution-modeling",
+      "display_name": "Species Distribution Modeling",
+      "version": "1.0.0",
+      "domain": ["SDM", "ENM", "niche modeling", "MaxEnt", "ensemble modeling"],
+      "trigger_keywords": [
+        "distribution model", "habitat suitability", "MaxEnt", "niche model",
+        "potential distribution", "range map", "suitable area",
+        "ecological niche", "ENM", "biomod2", "ensemble SDM",
+        "climate projection", "invasion risk", "range shift",
+        "suitability map", "calibration area", "occurrence modeling"
+      ],
+      "min_inputs": {
+        "occurrences_csv": "required",
+        "predictor_stack_tif": "required",
+        "study_area": "required",
+        "future_scenarios": "optional"
+      },
+      "primary_outputs": [
+        "suitability_current.tif",
+        "suitability_binary.tif",
+        "suitability_scenarios/",
+        "ensemble_sd.tif",
+        "variable_importance.csv",
+        "response_curves.png",
+        "sdm_report.md"
+      ],
+      "depends_on_skills": [
+        "ecological-data-foundation",
+        "geoprocessing-for-ecology",
+        "predictive-modeling-best-practices"
+      ],
+      "called_by_workflows": [
+        "run-sdm-study",
+        "run-multispecies-screening"
+      ],
+      "decision_points": {
+        "n_occurrences_min": 10,
+        "n_occurrences_recommended": 30,
+        "auc_min_acceptable": 0.70,
+        "action_if_n_below_min": "do not fit model; use literature-based range map with explicit caveat",
+        "action_if_auc_below": "revise predictors and expand calibration grid"
+      },
+      "skill_md_path": "skills/species-distribution-modeling/SKILL.md"
+    }
+  ],
+  "_metadata": {
+    "repository": "ecological-agent-skills",
+    "index_version": "1.0.0",
+    "last_updated": "2026-03-01",
+    "total_skills": 12,
+    "total_workflows": 9
+  }
+}

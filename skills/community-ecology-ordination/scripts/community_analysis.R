@@ -1,4 +1,4 @@
-# community_analysis.R
+# Usage: Rscript community_analysis.R <species_site_matrix.csv> <metadata.csv> <output_dir> [method]
 # NMDS ordination, diversity metrics, PERMANOVA
 # Usage: Rscript community_analysis.R <species_matrix_csv> <metadata_csv> <output_dir>
 # Requires: vegan, ggplot2, dplyr

@@ -1,3 +1,7 @@
+---
+skill_version: 1.0.0
+---
+
 # Skill: model-validation-and-uncertainty
 
 **Domain:** Metrics · Calibration · Sensitivity · External validation · Uncertainty  

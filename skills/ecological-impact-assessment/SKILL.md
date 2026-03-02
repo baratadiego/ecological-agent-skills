@@ -1,3 +1,7 @@
+---
+skill_version: 1.0.0
+---
+
 # Skill: ecological-impact-assessment
 
 **Domain:** BACI · Before/After · Fragmentation · Pressure · Impact synthesis  

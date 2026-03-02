@@ -1,3 +1,7 @@
+---
+skill_version: 1.0.0
+---
+
 # Skill: occupancy-and-detection
 
 **Domain:** Occupancy models · Imperfect detection · Replicate surveys  

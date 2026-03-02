@@ -1,4 +1,4 @@
-# glm_pipeline.R
+# Usage: Rscript glm_pipeline.R <data.csv> <response_col> <predictor_cols> <output_dir> [family]
 # Fit candidate GLMs, check assumptions, model selection
 # Usage: source this script or adapt interactively
 # Requires: glmmTMB, DHARMa, MuMIn, emmeans, dplyr

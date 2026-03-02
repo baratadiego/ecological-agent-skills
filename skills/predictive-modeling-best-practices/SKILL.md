@@ -1,3 +1,7 @@
+---
+skill_version: 1.0.0
+---
+
 # Skill: predictive-modeling-best-practices
 
 **Domain:** CV · Tuning · Leakage · Collinearity · Overfitting  

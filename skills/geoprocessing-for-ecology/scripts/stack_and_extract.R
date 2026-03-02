@@ -1,4 +1,4 @@
-# stack_and_extract.R
+# Usage: Rscript stack_and_extract.R <raster_dir> <points.csv> <study_area.shp> <output_dir>
 # Clip rasters to study area and extract values at points
 # Usage: Rscript stack_and_extract.R <raster_dir> <points_csv> <studyarea_shp> <output_dir>
 # Requires: terra, sf

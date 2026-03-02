@@ -1,4 +1,4 @@
-# occupancy_analysis.R
+# Usage: Rscript occupancy_analysis.R <detection_history.csv> <site_covariates.csv> <output_dir>
 # Single-season occupancy analysis with model selection
 # Usage: Rscript occupancy_analysis.R <detection_history_csv> <site_cov_csv> <output_dir>
 # Requires: unmarked, dplyr

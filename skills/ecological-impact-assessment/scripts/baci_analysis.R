@@ -1,4 +1,4 @@
-# baci_analysis.R
+# Usage: Rscript baci_analysis.R <baci_data.csv> <output_dir> [response_col] [random_effects]
 # BACI mixed-effects model for ecological impact assessment
 # Usage: Rscript baci_analysis.R <data_csv> <response_var> <output_dir>
 # Requires: glmmTMB, emmeans, ggplot2, dplyr

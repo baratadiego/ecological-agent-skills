@@ -1,3 +1,7 @@
+---
+skill_version: 1.0.0
+---
+
 # Skill: reproducible-ecology-pipeline
 
 **Domain:** Provenance · Parameter logging · Decision audit · Checklist · Reporting  

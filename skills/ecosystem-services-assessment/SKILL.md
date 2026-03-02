@@ -1,3 +1,7 @@
+---
+skill_version: 1.0.0
+---
+
 # Skill: ecosystem-services-assessment
 
 **Domain:** ES indicators · Provisioning · Regulating · Cultural · Trade-offs  

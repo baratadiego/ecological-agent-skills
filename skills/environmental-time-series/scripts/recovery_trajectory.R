@@ -1,4 +1,4 @@
-# recovery_trajectory.R
+# Usage: Rscript recovery_trajectory.R <timeseries.csv> <disturbance_date> <output_dir>
 # Estimate post-disturbance vegetation recovery trajectory
 # Usage: Rscript recovery_trajectory.R <timeseries_csv> <disturbance_date> <output_dir>
 # Requires: dplyr, ggplot2, zoo, broom, lubridate

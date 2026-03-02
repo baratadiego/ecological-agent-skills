@@ -1,3 +1,7 @@
+---
+skill_version: 1.0.0
+---
+
 # Skill: community-ecology-ordination
 
 **Domain:** NMDS · PCA · PCoA · Diversity · Clustering · Composition  

@@ -1,3 +1,7 @@
+---
+skill_version: 1.0.0
+---
+
 # Skill: environmental-time-series
 
 **Domain:** Trend · Seasonality · Breakpoints · Anomalies · Recovery  

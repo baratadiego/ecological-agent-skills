@@ -5,6 +5,49 @@ Format: [version] — date — description
 
 ---
 
+## [1.2.0] — 2026-03-01 — Agent navigation infrastructure (Phase 1)
+
+### Added — Agent infrastructure
+
+- **`AGENT_CONTEXT.md`** (root) — Primary entry-point document for AI agents.
+  Written for LLM consumption. Contains: canonical skill invocation order by
+  project type, disambiguation rules for overlapping skills, minimum sample-size
+  table, scaling rules (simple → medium → complex projects), file and output
+  naming conventions, and decision_log.md format.
+
+- **`skills/SKILL_INDEX.json`** — Machine-readable index of all 12 skills.
+  Each entry includes: `skill_id`, `display_name`, `version`, `domain`,
+  `trigger_keywords`, `min_inputs`, `primary_outputs`, `depends_on_skills`,
+  `called_by_workflows`, `decision_points`, and `skill_md_path`.
+  Validated with `python -m json.tool`. Includes `_metadata` block.
+
+- **`templates/SKILL_TEMPLATE.md`** — Blank template for new skills.
+  Contains all mandatory SKILL.md sections with HTML comment guidance,
+  `[OBRIGATÓRIO]` placeholders, and a pre-submission validation checklist.
+
+- **`tests/ci_check.sh`** — Bash CI script for repository structural integrity.
+  Checks: required root files, skill directory completeness, workflow presence,
+  file size (no empty files), R/Python script quality standards,
+  SKILL.md section coverage, SKILL_INDEX.json consistency, test coverage.
+  Exit code 0 = all pass, 1 = any failure. Prints PASS/FAIL per check.
+
+### Updated — All 12 SKILL.md files
+
+- Added `skill_version: 1.0.0` YAML front-matter header to all 12 skill files:
+  `biostatistics-workbench`, `community-ecology-ordination`,
+  `ecological-data-foundation`, `ecological-impact-assessment`,
+  `ecosystem-services-assessment`, `environmental-time-series`,
+  `geoprocessing-for-ecology`, `model-validation-and-uncertainty`,
+  `occupancy-and-detection`, `predictive-modeling-best-practices`,
+  `reproducible-ecology-pipeline`, `species-distribution-modeling`.
+
+### Updated — README.md
+
+- Added **"For AI Agents"** section with links to `AGENT_CONTEXT.md`
+  and `skills/SKILL_INDEX.json`.
+
+---
+
 ## [1.1.0] — 2026-03-01 — Project rename + SDM expansion + Decision Points
 
 ### Breaking change

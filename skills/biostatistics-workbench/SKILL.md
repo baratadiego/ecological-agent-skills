@@ -1,3 +1,7 @@
+---
+skill_version: 1.0.0
+---
+
 # Skill: biostatistics-workbench
 
 **Domain:** Hypothesis testing · GLM/GLMM · Assumptions · Effect sizes · CIs  

@@ -1,4 +1,4 @@
-# trend_analysis.R
+# Usage: Rscript trend_analysis.R <timeseries.csv> <output_dir> [frequency] [baseline_end]
 # Mann-Kendall trend + Sen's slope + BFAST breakpoints
 # Usage: Rscript trend_analysis.R <timeseries_csv> <output_dir> [frequency]
 # Requires: trend, bfast, zoo, ggplot2

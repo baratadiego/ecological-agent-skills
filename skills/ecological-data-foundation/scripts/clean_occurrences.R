@@ -1,4 +1,4 @@
-# clean_occurrences.R
+# Usage: Rscript clean_occurrences.R <raw_occurrences.csv> <output_dir> [country_code]
 # Standard occurrence cleaning pipeline
 # Usage: Rscript clean_occurrences.R <input_csv> <output_dir>
 # Requires: dplyr, readr, CoordinateCleaner, taxize, janitor

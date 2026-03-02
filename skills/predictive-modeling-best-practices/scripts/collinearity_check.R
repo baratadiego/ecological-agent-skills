@@ -1,4 +1,4 @@
-# collinearity_check.R
+# Usage: Rscript collinearity_check.R <predictors.csv> <output_dir> [vif_threshold] [cor_threshold]
 # Assess and reduce predictor collinearity
 # Usage: Rscript collinearity_check.R <env_matrix_csv> <output_dir> [vif_threshold]
 # Requires: usdm, corrplot, dplyr

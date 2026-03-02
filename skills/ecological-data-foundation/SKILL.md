@@ -1,3 +1,7 @@
+---
+skill_version: 1.0.0
+---
+
 # Skill: ecological-data-foundation
 
 **Domain:** Data ingestion · QA · Schema · Metadata  

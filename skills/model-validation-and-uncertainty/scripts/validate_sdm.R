@@ -1,4 +1,4 @@
-# validate_sdm.R
+# Usage: Rscript validate_sdm.R <model.rds> <test_data.csv> <output_dir> [threshold_method]
 # Compute AUC, TSS, Boyce index and calibration for SDM predictions
 # Usage: Rscript validate_sdm.R <predictions_csv> <output_dir>
 # Requires: PresenceAbsence, ecospat, dplyr, ggplot2

@@ -1,3 +1,7 @@
+---
+skill_version: 1.0.0
+---
+
 # Skill: species-distribution-modeling
 
 **Domain:** SDM · ENM · MaxEnt · Ensemble · Projection  

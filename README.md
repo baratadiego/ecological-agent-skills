@@ -105,6 +105,24 @@ Predictors: WorldClim v2.1 + MapBiomas land cover
 
 ---
 
+## For AI Agents
+
+If you are an AI agent operating in this repository, **read these two files first**:
+
+| File | Purpose |
+|---|---|
+| [`AGENT_CONTEXT.md`](AGENT_CONTEXT.md) | Canonical rules for skill invocation, disambiguation, minimum sample sizes, project scaling, and file conventions |
+| [`skills/SKILL_INDEX.json`](skills/SKILL_INDEX.json) | Machine-readable index of all skills with trigger keywords, required inputs, outputs, dependencies, and decision thresholds |
+
+**Quick start for agents:**
+1. Read `AGENT_CONTEXT.md` in full before any task.
+2. Search `skills/SKILL_INDEX.json` by `trigger_keywords` to select the correct skill.
+3. Read the full `SKILL.md` of the selected skill before executing any step.
+4. Check `min_inputs` and `decision_points` before running scripts.
+5. Write decisions to `decision_log.md` after each skill completes.
+
+---
+
 ## Implementation Roadmap
 
 **Phase 1 (foundation):** `ecological-data-foundation`, `geoprocessing-for-ecology`, `biostatistics-workbench`, `predictive-modeling-best-practices`, `reproducible-ecology-pipeline`

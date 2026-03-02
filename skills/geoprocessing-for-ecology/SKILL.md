@@ -1,3 +1,7 @@
+---
+skill_version: 1.0.0
+---
+
 # Skill: geoprocessing-for-ecology
 
 **Domain:** Spatial analysis · CRS · Raster · Vector · Extraction  

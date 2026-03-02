@@ -1,4 +1,4 @@
-# tradeoff_analysis.R
+# Usage: Rscript tradeoff_analysis.R <es_summary_table.csv> <output_dir>
 # ES trade-off and synergy analysis across pixels or land cover units
 # Usage: Rscript tradeoff_analysis.R <es_summary_csv> <output_dir>
 # Requires: dplyr, ggplot2, corrplot, tidyr

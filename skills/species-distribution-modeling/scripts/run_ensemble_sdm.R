@@ -1,4 +1,4 @@
-# run_ensemble_sdm.R
+# Usage: Rscript run_ensemble_sdm.R <occurrences.csv> <predictors_stack.tif> <study_area.shp> <output_dir>
 # Fit MaxEnt + BRT + RF ensemble SDM
 # Usage: Rscript run_ensemble_sdm.R <params_yaml> <output_dir>
 # Requires: terra, sf, maxnet, gbm, randomForest, dismo, blockCV, yaml
