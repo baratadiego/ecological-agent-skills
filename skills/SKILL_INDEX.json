@@ -4,12 +4,30 @@
       "skill_id": "biostatistics-workbench",
       "display_name": "Biostatistics Workbench",
       "version": "1.0.0",
-      "domain": ["statistics", "GLM", "GLMM", "hypothesis testing", "model selection"],
+      "domain": [
+        "statistics",
+        "GLM",
+        "GLMM",
+        "hypothesis testing",
+        "model selection"
+      ],
       "trigger_keywords": [
-        "statistical test", "GLM", "GLMM", "mixed model", "linear model",
-        "effect size", "confidence interval", "AIC", "model selection",
-        "normality test", "assumption check", "regression", "ANOVA",
-        "p-value", "overdispersion", "residual diagnostics"
+        "statistical test",
+        "GLM",
+        "GLMM",
+        "mixed model",
+        "linear model",
+        "effect size",
+        "confidence interval",
+        "AIC",
+        "model selection",
+        "normality test",
+        "assumption check",
+        "regression",
+        "ANOVA",
+        "p-value",
+        "overdispersion",
+        "residual diagnostics"
       ],
       "min_inputs": {
         "response_variable": "required",
@@ -44,12 +62,29 @@
       "skill_id": "community-ecology-ordination",
       "display_name": "Community Ecology Ordination",
       "version": "1.0.0",
-      "domain": ["community ecology", "ordination", "multivariate", "diversity", "beta diversity"],
+      "domain": [
+        "community ecology",
+        "ordination",
+        "multivariate",
+        "diversity",
+        "beta diversity"
+      ],
       "trigger_keywords": [
-        "species composition", "community structure", "NMDS", "PCA ordination",
-        "PERMANOVA", "beta diversity", "alpha diversity", "species richness",
-        "Bray-Curtis", "assemblage", "species matrix", "diversity index",
-        "indicator species", "cluster analysis", "dissimilarity"
+        "species composition",
+        "community structure",
+        "NMDS",
+        "PCA ordination",
+        "PERMANOVA",
+        "beta diversity",
+        "alpha diversity",
+        "species richness",
+        "Bray-Curtis",
+        "assemblage",
+        "species matrix",
+        "diversity index",
+        "indicator species",
+        "cluster analysis",
+        "dissimilarity"
       ],
       "min_inputs": {
         "species_site_matrix_csv": "required",
@@ -73,7 +108,7 @@
       "decision_points": {
         "n_sites_min": 5,
         "n_sites_recommended": 10,
-        "nmds_stress_max_acceptable": 0.20,
+        "nmds_stress_max_acceptable": 0.2,
         "action_if_stress_above_threshold": "increase NMDS dimensions to 3 or reduce species set",
         "action_if_permanova_r2_low": "report effect size and discuss ecological significance"
       },
@@ -83,13 +118,30 @@
       "skill_id": "ecological-data-foundation",
       "display_name": "Ecological Data Foundation",
       "version": "1.0.0",
-      "domain": ["data cleaning", "occurrence records", "data validation", "QA", "Darwin Core"],
+      "domain": [
+        "data cleaning",
+        "occurrence records",
+        "data validation",
+        "QA",
+        "Darwin Core"
+      ],
       "trigger_keywords": [
-        "clean data", "validate records", "occurrence data", "duplicate removal",
-        "coordinate cleaning", "outlier detection", "data preparation",
-        "data ingestion", "merge datasets", "standardise fields",
-        "GBIF download", "Darwin Core", "data quality", "flagged records",
-        "taxonomic harmonisation", "data foundation"
+        "clean data",
+        "validate records",
+        "occurrence data",
+        "duplicate removal",
+        "coordinate cleaning",
+        "outlier detection",
+        "data preparation",
+        "data ingestion",
+        "merge datasets",
+        "standardise fields",
+        "GBIF download",
+        "Darwin Core",
+        "data quality",
+        "flagged records",
+        "taxonomic harmonisation",
+        "data foundation"
       ],
       "min_inputs": {
         "raw_occurrence_or_survey_data": "required",
@@ -125,13 +177,27 @@
       "skill_id": "ecological-impact-assessment",
       "display_name": "Ecological Impact Assessment",
       "version": "1.0.0",
-      "domain": ["BACI", "impact assessment", "fragmentation", "landscape ecology", "pressure index"],
+      "domain": [
+        "BACI",
+        "impact assessment",
+        "fragmentation",
+        "landscape ecology",
+        "pressure index"
+      ],
       "trigger_keywords": [
-        "BACI", "before after control impact", "impact assessment",
-        "disturbance effect", "land use change", "fragmentation",
-        "landscape metrics", "pressure index", "threat index",
-        "intervention effect", "management effectiveness",
-        "before after comparison", "control impact"
+        "BACI",
+        "before after control impact",
+        "impact assessment",
+        "disturbance effect",
+        "land use change",
+        "fragmentation",
+        "landscape metrics",
+        "pressure index",
+        "threat index",
+        "intervention effect",
+        "management effectiveness",
+        "before after comparison",
+        "control impact"
       ],
       "min_inputs": {
         "indicator_time_series_csv": "required",
@@ -165,13 +231,30 @@
       "skill_id": "ecosystem-services-assessment",
       "display_name": "Ecosystem Services Assessment",
       "version": "1.0.0",
-      "domain": ["ecosystem services", "InVEST", "trade-offs", "land cover", "PES"],
+      "domain": [
+        "ecosystem services",
+        "InVEST",
+        "trade-offs",
+        "land cover",
+        "PES"
+      ],
       "trigger_keywords": [
-        "ecosystem services", "ES assessment", "InVEST", "carbon stock",
-        "water yield", "soil erosion", "biodiversity service",
-        "trade-off analysis", "PES", "payments for ecosystem services",
-        "ES mapping", "ES valuation", "natural capital", "RUSLE",
-        "habitat quality", "pollination service"
+        "ecosystem services",
+        "ES assessment",
+        "InVEST",
+        "carbon stock",
+        "water yield",
+        "soil erosion",
+        "biodiversity service",
+        "trade-off analysis",
+        "PES",
+        "payments for ecosystem services",
+        "ES mapping",
+        "ES valuation",
+        "natural capital",
+        "RUSLE",
+        "habitat quality",
+        "pollination service"
       ],
       "min_inputs": {
         "land_cover_map": "required",
@@ -204,13 +287,31 @@
       "skill_id": "environmental-time-series",
       "display_name": "Environmental Time Series Analysis",
       "version": "1.0.0",
-      "domain": ["time series", "trend detection", "BFAST", "remote sensing", "anomaly detection"],
+      "domain": [
+        "time series",
+        "trend detection",
+        "BFAST",
+        "remote sensing",
+        "anomaly detection"
+      ],
       "trigger_keywords": [
-        "time series", "trend analysis", "NDVI trend", "EVI", "LST",
-        "Mann-Kendall", "BFAST", "breakpoint", "structural change",
-        "anomaly detection", "seasonal decomposition", "recovery trajectory",
-        "regime shift", "temporal trend", "pixel-wise trend",
-        "Sen slope", "STL decomposition"
+        "time series",
+        "trend analysis",
+        "NDVI trend",
+        "EVI",
+        "LST",
+        "Mann-Kendall",
+        "BFAST",
+        "breakpoint",
+        "structural change",
+        "anomaly detection",
+        "seasonal decomposition",
+        "recovery trajectory",
+        "regime shift",
+        "temporal trend",
+        "pixel-wise trend",
+        "Sen slope",
+        "STL decomposition"
       ],
       "min_inputs": {
         "time_indexed_variable": "required",
@@ -245,13 +346,34 @@
       "skill_id": "geoprocessing-for-ecology",
       "display_name": "Geoprocessing for Ecology",
       "version": "1.0.0",
-      "domain": ["geoprocessing", "CRS", "raster", "vector", "spatial extraction", "remote sensing"],
+      "domain": [
+        "geoprocessing",
+        "CRS",
+        "raster",
+        "vector",
+        "spatial extraction",
+        "remote sensing"
+      ],
       "trigger_keywords": [
-        "reproject", "CRS", "coordinate reference system", "clip raster",
-        "mask raster", "spatial extraction", "extract values", "buffer",
-        "raster stack", "resample", "spatial join", "overlay",
-        "geoprocessing", "GeoTIFF", "shapefile", "GDAL",
-        "study area mask", "crop raster", "align rasters"
+        "reproject",
+        "CRS",
+        "coordinate reference system",
+        "clip raster",
+        "mask raster",
+        "spatial extraction",
+        "extract values",
+        "buffer",
+        "raster stack",
+        "resample",
+        "spatial join",
+        "overlay",
+        "geoprocessing",
+        "GeoTIFF",
+        "shapefile",
+        "GDAL",
+        "study area mask",
+        "crop raster",
+        "align rasters"
       ],
       "min_inputs": {
         "occurrence_or_sample_points": "required",
@@ -287,13 +409,33 @@
       "skill_id": "model-validation-and-uncertainty",
       "display_name": "Model Validation and Uncertainty",
       "version": "1.0.0",
-      "domain": ["model validation", "AUC", "calibration", "uncertainty", "extrapolation risk", "MOP"],
+      "domain": [
+        "model validation",
+        "AUC",
+        "calibration",
+        "uncertainty",
+        "extrapolation risk",
+        "MOP"
+      ],
       "trigger_keywords": [
-        "model performance", "AUC", "ROC curve", "model validation",
-        "calibration curve", "uncertainty", "extrapolation risk",
-        "MOP analysis", "MESS", "ExDet", "overfitting",
-        "cross-validation performance", "TSS", "sensitivity", "specificity",
-        "ensemble uncertainty", "prediction interval", "bootstrap uncertainty"
+        "model performance",
+        "AUC",
+        "ROC curve",
+        "model validation",
+        "calibration curve",
+        "uncertainty",
+        "extrapolation risk",
+        "MOP analysis",
+        "MESS",
+        "ExDet",
+        "overfitting",
+        "cross-validation performance",
+        "TSS",
+        "sensitivity",
+        "specificity",
+        "ensemble uncertainty",
+        "prediction interval",
+        "bootstrap uncertainty"
       ],
       "min_inputs": {
         "fitted_model_object": "required",
@@ -318,8 +460,8 @@
         "assess-ecosystem-services"
       ],
       "decision_points": {
-        "auc_min_acceptable": 0.70,
-        "tss_min_acceptable": 0.40,
+        "auc_min_acceptable": 0.7,
+        "tss_min_acceptable": 0.4,
         "mop_zero_pct_warning_threshold": 30,
         "action_if_auc_below": "revise predictors; expand calibration grid; report as unreliable",
         "action_if_mop_zero_exceeds_threshold": "restrict projection extent; add explicit caveats"
@@ -330,13 +472,30 @@
       "skill_id": "occupancy-and-detection",
       "display_name": "Occupancy and Detection Modeling",
       "version": "1.0.0",
-      "domain": ["occupancy", "detection probability", "unmarked", "monitoring", "imperfect detection"],
+      "domain": [
+        "occupancy",
+        "detection probability",
+        "unmarked",
+        "monitoring",
+        "imperfect detection"
+      ],
       "trigger_keywords": [
-        "occupancy model", "detection probability", "imperfect detection",
-        "occupancy estimation", "unmarked", "MacKenzie", "psi",
-        "detection history", "repeated visits", "site occupancy",
-        "dynamic occupancy", "colonisation", "extinction probability",
-        "goodness of fit", "MacKenzie-Bailey", "c-hat"
+        "occupancy model",
+        "detection probability",
+        "imperfect detection",
+        "occupancy estimation",
+        "unmarked",
+        "MacKenzie",
+        "psi",
+        "detection history",
+        "repeated visits",
+        "site occupancy",
+        "dynamic occupancy",
+        "colonisation",
+        "extinction probability",
+        "goodness of fit",
+        "MacKenzie-Bailey",
+        "c-hat"
       ],
       "min_inputs": {
         "detection_history_matrix": "required",
@@ -372,14 +531,32 @@
       "skill_id": "predictive-modeling-best-practices",
       "display_name": "Predictive Modeling Best Practices",
       "version": "1.0.0",
-      "domain": ["predictive modeling", "collinearity", "cross-validation", "hyperparameter tuning", "data leakage"],
+      "domain": [
+        "predictive modeling",
+        "collinearity",
+        "cross-validation",
+        "hyperparameter tuning",
+        "data leakage"
+      ],
       "trigger_keywords": [
-        "collinearity", "VIF", "predictor selection", "feature selection",
-        "cross-validation strategy", "spatial CV", "block CV",
-        "hyperparameter tuning", "overfitting", "data leakage",
-        "sampling bias", "background points", "pseudo-absence",
-        "model design", "predictor reduction", "ENMeval tuning",
-        "regularisation", "spatial autocorrelation"
+        "collinearity",
+        "VIF",
+        "predictor selection",
+        "feature selection",
+        "cross-validation strategy",
+        "spatial CV",
+        "block CV",
+        "hyperparameter tuning",
+        "overfitting",
+        "data leakage",
+        "sampling bias",
+        "background points",
+        "pseudo-absence",
+        "model design",
+        "predictor reduction",
+        "ENMeval tuning",
+        "regularisation",
+        "spatial autocorrelation"
       ],
       "min_inputs": {
         "feature_matrix_csv": "required",
@@ -405,7 +582,7 @@
       ],
       "decision_points": {
         "vif_max_acceptable": 10,
-        "pearson_correlation_max": 0.70,
+        "pearson_correlation_max": 0.7,
         "action_if_vif_above_threshold": "remove predictor with highest VIF iteratively until all below threshold",
         "action_if_spatial_autocorrelation": "use spatial block CV instead of random CV"
       },
@@ -415,13 +592,32 @@
       "skill_id": "reproducible-ecology-pipeline",
       "display_name": "Reproducible Ecology Pipeline",
       "version": "1.0.0",
-      "domain": ["reproducibility", "provenance", "audit trail", "renv", "targets", "DVC"],
+      "domain": [
+        "reproducibility",
+        "provenance",
+        "audit trail",
+        "renv",
+        "targets",
+        "DVC"
+      ],
       "trigger_keywords": [
-        "reproducibility", "audit trail", "data provenance", "decision log",
-        "file manifest", "session info", "software environment",
-        "renv", "targets", "DVC", "MLflow", "parameter manifest",
-        "reproducible workflow", "version control", "project initialisation",
-        "checksums", "pipeline logging"
+        "reproducibility",
+        "audit trail",
+        "data provenance",
+        "decision log",
+        "file manifest",
+        "session info",
+        "software environment",
+        "renv",
+        "targets",
+        "DVC",
+        "MLflow",
+        "parameter manifest",
+        "reproducible workflow",
+        "version control",
+        "project initialisation",
+        "checksums",
+        "pipeline logging"
       ],
       "min_inputs": {
         "project_directory": "required",
@@ -457,13 +653,31 @@
       "skill_id": "species-distribution-modeling",
       "display_name": "Species Distribution Modeling",
       "version": "1.0.0",
-      "domain": ["SDM", "ENM", "niche modeling", "MaxEnt", "ensemble modeling"],
+      "domain": [
+        "SDM",
+        "ENM",
+        "niche modeling",
+        "MaxEnt",
+        "ensemble modeling"
+      ],
       "trigger_keywords": [
-        "distribution model", "habitat suitability", "MaxEnt", "niche model",
-        "potential distribution", "range map", "suitable area",
-        "ecological niche", "ENM", "biomod2", "ensemble SDM",
-        "climate projection", "invasion risk", "range shift",
-        "suitability map", "calibration area", "occurrence modeling"
+        "distribution model",
+        "habitat suitability",
+        "MaxEnt",
+        "niche model",
+        "potential distribution",
+        "range map",
+        "suitable area",
+        "ecological niche",
+        "ENM",
+        "biomod2",
+        "ensemble SDM",
+        "climate projection",
+        "invasion risk",
+        "range shift",
+        "suitability map",
+        "calibration area",
+        "occurrence modeling"
       ],
       "min_inputs": {
         "occurrences_csv": "required",
@@ -492,11 +706,289 @@
       "decision_points": {
         "n_occurrences_min": 10,
         "n_occurrences_recommended": 30,
-        "auc_min_acceptable": 0.70,
+        "auc_min_acceptable": 0.7,
         "action_if_n_below_min": "do not fit model; use literature-based range map with explicit caveat",
         "action_if_auc_below": "revise predictors and expand calibration grid"
       },
       "skill_md_path": "skills/species-distribution-modeling/SKILL.md"
+    },
+    {
+      "skill_id": "camera-trap-processing",
+      "display_name": "Camera Trap Processing",
+      "version": "1.0.0",
+      "domain": [
+        "camera traps",
+        "wildlife monitoring",
+        "activity patterns",
+        "occupancy"
+      ],
+      "trigger_keywords": [
+        "camera trap",
+        "wildlife camera",
+        "detection event",
+        "trap night",
+        "activity pattern",
+        "diel activity",
+        "camtrapR",
+        "overlap index",
+        "RAI",
+        "relative activity index",
+        "detection history",
+        "camera station"
+      ],
+      "min_inputs": {
+        "image_directory": "required",
+        "camera_metadata": "required",
+        "species_list": "recommended",
+        "independence_threshold_min": "optional"
+      },
+      "primary_outputs": [
+        "record_table.csv",
+        "detection_history.csv",
+        "camera_operation.csv",
+        "trap_effort_summary.csv",
+        "activity_overlap.csv",
+        "activity_plot.png"
+      ],
+      "depends_on_skills": [
+        "ecological-data-foundation",
+        "occupancy-and-detection"
+      ],
+      "called_by_workflows": [],
+      "decision_points": {
+        "independence_threshold_default_min": 30,
+        "min_events_for_activity": 75,
+        "min_events_for_RAI": 10,
+        "min_trap_nights_per_station": 100
+      },
+      "skill_md_path": "skills/camera-trap-processing/SKILL.md"
+    },
+    {
+      "skill_id": "acoustic-monitoring",
+      "display_name": "Acoustic Monitoring",
+      "version": "1.0.0",
+      "domain": [
+        "bioacoustics",
+        "PAM",
+        "soundscape ecology",
+        "species detection"
+      ],
+      "trigger_keywords": [
+        "acoustic monitoring",
+        "soundscape",
+        "bioacoustics",
+        "acoustic index",
+        "ACI",
+        "NDSI",
+        "BirdNET",
+        "passive acoustic",
+        "AudioMoth",
+        "dawn chorus",
+        "species detection",
+        "bat detector",
+        "acoustic complexity"
+      ],
+      "min_inputs": {
+        "audio_directory": "required",
+        "recording_metadata": "recommended",
+        "species_list": "optional",
+        "location_coordinates": "recommended"
+      },
+      "primary_outputs": [
+        "acoustic_indices_timeseries.csv",
+        "indices_summary.csv",
+        "detections_filtered.csv",
+        "species_list.csv",
+        "soundscape_plot.png"
+      ],
+      "depends_on_skills": [
+        "ecological-data-foundation",
+        "environmental-time-series"
+      ],
+      "called_by_workflows": [],
+      "decision_points": {
+        "min_confidence_threshold": 0.7,
+        "min_recording_hours_for_richness": 48,
+        "ndsi_disturbance_threshold": -0.3,
+        "snr_exclusion_threshold_db": 10
+      },
+      "skill_md_path": "skills/acoustic-monitoring/SKILL.md"
+    },
+    {
+      "skill_id": "landscape-connectivity",
+      "display_name": "Landscape Connectivity",
+      "version": "1.0.0",
+      "domain": [
+        "landscape ecology",
+        "connectivity",
+        "corridors",
+        "Circuitscape",
+        "graph theory"
+      ],
+      "trigger_keywords": [
+        "habitat connectivity",
+        "wildlife corridor",
+        "Circuitscape",
+        "IIC",
+        "dPC",
+        "resistance surface",
+        "least-cost path",
+        "stepping stone",
+        "fragmentation",
+        "patch importance",
+        "betweenness centrality",
+        "landscape graph"
+      ],
+      "min_inputs": {
+        "habitat_patches": "required",
+        "dispersal_distance_m": "required",
+        "landcover_raster": "recommended",
+        "resistance_table": "recommended"
+      },
+      "primary_outputs": [
+        "patch_metrics.csv",
+        "landscape_summary.csv",
+        "resistance_combined.tif",
+        "connectivity_graph.png",
+        "pinchpoints.tif"
+      ],
+      "depends_on_skills": [
+        "geoprocessing-for-ecology",
+        "ecological-impact-assessment"
+      ],
+      "called_by_workflows": [],
+      "decision_points": {
+        "min_patches_for_graph": 3,
+        "sensitivity_dmax_values": [
+          500,
+          1000,
+          2000,
+          5000
+        ],
+        "min_iic_pc_for_connectivity": 0.01,
+        "pinchpoint_percentile": 95
+      },
+      "skill_md_path": "skills/landscape-connectivity/SKILL.md"
+    },
+    {
+      "skill_id": "population-viability-analysis",
+      "display_name": "Population Viability Analysis",
+      "version": "1.0.0",
+      "domain": [
+        "PVA",
+        "population dynamics",
+        "matrix models",
+        "extinction risk",
+        "IUCN"
+      ],
+      "trigger_keywords": [
+        "PVA",
+        "population viability",
+        "Leslie matrix",
+        "Lefkovitch matrix",
+        "lambda",
+        "quasi-extinction",
+        "IUCN criterion",
+        "extinction probability",
+        "elasticity",
+        "sensitivity",
+        "stochastic PVA",
+        "MVP",
+        "minimum viable population"
+      ],
+      "min_inputs": {
+        "vital_rates_csv": "required",
+        "initial_population_size": "recommended",
+        "time_horizon_years": "optional",
+        "quasi_extinction_threshold": "optional"
+      },
+      "primary_outputs": [
+        "lambda_summary.csv",
+        "sensitivity_elasticity.csv",
+        "stochastic_pva_results.csv",
+        "extinction_curve.csv",
+        "iucn_criterion_e.csv",
+        "trajectory_plot.png"
+      ],
+      "depends_on_skills": [
+        "biostatistics-workbench",
+        "occupancy-and-detection"
+      ],
+      "called_by_workflows": [],
+      "decision_points": {
+        "min_years_vital_rates": 3,
+        "cv_threshold_stochastic_required": 0.3,
+        "lambda_rapid_decline": 0.95,
+        "default_quasi_ext_threshold": 50,
+        "default_t_max_years": 100
+      },
+      "skill_md_path": "skills/population-viability-analysis/SKILL.md"
+    },
+    {
+      "skill_id": "spatial-prioritization",
+      "display_name": "Spatial Prioritization",
+      "version": "1.0.0",
+      "domain": [
+        "conservation planning",
+        "prioritizr",
+        "Marxan",
+        "Zonation",
+        "ILP",
+        "protected areas"
+      ],
+      "trigger_keywords": [
+        "conservation planning",
+        "Marxan",
+        "Zonation",
+        "prioritizr",
+        "30x30",
+        "irreplaceability",
+        "BLM",
+        "boundary length modifier",
+        "protected area design",
+        "minimum set",
+        "systematic conservation",
+        "representation target"
+      ],
+      "min_inputs": {
+        "planning_unit_raster": "required",
+        "feature_rasters": "required",
+        "representation_targets": "required",
+        "cost_layer": "recommended",
+        "locked_in_areas": "optional",
+        "locked_out_areas": "optional"
+      },
+      "primary_outputs": [
+        "solution.tif",
+        "feature_representation.csv",
+        "cost_summary.csv",
+        "irreplaceability.tif",
+        "blm_calibration.csv",
+        "portfolio_frequency.tif",
+        "prioritization_map.png"
+      ],
+      "depends_on_skills": [
+        "species-distribution-modeling",
+        "ecosystem-services-assessment",
+        "landscape-connectivity"
+      ],
+      "called_by_workflows": [],
+      "decision_points": {
+        "default_target": 0.3,
+        "max_iterations_before_target_relax": 1000,
+        "pct_targets_met_for_acceptance": 80,
+        "irreplaceability_restoration_threshold": 0.8,
+        "blm_calibration_values": [
+          0,
+          0.001,
+          0.01,
+          0.05,
+          0.1,
+          0.5,
+          1.0
+        ]
+      },
+      "skill_md_path": "skills/spatial-prioritization/SKILL.md"
     }
   ],
   "_metadata": {

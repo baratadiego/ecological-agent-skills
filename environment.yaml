@@ -29,6 +29,14 @@ dependencies:
   # ── Ecology Python ────────────────────────────────────────────────────
   - pip
 
+  # ── Acoustic monitoring Python ────────────────────────────────────────
+  - librosa=0.10.2
+  - soundfile=0.12.1
+
+  # ── Landscape connectivity Python ─────────────────────────────────────
+  - networkx=3.3
+  - scikit-image=0.23.2
+
   # ── Workflow Python ───────────────────────────────────────────────────
   - pyyaml=6.0.1
   - pathlib2=2.3.7
@@ -60,6 +68,10 @@ dependencies:
   - r-randomforest=4.7_1.1
   - r-trend=1.1.6
 
+  # ── R advanced skills (v2.0.0) ────────────────────────────────────────
+  - r-igraph=2.0.3
+  - r-ggrepel=0.9.5
+
   pip:
     # Python ecology (not on conda-forge)
     - pymannkendall==1.4.3
@@ -68,7 +80,9 @@ dependencies:
 
     # R packages not on conda-forge (install via renv after environment creation)
     # See renv.lock for: CoordinateCleaner, blockCV, maxnet, biomod2,
-    #                    bfast, landscapemetrics, DHARMa, glmmTMB, betapart, SPEI
+    #                    bfast, landscapemetrics, DHARMa, glmmTMB, betapart, SPEI,
+    #                    camtrapR, overlap, circular, soundecology, tuneR,
+    #                    popbio, prioritizr, highs
 
 variables:
   R_LIBS_USER: "${CONDA_PREFIX}/lib/R/library"

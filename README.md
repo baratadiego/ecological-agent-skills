@@ -63,6 +63,16 @@ ecological-agent-skills/
 | 11 | `ecosystem-services-assessment` | ES indicators, valuation |
 | 12 | `reproducible-ecology-pipeline` | Traceability, audit, checklist |
 
+**Advanced Skills (v2.0.0)**
+
+| # | Skill ID | Core capability |
+|---|---|---|
+| 13 | `camera-trap-processing` | Detection events, RAI, diel activity, Dhat4 overlap |
+| 14 | `acoustic-monitoring` | ACI/NDSI indices, BirdNET detection, soundscape ecology |
+| 15 | `landscape-connectivity` | IIC, PC, dPC, Circuitscape current maps, resistance surfaces |
+| 16 | `population-viability-analysis` | Leslie/Lefkovitch λ, stochastic PVA, IUCN Criterion E |
+| 17 | `spatial-prioritization` | prioritizr ILP, 30×30 targets, BLM calibration, irreplaceability |
+
 See [CATALOG.md](CATALOG.md) for full metadata, inputs, outputs, and workflow linkages.
 
 ---
@@ -131,7 +141,7 @@ If you are an AI agent operating in this repository, **read these two files firs
 
 **Phase 3 (specialist):** `occupancy-and-detection`, `community-ecology-ordination`, `ecosystem-services-assessment`
 
-**Phase 4:** Close all 8 workflows.
+**Phase 4 (advanced):** `camera-trap-processing`, `acoustic-monitoring`, `landscape-connectivity`, `population-viability-analysis`, `spatial-prioritization`
 
 ---
 

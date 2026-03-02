@@ -5,6 +5,57 @@ Format: [version] — date — description
 
 ---
 
+## [2.0.0] — 2026-03-02 — Five advanced skills (Phase 2)
+
+### Added — New skills (5)
+
+- **`skills/camera-trap-processing/`** — Camera trap data pipeline:
+  - `process_camtrap_data.R`: camtrapR record table, detection history, trap effort
+  - `estimate_activity.R`: diel activity curves, Dhat4 bootstrap CI, circular statistics
+  - `process_camtrap_data.py`: pure Python CSV summary and timeline
+  - 3 resources: independence threshold guide, camtrapR workflow, activity patterns
+  - 2 examples: 5 prompt scenarios + Leopard Serengeti full walkthrough
+
+- **`skills/acoustic-monitoring/`** — Passive acoustic monitoring:
+  - `compute_acoustic_indices.R`: ACI, BI, NDSI, H, ADI, AEI via soundecology + heatmap
+  - `batch_species_detection.py`: BirdNET batch detection, confidence filtering, accumulation
+  - `compute_acoustic_indices.py`: Python ACI/BI/NDSI/H from scratch via librosa
+  - 3 resources: index reference, species-ID tools comparison, soundscape ecology guide
+  - 2 examples: 5 prompt scenarios + Temperate Forest Birds full walkthrough
+
+- **`skills/landscape-connectivity/`** — Graph-based connectivity metrics:
+  - `connectivity_metrics.R`: IIC, PC, dIIC, dPC, betweenness centrality, network plot
+  - `resistance_surface.R`: LC reclassification + slope + road-proximity resistance
+  - `connectivity_analysis.py`: networkx IIC/PC/dPC, pairwise costs, matplotlib plot
+  - 3 resources: graph theory guide, resistance surface guide, Circuitscape parameters
+  - 2 examples: 5 prompt scenarios + Jaguar Mesoamerica Corridor full walkthrough
+
+- **`skills/population-viability-analysis/`** — Matrix PVA and IUCN Criterion E:
+  - `matrix_pva.R`: λ, sensitivity, elasticity heatmap, deterministic projection
+  - `stochastic_pva.R`: Monte Carlo PVA, Beta/Lognormal draws, extinction curve, IUCN categories
+  - `pva_analysis.py`: Python λ/sensitivity/elasticity + stochastic PVA
+  - 3 resources: matrix model guide, extinction thresholds, sensitivity/elasticity reference
+  - 2 examples: 5 prompt scenarios + African Elephant PVA full walkthrough
+
+- **`skills/spatial-prioritization/`** — Systematic conservation prioritization:
+  - `run_prioritization.R`: prioritizr min-set/max-coverage ILP, HiGHS solver, irreplaceability
+  - `prioritization_sensitivity.R`: BLM calibration, target/cost sensitivity, portfolio frequency
+  - 4 resources: prioritizr formulation, Marxan vs prioritizr, cost surface, representation targets
+  - 2 examples: 5 prompt scenarios + Atlantic Forest 85-species full walkthrough
+
+### Changed
+
+- **`skills/SKILL_INDEX.json`**: Extended from 12 to 17 skills (added 5 new entries with
+  trigger_keywords, min_inputs, primary_outputs, decision_points)
+- **`CATALOG.md`**: Added "Advanced Skills (v2.0.0)" section documenting all files in 5 new skills
+- **`README.md`**: Added 5-row "Advanced Skills" table; updated Implementation Roadmap with Phase 4
+- **`renv.lock`**: Added camtrapR, overlap, soundecology, popbio, prioritizr, highs, igraph
+- **`environment.yaml`**: Added librosa, soundfile, networkx, scikit-image
+- **`tests/r/`**: Added 5 new testthat test files (≥3 tests each)
+- **`tests/python/`**: Added 5 new pytest test files (≥3 tests each)
+
+---
+
 ## [1.2.0] — 2026-03-01 — Agent navigation infrastructure (Phase 1)
 
 ### Added — Agent infrastructure
