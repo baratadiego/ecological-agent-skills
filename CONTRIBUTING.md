@@ -1,4 +1,4 @@
-# Contributing to antigravity-eco-skills
+# Contributing to ecological-agent-skills
 
 Thank you for contributing! This guide explains how to add or improve skills, workflows, and resources.
 

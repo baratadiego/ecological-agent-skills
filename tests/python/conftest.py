@@ -1,5 +1,5 @@
 """
-conftest.py — shared fixtures for antigravity-eco-skills pytest suite.
+conftest.py — shared fixtures for ecological-agent-skills pytest suite.
 """
 import pytest
 import numpy as np

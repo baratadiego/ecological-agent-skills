@@ -1,4 +1,4 @@
-# Test Suite — antigravity-eco-skills
+# Test Suite — ecological-agent-skills
 
 Automated tests for all 12 skills using **pytest** (Python) and **testthat** (R).
 
