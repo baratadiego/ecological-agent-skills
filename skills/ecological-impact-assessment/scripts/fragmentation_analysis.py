@@ -5,12 +5,37 @@ Compute landscape fragmentation metrics from a land cover raster.
 Usage: python fragmentation_analysis.py <landcover_tif> <habitat_class> <output_dir>
 Requires: rasterio, numpy, pandas, scipy, skimage
 """
+import logging
 import sys
+from datetime import datetime
 from pathlib import Path
+
+SKILL_NAME = "ecological-impact-assessment"
+_LOG_DIR   = Path("logs")
+_LOG_DIR.mkdir(parents=True, exist_ok=True)
+_log_file  = _LOG_DIR / f"skill_{SKILL_NAME}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(asctime)s] [%(levelname)s] [" + SKILL_NAME + "] %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+    handlers=[
+        logging.StreamHandler(sys.stdout),
+        logging.FileHandler(_log_file, encoding="utf-8"),
+    ],
+)
+logger = logging.getLogger(SKILL_NAME)
+
+def log_step(n: int, desc: str) -> None:
+    logger.info("-- STEP %d: %s", n, desc)
+
+def log_decision(var: str, val, why: str) -> None:
+    logger.info("DECISION | %s = %s | %s", var, val, why)
+
 import numpy as np
 import pandas as pd
 import rasterio
 from scipy import ndimage
+
 
 def load_habitat_mask(tif_path: str, habitat_class: int) -> tuple:
     with rasterio.open(tif_path) as src:
@@ -57,22 +82,57 @@ def main():
     output_dir    = Path(sys.argv[3]) if len(sys.argv) > 3 else Path("outputs/fragmentation")
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"Loading: {tif_file} | Habitat class: {habitat_class}")
-    mask, (xres, yres), projected = load_habitat_mask(tif_file, habitat_class)
-    cell_area_ha = abs(xres * yres) / 10000  # m² → ha (assumes projected CRS)
-    if not projected:
-        print("WARNING: Raster appears to be in geographic CRS. Area estimates will be approximate.")
+    log_decision("tif_file", tif_file, "Input land cover raster path")
+    log_decision("habitat_class", habitat_class, "Target habitat class code to extract")
+    log_decision("output_dir", str(output_dir), "Directory for fragmentation metric outputs")
 
-    labeled, n_patches = label_patches(mask)
-    print(f"Patches found: {n_patches}")
+    if not Path(tif_file).exists():
+        logger.error(
+            "Input nao encontrado: %s\n"
+            "  Causa provavel: passo anterior nao concluiu.\n"
+            "  Skill anterior que deveria ter produzido este input: geoprocessing-for-ecology",
+            tif_file
+        )
+        sys.exit(1)
 
-    metrics = compute_metrics(mask, labeled, n_patches, cell_area_ha)
-    print("\nFragmentation Metrics:")
-    print(metrics.to_string())
+    try:
+        log_step(1, "Loading habitat mask from raster")
+        logger.info("Loading: %s | Habitat class: %s", tif_file, habitat_class)
+        mask, (xres, yres), projected = load_habitat_mask(tif_file, habitat_class)
+        cell_area_ha = abs(xres * yres) / 10000  # m² → ha (assumes projected CRS)
+        log_decision("cell_area_ha", round(cell_area_ha, 6), "Derived from pixel resolution; assumes projected CRS")
+        if not projected:
+            logger.warning(
+                "Raster appears to be in geographic CRS. Area estimates will be approximate."
+            )
 
-    metrics_df = metrics.to_frame(name="value").reset_index().rename(columns={"index": "metric"})
-    metrics_df.to_csv(output_dir / "fragmentation_metrics.csv", index=False)
-    print(f"\nSaved to: {output_dir / 'fragmentation_metrics.csv'}")
+        log_step(2, "Labeling habitat patches with 8-connectivity")
+        labeled, n_patches = label_patches(mask)
+        logger.info("Patches found: %d", n_patches)
+        if n_patches == 0:
+            logger.warning("No patches found for habitat class %d. Check class code.", habitat_class)
+
+        log_step(3, "Computing fragmentation metrics")
+        metrics = compute_metrics(mask, labeled, n_patches, cell_area_ha)
+        logger.info("Fragmentation Metrics:\n%s", metrics.to_string())
+
+        log_step(4, "Writing outputs")
+        metrics_df = metrics.to_frame(name="value").reset_index().rename(columns={"index": "metric"})
+        out_csv = output_dir / "fragmentation_metrics.csv"
+        metrics_df.to_csv(out_csv, index=False)
+        logger.info("Saved to: %s", out_csv)
+
+    except FileNotFoundError as e:
+        logger.error(
+            "Input file not found: %s\n"
+            "  Expected output from: geoprocessing-for-ecology\n"
+            "  Check that previous step completed.",
+            e
+        )
+        raise
+    except Exception as e:
+        logger.error("Unexpected error in fragmentation analysis: %s", e)
+        raise
 
 if __name__ == "__main__":
     main()

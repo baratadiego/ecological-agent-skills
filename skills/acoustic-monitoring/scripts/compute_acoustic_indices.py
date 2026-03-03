@@ -19,22 +19,44 @@ Outputs:
     soundscape_plot.png              — heatmap (date × hour, coloured by ACI)
 """
 
+import logging
 import sys
+from datetime import datetime
+from pathlib import Path
+
+SKILL_NAME = "acoustic-monitoring"
+_LOG_DIR   = Path("logs")
+_LOG_DIR.mkdir(parents=True, exist_ok=True)
+_log_file  = _LOG_DIR / f"skill_{SKILL_NAME}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(asctime)s] [%(levelname)s] [" + SKILL_NAME + "] %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+    handlers=[
+        logging.StreamHandler(sys.stdout),
+        logging.FileHandler(_log_file, encoding="utf-8"),
+    ],
+)
+logger = logging.getLogger(SKILL_NAME)
+
+def log_step(n: int, desc: str) -> None:
+    logger.info("-- STEP %d: %s", n, desc)
+
+def log_decision(var: str, val, why: str) -> None:
+    logger.info("DECISION | %s = %s | %s", var, val, why)
+
 import os
 import re
 import csv
 import math
 import argparse
-from pathlib import Path
-from datetime import datetime
 
 try:
     import numpy as np
     import librosa
     import soundfile as sf
 except ImportError as e:
-    print(f"[ERROR] Missing dependency: {e}")
-    print("Install with: pip install librosa soundfile numpy")
+    logger.error("Missing dependency: %s. Install with: pip install librosa soundfile numpy", e)
     sys.exit(1)
 
 
@@ -161,7 +183,7 @@ def process_file(fpath: Path, freq_min: float, freq_max: float) -> dict | None:
     try:
         y, sr = librosa.load(str(fpath), sr=None, mono=True)
     except Exception as e:
-        print(f"  [WARN] Cannot load {fpath.name}: {e}")
+        logger.warning("Nao foi possivel carregar %s: %s", fpath.name, e)
         return None
 
     freq_max_use = min(freq_max, sr / 2)
@@ -222,7 +244,7 @@ def write_summary(rows: list[dict], output_dir: Path) -> None:
                     row += ["", ""]
             row.append(sum(len(hour_data[h][k]) for k in ("ACI",)) // 1)  # n per hour
             writer.writerow(row)
-    print(f"Summary written: {path}")
+    logger.info("Resumo escrito: %s", path)
 
 
 def write_heatmap(rows: list[dict], output_dir: Path) -> None:
@@ -232,11 +254,12 @@ def write_heatmap(rows: list[dict], output_dir: Path) -> None:
         matplotlib.use("Agg")
         import matplotlib.pyplot as plt
     except ImportError:
-        print("  [SKIP] matplotlib not available; skipping heatmap.")
+        logger.warning("matplotlib nao disponivel; pulando heatmap")
         return
 
     dated = [r for r in rows if r["date"] and r["hour"] >= 0]
     if not dated:
+        logger.warning("Sem timestamps validos; heatmap nao gerado")
         return
 
     dates = sorted(set(r["date"] for r in dated))
@@ -268,7 +291,7 @@ def write_heatmap(rows: list[dict], output_dir: Path) -> None:
     path = output_dir / "soundscape_plot.png"
     fig.savefig(path, dpi=150)
     plt.close(fig)
-    print(f"Heatmap saved: {path}")
+    logger.info("Heatmap salvo: %s", path)
 
 
 def main():
@@ -277,30 +300,54 @@ def main():
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    # ── Input precondition checks ────────────────────────────────────────────
     if not audio_dir.is_dir():
-        print(f"[ERROR] Not a directory: {audio_dir}")
+        logger.error(
+            "Input nao encontrado: %s\n  Causa provavel: caminho incorreto ou diretorio nao montado\n  Skill anterior: [nenhuma — etapa inicial]",
+            audio_dir,
+        )
         sys.exit(1)
 
+    log_decision("resolution_min", args.resolution_min,
+                 "resolucao de agregacao temporal em minutos")
+    log_decision("freq_min", args.freq_min,
+                 "frequencia minima de analise em Hz")
+    log_decision("freq_max", args.freq_max,
+                 "frequencia maxima de analise em Hz; limitado pela taxa de amostragem")
+
+    log_step(1, "Descobrindo arquivos de audio")
     files = sorted(
         p for ext in ("*.wav", "*.WAV", "*.flac", "*.FLAC")
         for p in audio_dir.rglob(ext)
     )
     if not files:
-        print(f"[ERROR] No audio files found in {audio_dir}")
+        logger.error(
+            "Nenhum arquivo de audio encontrado em %s\n  Causa provavel: diretorio vazio ou extensoes nao reconhecidas\n  Skill anterior: [nenhuma]",
+            audio_dir,
+        )
         sys.exit(1)
+    logger.info("Encontrados %d arquivos de audio", len(files))
 
-    print(f"Found {len(files)} audio files.")
+    log_step(2, "Computando indices acusticos por arquivo")
     rows = []
     for i, fpath in enumerate(files, 1):
-        print(f"  [{i}/{len(files)}] {fpath.name}")
-        result = process_file(fpath, args.freq_min, args.freq_max)
+        logger.info("  [%d/%d] %s", i, len(files), fpath.name)
+        try:
+            result = process_file(fpath, args.freq_min, args.freq_max)
+        except Exception as e:
+            logger.error("Unexpected error in process_file for %s: %s", fpath.name, e)
+            raise
         if result:
             rows.append(result)
 
     if not rows:
-        print("[ERROR] No files processed successfully.")
+        logger.error(
+            "Nenhum arquivo processado com sucesso\n  Causa provavel: formato de audio incompativel ou intervalo de frequencia invalido\n  Skill anterior: [nenhuma]"
+        )
         sys.exit(1)
+    logger.info("%d de %d arquivos processados com sucesso", len(rows), len(files))
 
+    log_step(3, "Escrevendo CSV de serie temporal")
     # Write timeseries
     ts_path = output_dir / "acoustic_indices_timeseries.csv"
     fieldnames = ["file", "datetime", "date", "hour",
@@ -309,12 +356,15 @@ def main():
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(rows)
-    print(f"\nTimeseries written: {ts_path} ({len(rows)} rows)")
+    logger.info("Serie temporal escrita: %s (%d linhas)", ts_path, len(rows))
 
+    log_step(4, "Escrevendo resumo por hora do dia")
     write_summary(rows, output_dir)
+
+    log_step(5, "Gerando heatmap de paisagem sonora")
     write_heatmap(rows, output_dir)
 
-    print("\nAcoustic index computation complete.")
+    logger.info("Computacao de indices acusticos concluida")
 
 
 if __name__ == "__main__":

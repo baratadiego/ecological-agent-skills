@@ -78,8 +78,78 @@ skills/<skill-name>/
 
 ## Versioning
 
-- Patch (1.0.x): bug fixes, minor additions to existing skills
-- Minor (1.x.0): new skills or workflows
-- Major (x.0.0): breaking changes to SKILL.md structure or workflow chaining
+### Repository Releases (CHANGELOG.md)
+
+| Version bump | When to use |
+|-------------|-------------|
+| **Patch** (1.0.x) | Bug fix in a script; correction in a resource file with no interface change |
+| **Minor** (1.x.0) | New skill, workflow, or script added; new optional fields in Inputs/Outputs |
+| **Major** (x.0.0) | Structural change that breaks existing invocations (e.g., renaming required Inputs, reordering Steps) |
 
 Update `CHANGELOG.md` for every release.
+
+### Per-Skill Versioning (skill_version field in SKILL.md)
+
+Every SKILL.md must contain a `skill_version` field in its YAML front-matter:
+
+```yaml
+---
+skill_name: species-distribution-modeling
+skill_version: "1.0.0"
+---
+```
+
+Increment the `skill_version` according to these rules:
+
+| Change type | Version bump | Example |
+|-------------|-------------|---------|
+| Fix typo, clarify wording in Steps/Notes/Resources | **Patch** (x.y.z+1) | `1.0.0` → `1.0.1` |
+| Add a new resource file or new script to an existing skill | **Minor** (x.y+1.0) | `1.0.0` → `1.1.0` |
+| Add a new optional input or output column | **Minor** (x.y+1.0) | `1.1.0` → `1.2.0` |
+| Add a new required input, rename an existing input, or change the meaning of a Step | **Major** (x+1.0.0) | `1.0.0` → `2.0.0` |
+| Remove a required input or output, or delete a mandatory Step | **Major** (x+1.0.0) | `1.2.3` → `2.0.0` |
+
+#### Why this matters
+Workflows chain skills together. If a downstream skill expects `suitability.tif` and an upstream skill is updated to output `suitability_current.tif` (a major change), the workflow will silently fail unless the version bump signals incompatibility.
+
+Agents can inspect `skill_version` to decide whether to re-run a skill or accept a cached result.
+
+---
+
+## Logging Standards (v2.1.0+)
+
+All scripts must include the inline logger block and follow these conventions:
+
+### R scripts
+- Inline logger block inserted immediately after the `# Usage:` line 1 comment
+- `log_step(N, description)` at the start of each major processing block
+- `log_decision(variable, value, rationale)` for every key parameter
+- All informational `cat()` / `message()` calls replaced by `log_info()`
+- `log_warn()` when data quality issues are detected (< 30 records, > 20% missing, etc.)
+- Every `tryCatch` must emit an actionable `log_error()` message with:
+  - Failing step name
+  - Probable cause
+  - What to check
+  - Which upstream skill should have produced the missing input
+
+### Python scripts
+- Inline logger block inserted after the module docstring, before other imports
+- `log_step(N, description)` / `log_decision(var, val, why)` helper functions
+- All `print()` informational calls replaced by `logger.info()`
+- Every `try/except` block must emit a structured error with the same four fields as R
+
+### Precondition checks
+Every script must verify all inputs exist before processing begins:
+```r
+# R
+if (!file.exists(input_csv)) {
+  log_error("Input nao encontrado: %s\nCausa provavel: ...\nVerifique: ...\nSkill anterior: ...", input_csv)
+  stop("Missing input: ", input_csv)
+}
+```
+```python
+# Python
+if not Path(input_csv).exists():
+    logger.error("Input nao encontrado: %s\n  Skill anterior: ...", input_csv)
+    sys.exit(1)
+```

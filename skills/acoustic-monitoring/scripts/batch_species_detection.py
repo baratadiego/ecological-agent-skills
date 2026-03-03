@@ -18,14 +18,38 @@ Outputs:
     daily_detection_plot.png     — species accumulation and hourly bar chart
 """
 
+import logging
 import sys
+from datetime import datetime
+from pathlib import Path
+
+SKILL_NAME = "acoustic-monitoring"
+_LOG_DIR   = Path("logs")
+_LOG_DIR.mkdir(parents=True, exist_ok=True)
+_log_file  = _LOG_DIR / f"skill_{SKILL_NAME}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(asctime)s] [%(levelname)s] [" + SKILL_NAME + "] %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+    handlers=[
+        logging.StreamHandler(sys.stdout),
+        logging.FileHandler(_log_file, encoding="utf-8"),
+    ],
+)
+logger = logging.getLogger(SKILL_NAME)
+
+def log_step(n: int, desc: str) -> None:
+    logger.info("-- STEP %d: %s", n, desc)
+
+def log_decision(var: str, val, why: str) -> None:
+    logger.info("DECISION | %s = %s | %s", var, val, why)
+
 import os
 import subprocess
 import csv
 import json
 import re
-from pathlib import Path
-from datetime import datetime, timedelta
+from datetime import timedelta
 from collections import defaultdict
 import argparse
 
@@ -116,14 +140,16 @@ def run_birdnet(audio_file: Path, output_dir: Path, args) -> Path | None:
     try:
         proc = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
         if proc.returncode != 0:
-            print(f"  [WARN] BirdNET failed for {audio_file.name}: {proc.stderr[:200]}")
+            logger.warning("BirdNET falhou para %s: %s", audio_file.name, proc.stderr[:200])
             return None
         return result_file if result_file.exists() else None
     except FileNotFoundError:
-        print(f"  [ERROR] BirdNET not found. Set BIRDNET_PATH or install birdnet_analyzer.")
+        logger.error(
+            "BirdNET nao encontrado. Configure BIRDNET_PATH ou instale birdnet_analyzer\n  Causa provavel: BirdNET-Analyzer nao instalado ou nao esta no PATH\n  Skill anterior: [nenhuma — dependencia externa]"
+        )
         sys.exit(1)
     except subprocess.TimeoutExpired:
-        print(f"  [WARN] Timeout processing {audio_file.name}")
+        logger.warning("Timeout ao processar %s", audio_file.name)
         return None
 
 
@@ -157,7 +183,7 @@ def parse_birdnet_csv(result_file: Path) -> list[dict]:
                 }
                 detections.append(det)
     except Exception as e:
-        print(f"  [WARN] Could not parse {result_file.name}: {e}")
+        logger.warning("Nao foi possivel analisar %s: %s", result_file.name, e)
     return detections
 
 
@@ -167,25 +193,46 @@ def main():
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    # ── Input precondition checks ────────────────────────────────────────────
     if not audio_dir.is_dir():
-        print(f"[ERROR] audio_dir not found: {audio_dir}")
+        logger.error(
+            "Input nao encontrado: %s\n  Causa provavel: caminho incorreto ou diretorio nao montado\n  Skill anterior: [nenhuma — etapa inicial]",
+            audio_dir,
+        )
         sys.exit(1)
 
+    log_decision("confidence", args.confidence,
+                 "limiar minimo de confianca para filtrar deteccoes; >= 0.7 recomendado")
+    log_decision("lat/lon", f"{args.lat}/{args.lon}",
+                 "coordenadas geograficas melhoram o filtro de especies do BirdNET")
+    log_decision("overlap", args.overlap,
+                 "sobreposicao de segmentos em segundos; 0 = sem sobreposicao")
+
+    log_step(1, "Descobrindo arquivos de audio")
     audio_files = discover_audio_files(audio_dir)
     if not audio_files:
-        print(f"[ERROR] No audio files found in {audio_dir}")
+        logger.error(
+            "Nenhum arquivo de audio encontrado em %s\n  Causa provavel: diretorio vazio ou extensoes nao suportadas\n  Skill anterior: [nenhuma]",
+            audio_dir,
+        )
         sys.exit(1)
+    logger.info("Encontrados %d arquivos de audio", len(audio_files))
+    logger.info("Limiar de confianca: %s", args.confidence)
 
-    print(f"Found {len(audio_files)} audio files.")
-    print(f"Confidence threshold: {args.confidence}")
-
+    log_step(2, "Executando BirdNET em cada arquivo de audio")
     all_detections = []
 
     for i, fpath in enumerate(audio_files, 1):
-        print(f"  [{i}/{len(audio_files)}] {fpath.name}")
+        logger.info("  [%d/%d] %s", i, len(audio_files), fpath.name)
         file_ts = parse_timestamp_from_filename(fpath.name)
+        if file_ts is None:
+            logger.warning("Timestamp nao extraido do nome do arquivo: %s", fpath.name)
 
-        result_file = run_birdnet(fpath, output_dir, args)
+        try:
+            result_file = run_birdnet(fpath, output_dir, args)
+        except Exception as e:
+            logger.error("Unexpected error in run_birdnet for %s: %s", fpath.name, e)
+            raise
         if result_file is None:
             continue
 
@@ -204,18 +251,27 @@ def main():
             all_detections.append(det)
 
     if not all_detections:
-        print("[WARN] No detections produced. Check BirdNET installation and audio files.")
+        logger.warning(
+            "Nenhuma deteccao produzida. Verifique a instalacao do BirdNET e os arquivos de audio."
+        )
         sys.exit(0)
 
+    logger.info("Total de deteccoes brutas: %d", len(all_detections))
+
+    log_step(3, "Escrevendo deteccoes brutas e filtradas")
     # ── Write raw detections ────────────────────────────────────────────────
     fieldnames = ["file", "datetime", "date", "hour",
                   "start_s", "end_s", "species_code", "common_name", "confidence"]
     raw_path = output_dir / "detections_raw.csv"
-    with open(raw_path, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(all_detections)
-    print(f"\nRaw detections: {len(all_detections)} → {raw_path}")
+    try:
+        with open(raw_path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(all_detections)
+        logger.info("Deteccoes brutas: %d -> %s", len(all_detections), raw_path)
+    except Exception as e:
+        logger.error("Unexpected error writing raw detections: %s", e)
+        raise
 
     # ── Filter by confidence ────────────────────────────────────────────────
     filtered = [d for d in all_detections if d["confidence"] >= args.confidence]
@@ -224,8 +280,15 @@ def main():
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(filtered)
-    print(f"Filtered detections (≥{args.confidence}): {len(filtered)} → {filt_path}")
+    logger.info("Deteccoes filtradas (>=%s): %d -> %s", args.confidence, len(filtered), filt_path)
 
+    if len(filtered) == 0:
+        logger.warning(
+            "Nenhuma deteccao apos filtro de confianca %.2f; considere reduzir o limiar",
+            args.confidence,
+        )
+
+    log_step(4, "Construindo lista de especies detectadas")
     # ── Species list ────────────────────────────────────────────────────────
     species_stats = defaultdict(lambda: {"n": 0, "max_conf": 0.0, "dates": set()})
     for d in filtered:
@@ -245,8 +308,9 @@ def main():
                         "medium" if stats["max_conf"] >= 0.7 else "low")
             writer.writerow([sp, stats["n"], round(stats["max_conf"], 3),
                              len(stats["dates"]), conf_cat])
-    print(f"Species detected: {len(species_stats)} → {sp_path}")
+    logger.info("Especies detectadas: %d -> %s", len(species_stats), sp_path)
 
+    log_step(5, "Gerando resumo de deteccoes por hora")
     # ── Detection summary by hour ────────────────────────────────────────────
     hour_counts = defaultdict(lambda: defaultdict(int))
     for d in filtered:
@@ -263,8 +327,13 @@ def main():
             writer.writerow(["species"] + [str(h) for h in all_hours])
             for sp in all_sps:
                 writer.writerow([sp] + [hour_counts[sp].get(h, 0) for h in all_hours])
-        print(f"Detection summary by hour → {sum_path}")
+        logger.info("Resumo de deteccoes por hora -> %s", sum_path)
+    else:
+        logger.warning(
+            "Sem timestamps horarios disponíveis; detection_summary.csv nao gerado"
+        )
 
+    log_step(6, "Calculando acumulacao de especies")
     # ── Species accumulation (text) ─────────────────────────────────────────
     seen = set()
     accumulation = []
@@ -279,9 +348,9 @@ def main():
         writer = csv.DictWriter(f, fieldnames=["n_detections", "cumulative_species"])
         writer.writeheader()
         writer.writerows(accumulation)
-    print(f"Species accumulation → {accum_path}")
+    logger.info("Acumulacao de especies -> %s", accum_path)
 
-    print("\nBatch detection complete.")
+    logger.info("Deteccao em lote concluida")
 
 
 if __name__ == "__main__":

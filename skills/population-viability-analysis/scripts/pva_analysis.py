@@ -22,21 +22,44 @@ Outputs:
     trajectory_plot.png          — Stochastic trajectories
 """
 
+import logging
 import sys
 import csv
 import math
 import random
 import argparse
 import warnings
+from datetime import datetime
 from pathlib import Path
 from collections import defaultdict
+
+SKILL_NAME = "population-viability-analysis"
+_LOG_DIR   = Path("logs")
+_LOG_DIR.mkdir(parents=True, exist_ok=True)
+_log_file  = _LOG_DIR / f"skill_{SKILL_NAME}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(asctime)s] [%(levelname)s] [" + SKILL_NAME + "] %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+    handlers=[
+        logging.StreamHandler(sys.stdout),
+        logging.FileHandler(_log_file, encoding="utf-8"),
+    ],
+)
+logger = logging.getLogger(SKILL_NAME)
+
+def log_step(n: int, desc: str) -> None:
+    logger.info("-- STEP %d: %s", n, desc)
+
+def log_decision(var: str, val, why: str) -> None:
+    logger.info("DECISION | %s = %s | %s", var, val, why)
 
 import numpy as np
 
 try:
     import numpy.linalg as la
 except ImportError:
-    print("[ERROR] numpy required. Install: pip install numpy")
+    logger.error("numpy required. Install: pip install numpy")
     sys.exit(1)
 
 
@@ -207,151 +230,209 @@ def main():
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    mat_cols, rows = load_vital_rates(Path(args.vital_rates_csv))
-    if not mat_cols:
-        print("[ERROR] No a_i_j columns found in vital_rates_csv.")
+    log_decision("vital_rates_csv", args.vital_rates_csv,
+                 "Input vital rates CSV with stage matrix elements over years")
+    log_decision("t_max", args.t_max, "Projection horizon in years for stochastic PVA")
+    log_decision("n_sim", args.n_sim, "Number of Monte Carlo simulation replicates")
+    log_decision("quasi_ext", args.quasi_ext,
+                 "Quasi-extinction threshold N below which population is considered extinct")
+
+    if not Path(args.vital_rates_csv).exists():
+        logger.error(
+            "Input nao encontrado: %s\n"
+            "  Causa provavel: passo anterior nao concluiu.\n"
+            "  Skill anterior que deveria ter produzido este input: reproducible-ecology-pipeline",
+            args.vital_rates_csv
+        )
         sys.exit(1)
 
-    indices = [(int(c.split("_")[1]) - 1, int(c.split("_")[2]) - 1) for c in mat_cols]
-    k = max(max(i, j) for i, j in indices) + 1
-    print(f"Matrix size: {k}×{k}")
-
-    A = build_mean_matrix(mat_cols, rows)
-    lam = compute_lambda(A)
-    SS  = stable_stage(A)
-    S   = sensitivity_matrix(A)
-    E   = elasticity_matrix(A, S)
-
-    print(f"λ = {lam:.4f}")
-    if lam < 0.95:
-        print("WARNING: λ < 0.95 — population declining rapidly.")
-
-    # Initial N
-    n0 = args.n_init
-    if n0 is None:
-        pop_vals = [float(r["population_N"]) for r in rows
-                    if "population_N" in r and r["population_N"] != ""]
-        n0 = int(pop_vals[-1]) if pop_vals else 1000
-    print(f"N₀ = {n0}, quasi-extinction threshold = {args.quasi_ext}")
-
-    # Lambda summary
-    lam_sum_path = output_dir / "lambda_summary.csv"
-    with open(lam_sum_path, "w", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow(["metric", "value"])
-        writer.writerows([
-            ["lambda",          round(lam, 6)],
-            ["log_lambda",      round(math.log(lam), 6) if lam > 0 else "nan"],
-            ["doubling_time_yr", round(math.log(2) / math.log(lam), 2) if lam > 1 else "Inf"],
-            ["halving_time_yr",  round(math.log(0.5) / math.log(lam), 2) if 0 < lam < 1 else "Inf"],
-        ])
-        writer.writerow(["sum_elasticity", round(float(E.sum()), 4)])
-
-    print(f"Lambda summary → {lam_sum_path}")
-
-    # Stochastic simulation
-    print(f"\nRunning {args.n_sim} stochastic simulations (t={args.t_max})...")
-    dists = build_stoch_distributions(mat_cols, rows, indices)
-    all_N, ext_times = run_stochastic_pva(
-        dists, k, n0, args.t_max, args.n_sim, args.quasi_ext, SS
-    )
-
-    # Extinction curve
-    ext_curve = []
-    for t in range(1, args.t_max + 1):
-        p = float(np.sum(~np.isnan(ext_times) & (ext_times <= t))) / args.n_sim
-        ext_curve.append(p)
-
-    ext_path = output_dir / "extinction_curve.csv"
-    with open(ext_path, "w", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow(["time", "p_extinction"])
-        for t, p in enumerate(ext_curve, 1):
-            writer.writerow([t, round(p, 4)])
-    print(f"Extinction curve → {ext_path}")
-
-    # IUCN Criterion E
-    iucn_rows = iucn_criterion_e(ext_curve, args.t_max, gen_time=args.t_max // 5)
-    iucn_path = output_dir / "iucn_criterion_e.csv"
-    with open(iucn_path, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=list(iucn_rows[0].keys()))
-        writer.writeheader()
-        writer.writerows(iucn_rows)
-
-    # Determine category
-    risk_cat = "LC/NT"
-    for row in iucn_rows:
-        if row["qualifies"]:
-            risk_cat = row["category"]
-            break
-
-    # MTE
-    valid_ext = ext_times[~np.isnan(ext_times)]
-    mte_mean = float(np.mean(valid_ext)) if len(valid_ext) > 0 else float("inf")
-    mte_lo   = float(np.percentile(valid_ext, 2.5))  if len(valid_ext) >= 10 else float("nan")
-    mte_hi   = float(np.percentile(valid_ext, 97.5)) if len(valid_ext) >= 10 else float("nan")
-
-    # Stochastic growth rate
-    final_N  = all_N[:, -1]
-    log_N    = np.log(final_N[np.isfinite(final_N) & (final_N > 0)])
-    lam_s    = float(np.exp((np.mean(log_N) - math.log(n0)) / args.t_max)) if len(log_N) > 0 else float("nan")
-
-    results_path = output_dir / "stochastic_pva_results.csv"
-    with open(results_path, "w", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow(["metric", "value"])
-        writer.writerows([
-            ["n_simulations",     args.n_sim],
-            ["n_init",            n0],
-            ["quasi_ext_threshold", args.quasi_ext],
-            ["t_max",             args.t_max],
-            ["p_extinction",      round(ext_curve[-1], 4)],
-            ["mte_mean_yr",       round(mte_mean, 1)],
-            ["mte_CI_2.5",        round(mte_lo, 1)],
-            ["mte_CI_97.5",       round(mte_hi, 1)],
-            ["lambda_s",          round(lam_s, 4)],
-            ["iucn_category",     risk_cat],
-        ])
-    print(f"PVA results → {results_path}")
-    print(f"P(extinction at t={args.t_max}) = {ext_curve[-1]:.4f}")
-    print(f"IUCN Criterion E: {risk_cat}")
-
-    # Trajectory plot
     try:
-        import matplotlib
-        matplotlib.use("Agg")
-        import matplotlib.pyplot as plt
+        log_step(1, "Loading vital rates and building mean matrix")
+        mat_cols, rows = load_vital_rates(Path(args.vital_rates_csv))
+        if not mat_cols:
+            logger.error("No a_i_j columns found in vital_rates_csv.")
+            sys.exit(1)
 
-        fig, axes = plt.subplots(1, 2, figsize=(12, 5))
-        t_axis = np.arange(args.t_max + 1)
-        sample_idx = np.random.choice(args.n_sim, min(200, args.n_sim), replace=False)
-        for s in sample_idx:
-            axes[0].plot(t_axis, all_N[s, :], alpha=0.05, color="steelblue", lw=0.5)
-        med_N = np.nanmedian(all_N, axis=0)
-        axes[0].plot(t_axis, med_N, color="darkblue", lw=2, label="Median N")
-        axes[0].axhline(args.quasi_ext, color="red", ls="--", label=f"Ne={args.quasi_ext}")
-        axes[0].set_xlabel("Time (years)"); axes[0].set_ylabel("N")
-        axes[0].set_title(f"Stochastic trajectories ({args.n_sim} sims, N₀={n0})")
-        axes[0].legend(); axes[0].set_ylim(bottom=0)
+        indices = [(int(c.split("_")[1]) - 1, int(c.split("_")[2]) - 1) for c in mat_cols]
+        k = max(max(i, j) for i, j in indices) + 1
+        logger.info("Matrix size: %dx%d", k, k)
 
-        axes[1].plot(range(1, args.t_max + 1), ext_curve, color="darkred", lw=2)
-        for pct, label, col in [(0.50, "CR ≥50%", "red"),
-                                  (0.20, "EN ≥20%", "orange"),
-                                  (0.10, "VU ≥10%", "goldenrod")]:
-            axes[1].axhline(pct, color=col, ls="--", lw=1, label=label)
-        axes[1].set_xlabel("Time (years)"); axes[1].set_ylabel("P(quasi-extinction)")
-        axes[1].set_title(f"Extinction curve (Ne={args.quasi_ext})")
-        axes[1].legend(); axes[1].set_ylim(0, 1)
+        log_step(2, "Deterministic analysis: lambda, stable stage, sensitivity, elasticity")
+        A = build_mean_matrix(mat_cols, rows)
+        lam = compute_lambda(A)
+        SS  = stable_stage(A)
+        S   = sensitivity_matrix(A)
+        E   = elasticity_matrix(A, S)
 
-        plt.suptitle(f"PVA — IUCN Category: {risk_cat} | λ={lam:.4f} | λ_s={lam_s:.4f}")
-        plt.tight_layout()
-        fig.savefig(output_dir / "trajectory_plot.png", dpi=150)
-        plt.close(fig)
-        print(f"Trajectory plot → {output_dir / 'trajectory_plot.png'}")
-    except ImportError:
-        print("  [SKIP] matplotlib not available.")
+        logger.info("lambda = %.4f", lam)
+        if lam < 0.95:
+            logger.warning(
+                "lambda = %.4f < 0.95 — population declining rapidly. "
+                "Review vital rates and consider conservation interventions.",
+                lam
+            )
+        elif lam < 1.0:
+            logger.warning(
+                "lambda = %.4f < 1.0 — population is declining (sub-replacement).",
+                lam
+            )
 
-    print("\nPVA analysis complete.")
+        log_step(3, "Resolving initial population size")
+        # Initial N
+        n0 = args.n_init
+        if n0 is None:
+            pop_vals = [float(r["population_N"]) for r in rows
+                        if "population_N" in r and r["population_N"] != ""]
+            n0 = int(pop_vals[-1]) if pop_vals else 1000
+            log_decision("n0", n0,
+                         "Taken from last population_N value in CSV (no --n_init provided)")
+        else:
+            log_decision("n0", n0, "User-specified initial population size via --n_init")
+        logger.info("N0 = %d, quasi-extinction threshold = %s", n0, args.quasi_ext)
+
+        log_step(4, "Writing lambda summary CSV")
+        # Lambda summary
+        lam_sum_path = output_dir / "lambda_summary.csv"
+        with open(lam_sum_path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow(["metric", "value"])
+            writer.writerows([
+                ["lambda",          round(lam, 6)],
+                ["log_lambda",      round(math.log(lam), 6) if lam > 0 else "nan"],
+                ["doubling_time_yr", round(math.log(2) / math.log(lam), 2) if lam > 1 else "Inf"],
+                ["halving_time_yr",  round(math.log(0.5) / math.log(lam), 2) if 0 < lam < 1 else "Inf"],
+            ])
+            writer.writerow(["sum_elasticity", round(float(E.sum()), 4)])
+
+        logger.info("Lambda summary -> %s", lam_sum_path)
+
+        log_step(5, "Running stochastic Monte Carlo simulations")
+        logger.info(
+            "Running %d stochastic simulations (t=%d)...", args.n_sim, args.t_max
+        )
+        dists = build_stoch_distributions(mat_cols, rows, indices)
+        all_N, ext_times = run_stochastic_pva(
+            dists, k, n0, args.t_max, args.n_sim, args.quasi_ext, SS
+        )
+
+        log_step(6, "Computing extinction curve and IUCN Criterion E")
+        # Extinction curve
+        ext_curve = []
+        for t in range(1, args.t_max + 1):
+            p = float(np.sum(~np.isnan(ext_times) & (ext_times <= t))) / args.n_sim
+            ext_curve.append(p)
+
+        ext_path = output_dir / "extinction_curve.csv"
+        with open(ext_path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow(["time", "p_extinction"])
+            for t, p in enumerate(ext_curve, 1):
+                writer.writerow([t, round(p, 4)])
+        logger.info("Extinction curve -> %s", ext_path)
+
+        # IUCN Criterion E
+        iucn_rows = iucn_criterion_e(ext_curve, args.t_max, gen_time=args.t_max // 5)
+        iucn_path = output_dir / "iucn_criterion_e.csv"
+        with open(iucn_path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=list(iucn_rows[0].keys()))
+            writer.writeheader()
+            writer.writerows(iucn_rows)
+
+        # Determine category
+        risk_cat = "LC/NT"
+        for row in iucn_rows:
+            if row["qualifies"]:
+                risk_cat = row["category"]
+                break
+
+        log_step(7, "Computing MTE and stochastic growth rate")
+        # MTE
+        valid_ext = ext_times[~np.isnan(ext_times)]
+        mte_mean = float(np.mean(valid_ext)) if len(valid_ext) > 0 else float("inf")
+        mte_lo   = float(np.percentile(valid_ext, 2.5))  if len(valid_ext) >= 10 else float("nan")
+        mte_hi   = float(np.percentile(valid_ext, 97.5)) if len(valid_ext) >= 10 else float("nan")
+
+        # Stochastic growth rate
+        final_N  = all_N[:, -1]
+        log_N    = np.log(final_N[np.isfinite(final_N) & (final_N > 0)])
+        lam_s    = float(np.exp((np.mean(log_N) - math.log(n0)) / args.t_max)) if len(log_N) > 0 else float("nan")
+
+        log_step(8, "Writing stochastic PVA results CSV")
+        results_path = output_dir / "stochastic_pva_results.csv"
+        with open(results_path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow(["metric", "value"])
+            writer.writerows([
+                ["n_simulations",     args.n_sim],
+                ["n_init",            n0],
+                ["quasi_ext_threshold", args.quasi_ext],
+                ["t_max",             args.t_max],
+                ["p_extinction",      round(ext_curve[-1], 4)],
+                ["mte_mean_yr",       round(mte_mean, 1)],
+                ["mte_CI_2.5",        round(mte_lo, 1)],
+                ["mte_CI_97.5",       round(mte_hi, 1)],
+                ["lambda_s",          round(lam_s, 4)],
+                ["iucn_category",     risk_cat],
+            ])
+        logger.info("PVA results -> %s", results_path)
+        logger.info("P(extinction at t=%d) = %.4f", args.t_max, ext_curve[-1])
+        logger.info("IUCN Criterion E: %s", risk_cat)
+        if risk_cat in ("CR", "EN"):
+            logger.warning(
+                "Population qualifies as %s under IUCN Criterion E. "
+                "Immediate conservation action recommended.",
+                risk_cat
+            )
+
+        log_step(9, "Generating trajectory and extinction curve plots")
+        # Trajectory plot
+        try:
+            import matplotlib
+            matplotlib.use("Agg")
+            import matplotlib.pyplot as plt
+
+            fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+            t_axis = np.arange(args.t_max + 1)
+            sample_idx = np.random.choice(args.n_sim, min(200, args.n_sim), replace=False)
+            for s in sample_idx:
+                axes[0].plot(t_axis, all_N[s, :], alpha=0.05, color="steelblue", lw=0.5)
+            med_N = np.nanmedian(all_N, axis=0)
+            axes[0].plot(t_axis, med_N, color="darkblue", lw=2, label="Median N")
+            axes[0].axhline(args.quasi_ext, color="red", ls="--", label=f"Ne={args.quasi_ext}")
+            axes[0].set_xlabel("Time (years)"); axes[0].set_ylabel("N")
+            axes[0].set_title(f"Stochastic trajectories ({args.n_sim} sims, N0={n0})")
+            axes[0].legend(); axes[0].set_ylim(bottom=0)
+
+            axes[1].plot(range(1, args.t_max + 1), ext_curve, color="darkred", lw=2)
+            for pct, label, col in [(0.50, "CR >=50%", "red"),
+                                      (0.20, "EN >=20%", "orange"),
+                                      (0.10, "VU >=10%", "goldenrod")]:
+                axes[1].axhline(pct, color=col, ls="--", lw=1, label=label)
+            axes[1].set_xlabel("Time (years)"); axes[1].set_ylabel("P(quasi-extinction)")
+            axes[1].set_title(f"Extinction curve (Ne={args.quasi_ext})")
+            axes[1].legend(); axes[1].set_ylim(0, 1)
+
+            plt.suptitle(f"PVA — IUCN Category: {risk_cat} | lambda={lam:.4f} | lambda_s={lam_s:.4f}")
+            plt.tight_layout()
+            fig.savefig(output_dir / "trajectory_plot.png", dpi=150)
+            plt.close(fig)
+            logger.info("Trajectory plot -> %s", output_dir / "trajectory_plot.png")
+        except ImportError:
+            logger.warning("matplotlib not available; skipping trajectory plot.")
+
+        logger.info("PVA analysis complete.")
+
+    except FileNotFoundError as e:
+        logger.error(
+            "Input file not found: %s\n"
+            "  Expected output from: reproducible-ecology-pipeline\n"
+            "  Check that previous step completed.",
+            e
+        )
+        raise
+    except Exception as e:
+        logger.error("Unexpected error in PVA analysis: %s", e)
+        raise
 
 
 if __name__ == "__main__":

@@ -5,8 +5,33 @@ Clip rasters to study area and extract values at points.
 Usage: python stack_and_extract.py <raster_dir> <points_csv> <studyarea_shp> <output_dir>
 Requires: rasterio, geopandas, rasterstats, numpy, pandas
 """
-import sys, os
+import logging
+import sys
+from datetime import datetime
 from pathlib import Path
+
+SKILL_NAME = "geoprocessing-for-ecology"
+_LOG_DIR   = Path("logs")
+_LOG_DIR.mkdir(parents=True, exist_ok=True)
+_log_file  = _LOG_DIR / f"skill_{SKILL_NAME}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(asctime)s] [%(levelname)s] [" + SKILL_NAME + "] %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+    handlers=[
+        logging.StreamHandler(sys.stdout),
+        logging.FileHandler(_log_file, encoding="utf-8"),
+    ],
+)
+logger = logging.getLogger(SKILL_NAME)
+
+def log_step(n: int, desc: str) -> None:
+    logger.info("-- STEP %d: %s", n, desc)
+
+def log_decision(var: str, val, why: str) -> None:
+    logger.info("DECISION | %s = %s | %s", var, val, why)
+
+import os
 import numpy as np
 import pandas as pd
 import geopandas as gpd
@@ -14,6 +39,7 @@ import rasterio
 from rasterio.mask import mask as rio_mask
 from rasterio.warp import reproject, Resampling, calculate_default_transform
 from shapely.geometry import mapping
+
 
 def reproject_raster(src_path, dst_path, dst_crs):
     with rasterio.open(src_path) as src:
@@ -54,28 +80,90 @@ def main():
     output_dir  = Path(sys.argv[4]) if len(sys.argv) > 4 else Path("data/processed")
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    tif_files = sorted(Path(raster_dir).glob("*.tif"))
-    print(f"Rasters found: {len(tif_files)}")
+    log_decision("raster_dir", raster_dir, "Directory containing raw predictor GeoTIFFs")
+    log_decision("points_file", points_file, "CSV of occurrence/sample points with coordinates")
+    log_decision("area_file", area_file, "Shapefile defining the study area extent for clipping")
+    log_decision("output_dir", str(output_dir), "Directory for clipped rasters and extracted values")
 
-    area = gpd.read_file(area_file)
-    area_geom = area.geometry.unary_union
+    if not Path(raster_dir).exists():
+        logger.error(
+            "Input nao encontrado: %s\n"
+            "  Causa provavel: passo anterior nao concluiu.\n"
+            "  Skill anterior que deveria ter produzido este input: reproducible-ecology-pipeline",
+            raster_dir
+        )
+        sys.exit(1)
 
-    clipped_dir = output_dir / "predictors_clipped"
-    clipped_dir.mkdir(exist_ok=True)
-    clipped_paths = []
-    for tif in tif_files:
-        out_path = clipped_dir / tif.name
-        clip_to_area(str(tif), area_geom, str(out_path))
-        clipped_paths.append(str(out_path))
-        print(f"  Clipped: {tif.name}")
+    if not Path(points_file).exists():
+        logger.error(
+            "Input nao encontrado: %s\n"
+            "  Causa provavel: passo anterior nao concluiu.\n"
+            "  Skill anterior que deveria ter produzido este input: reproducible-ecology-pipeline",
+            points_file
+        )
+        sys.exit(1)
 
-    pts = pd.read_csv(points_file)
-    print(f"Points loaded: {len(pts)}")
-    pts_env = extract_values(clipped_paths, pts)
-    pts_env.to_csv(output_dir / "points_with_env.csv", index=False)
-    complete = pts_env.dropna().shape[0]
-    print(f"Points with complete env data: {complete}/{len(pts)}")
-    print(f"Output written to: {output_dir / 'points_with_env.csv'}")
+    if not Path(area_file).exists():
+        logger.error(
+            "Input nao encontrado: %s\n"
+            "  Causa provavel: passo anterior nao concluiu.\n"
+            "  Skill anterior que deveria ter produzido este input: reproducible-ecology-pipeline",
+            area_file
+        )
+        sys.exit(1)
+
+    try:
+        log_step(1, "Discovering raster files in raster directory")
+        tif_files = sorted(Path(raster_dir).glob("*.tif"))
+        logger.info("Rasters found: %d", len(tif_files))
+        if len(tif_files) == 0:
+            logger.warning(
+                "No .tif files found in %s. Check raster_dir path or file extension.", raster_dir
+            )
+
+        log_step(2, "Loading study area geometry")
+        area = gpd.read_file(area_file)
+        area_geom = area.geometry.unary_union
+
+        log_step(3, "Clipping rasters to study area extent")
+        clipped_dir = output_dir / "predictors_clipped"
+        clipped_dir.mkdir(exist_ok=True)
+        clipped_paths = []
+        for tif in tif_files:
+            out_path = clipped_dir / tif.name
+            clip_to_area(str(tif), area_geom, str(out_path))
+            clipped_paths.append(str(out_path))
+            logger.info("  Clipped: %s", tif.name)
+
+        log_step(4, "Loading point data and extracting raster values")
+        pts = pd.read_csv(points_file)
+        logger.info("Points loaded: %d", len(pts))
+        pts_env = extract_values(clipped_paths, pts)
+        pts_env.to_csv(output_dir / "points_with_env.csv", index=False)
+
+        complete = pts_env.dropna().shape[0]
+        incomplete = len(pts) - complete
+        logger.info(
+            "Points with complete env data: %d/%d", complete, len(pts)
+        )
+        if incomplete > 0:
+            logger.warning(
+                "%d points have missing values after extraction — likely fall outside raster extent.",
+                incomplete
+            )
+        logger.info("Output written to: %s", output_dir / "points_with_env.csv")
+
+    except FileNotFoundError as e:
+        logger.error(
+            "Input file not found: %s\n"
+            "  Expected output from: reproducible-ecology-pipeline\n"
+            "  Check that previous step completed.",
+            e
+        )
+        raise
+    except Exception as e:
+        logger.error("Unexpected error in stack and extract: %s", e)
+        raise
 
 if __name__ == "__main__":
     main()

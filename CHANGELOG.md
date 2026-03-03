@@ -5,6 +5,72 @@ Format: [version] — date — description
 
 ---
 
+## [2.1.0] — 2026-03-03 — Script quality: logging, error handling, new SDM and BACI scripts
+
+### Added — Logging infrastructure
+- **`templates/scripts/logger_setup.R`** — Reusable R logger template using futile.logger with dual console+file output, `log_step()`, `log_decision()`, `log_actionable_error()` wrappers
+- **`templates/scripts/logger_setup.py`** — Python equivalent with `logging.basicConfig`, file rotation, same helper functions
+
+### Added — Inline logger in ALL 43 skill scripts
+Every script in `skills/*/scripts/` now contains an inline logger block (no external dependency) providing:
+- `log_info()` / `log_warn()` / `log_error()` with ISO timestamp prefix
+- `log_step(N, description)` to mark major processing stages
+- `log_decision(variable, value, rationale)` to document analytical choices
+- `dir.create("logs", ...)` auto-creates the log directory
+- Log format: `[YYYY-MM-DD HH:MM:SS] [LEVEL]  message`
+
+### Added — Actionable error handling in ALL 43 skill scripts
+Every `tryCatch` / `try-except` block now emits a structured four-field error:
+1. Failing step name
+2. Probable cause
+3. What to verify
+4. Which upstream skill should have produced the missing input
+
+Every script now validates all inputs before processing begins with `file.exists()` / `Path.exists()` guards.
+
+### Added — SDM spatial prediction (Deliverable 3)
+- **`skills/species-distribution-modeling/scripts/predict_distribution.R`**
+  - Loads maxnet / gbm / randomForest / ensemble list models
+  - Generates suitability [0,1], binary (MaxTSS/P10/MTP), uncertainty (ensemble SD), and MESS rasters
+  - Warns if > 20% of area is in novel climate space
+  - Outputs: `suitability_{scenario}.tif`, `binary_{scenario}.tif`, `uncertainty_{scenario}.tif`, `mess_{scenario}.tif`, `prediction_summary.csv`
+- **`skills/species-distribution-modeling/scripts/predict_distribution.py`**
+  - Sklearn equivalent: supports `predict_proba`, `decision_function`, and generic `predict`
+  - Same outputs as R version; MESS computed from `training_ranges` stored in model dict
+- **`skills/species-distribution-modeling/scripts/project_scenarios.R`**
+  - Batch projection across all `.tif` stacks in `scenarios_dir` (SSP × year loop)
+  - Auto-names outputs: `suitability_{ssp}_{year}.tif`
+  - Outputs: `scenario_comparison.csv`, `scenario_change_map.tif`, `scenario_summary_plot.png`
+
+### Added — BACI power analysis (Deliverable 4)
+- **`skills/ecological-impact-assessment/scripts/power_analysis_baci.R`**
+  - Three power curves: power × n_sites, power × n_surveys, power × effect_size
+  - Minimum n for 80% and 90% power (searched over sites and surveys independently)
+  - Outputs: `power_curves.png`, `power_summary.csv`, `minimum_n_recommendation.md`
+  - Depends on: `pwr`, `ggplot2`, `patchwork`
+- **`skills/ecological-impact-assessment/resources/study-design-guide.md`**
+  - Recommended sites per group (≥5:5), surveys (≥3 before + 3 after)
+  - Control site matching criteria and propensity-score matching example
+  - Survey interval guidance by taxon, variance estimation methods
+  - Effect size reference table by impact type (roads, dams, deforestation, mining, etc.)
+
+### Added — Tests
+- **`tests/r/test-logging-and-errors.R`** — 14 testthat tests covering:
+  logger format, log_step/log_decision output, precondition check behaviour,
+  predict_distribution binary map and MESS logic, power analysis monotonicity and plausible range,
+  project_scenarios filename parsing and change map formula
+- **`tests/python/test_logging_and_errors.py`** — 14 pytest tests covering the same areas
+
+### Changed — CONTRIBUTING.md
+- Versioning section expanded with per-skill `skill_version` policy (Patch/Minor/Major rules table)
+- New "Logging Standards (v2.1.0+)" section documenting the mandatory inline logger pattern,
+  log_step/log_decision conventions, and precondition check templates for R and Python
+
+### Verified — skill_version
+- All 17 SKILL.md files confirmed to have `skill_version: "1.0.0"` in YAML front-matter
+
+---
+
 ## [2.0.0] — 2026-03-02 — Five advanced skills (Phase 2)
 
 ### Added — New skills (5)

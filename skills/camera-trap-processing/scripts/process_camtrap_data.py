@@ -11,12 +11,37 @@ Arguments:
     output_dir       : directory for output files
     species_name     : optional; filter to a single species
 """
+
+import logging
 import sys
+from datetime import datetime
+from pathlib import Path
+
+SKILL_NAME = "camera-trap-processing"
+_LOG_DIR   = Path("logs")
+_LOG_DIR.mkdir(parents=True, exist_ok=True)
+_log_file  = _LOG_DIR / f"skill_{SKILL_NAME}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(asctime)s] [%(levelname)s] [" + SKILL_NAME + "] %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+    handlers=[
+        logging.StreamHandler(sys.stdout),
+        logging.FileHandler(_log_file, encoding="utf-8"),
+    ],
+)
+logger = logging.getLogger(SKILL_NAME)
+
+def log_step(n: int, desc: str) -> None:
+    logger.info("-- STEP %d: %s", n, desc)
+
+def log_decision(var: str, val, why: str) -> None:
+    logger.info("DECISION | %s = %s | %s", var, val, why)
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
-from pathlib import Path
 
 
 def load_records(csv_path: str) -> pd.DataFrame:
@@ -89,31 +114,75 @@ def main():
     output_dir = Path(sys.argv[2])
     species_filter = sys.argv[3] if len(sys.argv) >= 4 else None
 
+    # ── Input precondition checks ────────────────────────────────────────────
+    if not Path(record_csv).exists():
+        logger.error(
+            "Input nao encontrado: %s\n  Causa provavel: process_camtrap_data.R nao foi executado ou falhou\n  Skill anterior: camera-trap-processing (process_camtrap_data.R)",
+            record_csv,
+        )
+        sys.exit(1)
+
+    log_decision("species_filter", species_filter,
+                 "None = todas as especies; nome especifico = filtro por especie")
+
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"Loading records from: {record_csv}")
-    df = load_records(record_csv)
-    print(f"  Total records: {len(df)}, Species: {df['Species'].nunique()}")
+    log_step(1, "Carregando registros da tabela CSV")
+    try:
+        df = load_records(record_csv)
+    except Exception as e:
+        logger.error(
+            "Falha ao carregar record_table CSV: %s\n  Causa provavel: colunas obrigatorias ausentes ou arquivo corrompido\n  Skill anterior: camera-trap-processing",
+            e,
+        )
+        sys.exit(1)
+
+    logger.info("Total de registros: %d, Especies: %d", len(df), df["Species"].nunique())
 
     if species_filter:
+        log_step(2, f"Filtrando para a especie '{species_filter}'")
         df = df[df["Species"] == species_filter]
-        print(f"  Filtered to '{species_filter}': {len(df)} records")
+        logger.info("Filtrado para '%s': %d registros", species_filter, len(df))
+        if len(df) == 0:
+            logger.error(
+                "Nenhum registro encontrado para a especie '%s'\n  Causa provavel: nome de especie incorreto\n  Skill anterior: camera-trap-processing (process_camtrap_data.R)",
+                species_filter,
+            )
+            sys.exit(1)
+    else:
+        log_step(2, "Processando todas as especies")
 
-    sp_sum = species_summary(df)
-    st_sum = station_summary(df)
+    log_step(3, "Calculando resumo por especie e estacao")
+    try:
+        sp_sum = species_summary(df)
+        st_sum = station_summary(df)
+    except Exception as e:
+        logger.error("Unexpected error in species/station summary: %s", e)
+        raise
 
     sp_sum.to_csv(output_dir / "species_summary.csv", index=False)
     st_sum.to_csv(output_dir / "station_summary.csv", index=False)
+    logger.info("species_summary.csv: %d especies", len(sp_sum))
+    logger.info("station_summary.csv: %d estacoes", len(st_sum))
 
     low_events = sp_sum[sp_sum["n_events"] < 10]["Species"].tolist()
     if low_events:
-        print(f"  WARNING: Species with < 10 events (RAI only): {low_events}")
+        logger.warning(
+            "Especies com < 10 eventos (apenas RAI; sem estimativa de ocupancia): %s",
+            low_events,
+        )
 
-    plot_detection_timeline(df, output_dir / "detection_timeline.png")
+    log_step(4, "Gerando grafico de linha do tempo de deteccoes")
+    try:
+        plot_detection_timeline(df, output_dir / "detection_timeline.png")
+        logger.info("detection_timeline.png salvo")
+    except Exception as e:
+        logger.error("Unexpected error in plot_detection_timeline: %s", e)
+        raise
 
-    print(f"Done. Outputs written to: {output_dir}")
-    print(f"  species_summary.csv: {len(sp_sum)} species")
-    print(f"  station_summary.csv: {len(st_sum)} stations")
+    logger.info("Concluido. Saidas gravadas em: %s", output_dir)
+    logger.info("  species_summary.csv: %d especies", len(sp_sum))
+    logger.info("  station_summary.csv: %d estacoes", len(st_sum))
 
 
 if __name__ == "__main__":

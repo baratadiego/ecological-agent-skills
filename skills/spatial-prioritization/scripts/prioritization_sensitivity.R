@@ -14,6 +14,16 @@
 #   cost_scenario_sensitivity.csv  — Cost and PU selection under cost uncertainty
 #   portfolio_frequency.tif        — Selection frequency raster across all scenarios
 
+# ── Inline logger ─────────────────────────────────────────────────────────────
+SKILL_NAME <- "spatial-prioritization"
+.log_ts  <- function() format(Sys.time(), "[%Y-%m-%d %H:%M:%S]")
+log_info <- function(...) message(.log_ts(), " [INFO]  ", sprintf(...))
+log_warn <- function(...) message(.log_ts(), " [WARN]  ", sprintf(...))
+log_error<- function(...) message(.log_ts(), " [ERROR] ", sprintf(...))
+log_step <- function(n, d) log_info("-- STEP %d: %s", n, d)
+log_decision <- function(v, val, why) log_info("DECISION | %s = %s | %s", v, val, why)
+dir.create("logs", recursive=TRUE, showWarnings=FALSE)
+
 suppressPackageStartupMessages(library(prioritizr))
 suppressPackageStartupMessages(library(terra))
 suppressPackageStartupMessages(library(dplyr))
@@ -33,33 +43,81 @@ targets_arg  <- if (length(args) >= 4 && args[4] != "NA") args[4] else "0.30"
 locked_in_p  <- if (length(args) >= 5 && args[5] != "NA") args[5] else NULL
 locked_out_p <- if (length(args) >= 6 && args[6] != "NA") args[6] else NULL
 
+# ── Input precondition checks ─────────────────────────────────────────────────
+if (!file.exists(pu_path)) {
+  log_error("Input nao encontrado: %s\nCausa provavel: passo anterior nao concluiu.\nVerifique: outputs do skill anterior.\nSkill anterior: spatial-prioritization (run_prioritization)", pu_path)
+  stop("Missing input: ", pu_path)
+}
+if (!dir.exists(features_dir)) {
+  log_error("Diretorio de features nao encontrado: %s\nCausa provavel: passo anterior nao concluiu ou caminho incorreto.\nVerifique: outputs do skill anterior.\nSkill anterior: spatial-prioritization (run_prioritization)", features_dir)
+  stop("Missing features directory: ", features_dir)
+}
+
+log_decision("targets_arg", targets_arg, "Baseline targets: single proportion applied to all features, or path to CSV with per-feature targets")
+log_decision("locked_in_p", ifelse(is.null(locked_in_p), "none", locked_in_p), "Locked-in raster constrains solver to always select these PUs")
+log_decision("locked_out_p", ifelse(is.null(locked_out_p), "none", locked_out_p), "Locked-out raster constrains solver to never select these PUs")
+
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
 # ── Load data ─────────────────────────────────────────────────────────────────
-pu       <- rast(pu_path)
-feat_files <- list.files(features_dir, pattern = "\\.tif$",
-                          full.names = TRUE, ignore.case = TRUE)
-features   <- rast(feat_files)
-features   <- resample(features, pu, method = "bilinear")
-names(features) <- tools::file_path_sans_ext(basename(feat_files))
+log_step(1, "Load planning unit raster and feature layers")
+tryCatch({
+  pu       <- rast(pu_path)
+  feat_files <- list.files(features_dir, pattern = "\\.tif$",
+                            full.names = TRUE, ignore.case = TRUE)
+  if (length(feat_files) == 0) {
+    log_error("Nenhum arquivo .tif encontrado em: %s\nCausa provavel: features_dir incorreto ou features nao geradas.\nVerifique: conteudo do diretorio de features.\nSkill anterior: spatial-prioritization (run_prioritization)", features_dir)
+    stop("No .tif feature files found in: ", features_dir)
+  }
+  features   <- rast(feat_files)
+  features   <- resample(features, pu, method = "bilinear")
+  names(features) <- tools::file_path_sans_ext(basename(feat_files))
 
-# Remove zero-sum features
-feat_sums <- global(features, "sum", na.rm = TRUE)[[1]]
-features  <- features[[feat_sums > 0]]
-n_feats   <- nlyr(features)
+  # Remove zero-sum features
+  feat_sums <- global(features, "sum", na.rm = TRUE)[[1]]
+  zero_feats <- names(features)[feat_sums == 0]
+  if (length(zero_feats) > 0) {
+    log_warn("%d features com soma zero excluidas: %s", length(zero_feats), paste(zero_feats, collapse = ", "))
+  }
+  features  <- features[[feat_sums > 0]]
+  n_feats   <- nlyr(features)
+  log_info("Planning unit raster loaded: %d x %d cells.", nrow(pu), ncol(pu))
+  log_info("Feature layers loaded: %d (after removing zero-sum).", n_feats)
+
+  if (n_feats < 1) {
+    log_error("Nenhuma feature valida apos remocao de zero-sum.\nCausa provavel: todas as features tem distribuicao zero na area de estudo.\nVerifique: extensao espacial dos rasters de features.\nSkill anterior: spatial-prioritization (run_prioritization)")
+    stop("No valid feature layers remaining after zero-sum removal.")
+  }
+}, error = function(e) {
+  log_error("Falha em load_data: %s\nCausa provavel: rasters corrompidos, incompativeis ou caminho incorreto.\nVerifique: arquivos .tif e resolucao espacial.\nSkill anterior: spatial-prioritization (run_prioritization)", conditionMessage(e))
+  stop(e)
+})
 
 # Baseline targets
-if (file.exists(targets_arg)) {
-  target_df   <- read.csv(targets_arg)
-  targets_base <- target_df$target[match(names(features), target_df$feature_name)]
-  targets_base[is.na(targets_base)] <- 0.30
-} else {
-  targets_base <- rep(as.numeric(targets_arg), n_feats)
-}
+log_step(2, "Set baseline targets")
+tryCatch({
+  if (file.exists(targets_arg)) {
+    target_df   <- read.csv(targets_arg)
+    targets_base <- target_df$target[match(names(features), target_df$feature_name)]
+    n_unmatched <- sum(is.na(targets_base))
+    targets_base[is.na(targets_base)] <- 0.30
+    if (n_unmatched > 0) {
+      log_warn("%d features sem alvo no CSV; usando padrao 0.30.", n_unmatched)
+    }
+    log_decision("targets_base", "from_csv", paste0("Per-feature targets loaded from ", targets_arg))
+  } else {
+    targets_base <- rep(as.numeric(targets_arg), n_feats)
+    log_decision("targets_base", targets_arg, "Single proportion applied uniformly to all features")
+  }
+  log_info("Baseline targets: min=%.2f, mean=%.2f, max=%.2f",
+           min(targets_base), mean(targets_base), max(targets_base))
+}, error = function(e) {
+  log_error("Falha em set_targets: %s\nCausa provavel: CSV de alvos malformado ou proporcao invalida.\nVerifique: formato do arquivo de alvos e nomes das features.\nSkill anterior: spatial-prioritization (run_prioritization)", conditionMessage(e))
+  stop(e)
+})
 
 # Helper: build and solve base problem with given cost and targets
-solve_scenario <- function(cost_r, targets_v, blm_val = 0,
-                            name = "scenario") {
+solve_scenario <- function(cost_r, targets_v, blm_val = 0, name = "scenario") {
   p <- problem(cost_r, features) %>%
     add_min_set_objective() %>%
     add_relative_targets(pmin(targets_v, 0.999)) %>%
@@ -79,7 +137,7 @@ solve_scenario <- function(cost_r, targets_v, blm_val = 0,
   }
 
   s <- tryCatch(solve(p), error = function(e) {
-    warning("Solver failed for scenario '", name, "': ", conditionMessage(e))
+    log_warn("Solver falhou para cenario '%s': %s. Retornando NULL.", name, conditionMessage(e))
     return(NULL)
   })
   if (is.null(s)) return(NULL)
@@ -100,105 +158,160 @@ solve_scenario <- function(cost_r, targets_v, blm_val = 0,
 }
 
 # ── 1. BLM Calibration ────────────────────────────────────────────────────────
-cat("Running BLM calibration...\n")
+log_step(3, "BLM calibration: cost vs compactness tradeoff")
+log_info("Running BLM calibration...")
 blm_values <- c(0, 0.001, 0.01, 0.05, 0.1, 0.5, 1.0)
-blm_results <- lapply(blm_values, function(blm) {
-  cat(sprintf("  BLM = %g\n", blm))
-  res <- solve_scenario(pu, targets_base, blm_val = blm,
+log_decision("blm_values", paste(blm_values, collapse = ", "),
+             "Standard BLM range spanning several orders of magnitude to identify elbow in cost-boundary tradeoff")
+
+tryCatch({
+  blm_results <- lapply(blm_values, function(blm) {
+    log_info("  BLM = %g", blm)
+    res <- solve_scenario(pu, targets_base, blm_val = blm,
                           name = paste0("blm_", blm))
-  if (is.null(res)) return(NULL)
-  data.frame(blm = blm, cost = res$total_cost,
-             boundary = res$boundary, n_selected = res$n_selected)
+    if (is.null(res)) {
+      log_warn("Cenario BLM=%g nao produziu solucao.", blm)
+      return(NULL)
+    }
+    data.frame(blm = blm, cost = res$total_cost,
+               boundary = res$boundary, n_selected = res$n_selected)
+  })
+  blm_df <- dplyr::bind_rows(Filter(Negate(is.null), blm_results))
+  write.csv(blm_df, file.path(output_dir, "blm_calibration.csv"), row.names = FALSE)
+  log_info("BLM calibration done. %d / %d scenarios solved successfully.", nrow(blm_df), length(blm_values))
+
+  if (nrow(blm_df) < 3) {
+    log_warn("Menos de 3 cenarios BLM resolvidos. Grafico de cotovelo pode ser insuficiente para selecao de BLM.")
+  }
+}, error = function(e) {
+  log_error("Falha em blm_calibration: %s\nCausa provavel: falha do solver HiGHS ou dados raster invalidos.\nVerifique: instalacao do HiGHS e integridade dos rasters.\nSkill anterior: spatial-prioritization (run_prioritization)", conditionMessage(e))
+  stop(e)
 })
-blm_df <- dplyr::bind_rows(Filter(Negate(is.null), blm_results))
-write.csv(blm_df, file.path(output_dir, "blm_calibration.csv"), row.names = FALSE)
-cat("BLM calibration done.\n")
 
 # BLM elbow plot
+log_step(4, "Generate BLM elbow plot")
 if (nrow(blm_df) > 2) {
-  p_blm <- ggplot(blm_df, aes(x = boundary, y = cost, label = blm)) +
-    geom_path(colour = "steelblue") +
-    geom_point(size = 3, colour = "steelblue") +
-    ggrepel::geom_text_repel(size = 3) +
-    labs(x = "Total boundary length", y = "Total cost",
-         title = "BLM calibration: cost vs compactness tradeoff") +
-    theme_minimal(base_size = 10)
-  tryCatch(
-    ggsave(file.path(output_dir, "blm_calibration_plot.png"), p_blm,
-           width = 7, height = 5, dpi = 150),
-    error = function(e) warning("BLM plot failed: ", conditionMessage(e))
-  )
+  tryCatch({
+    p_blm <- ggplot(blm_df, aes(x = boundary, y = cost, label = blm)) +
+      geom_path(colour = "steelblue") +
+      geom_point(size = 3, colour = "steelblue") +
+      ggrepel::geom_text_repel(size = 3) +
+      labs(x = "Total boundary length", y = "Total cost",
+           title = "BLM calibration: cost vs compactness tradeoff") +
+      theme_minimal(base_size = 10)
+    tryCatch(
+      ggsave(file.path(output_dir, "blm_calibration_plot.png"), p_blm,
+             width = 7, height = 5, dpi = 150),
+      error = function(e) log_warn("BLM plot falhou ao salvar: %s", conditionMessage(e))
+    )
+    log_info("BLM calibration plot saved.")
+  }, error = function(e) {
+    log_warn("Falha ao gerar grafico BLM: %s. Continuando sem o grafico.", conditionMessage(e))
+  })
+} else {
+  log_warn("Dados insuficientes para grafico BLM (menos de 3 pontos). Grafico nao gerado.")
 }
 
 # ── 2. Target Sensitivity ─────────────────────────────────────────────────────
-cat("Running target sensitivity analysis...\n")
+log_step(5, "Target sensitivity analysis")
+log_info("Running target sensitivity analysis...")
 target_scalings <- c(0.50, 0.75, 1.00, 1.25, 1.50)
-target_results <- lapply(target_scalings, function(sc) {
-  cat(sprintf("  Target scaling = %.2f×\n", sc))
-  tgts <- pmin(targets_base * sc, 0.999)
-  res  <- solve_scenario(pu, tgts, name = paste0("target_", sc))
-  if (is.null(res)) return(NULL)
-  data.frame(target_scaling = sc,
-             mean_target    = mean(tgts),
-             cost           = res$total_cost,
-             targets_met    = res$targets_met,
-             n_selected     = res$n_selected)
+log_decision("target_scalings", paste(target_scalings, collapse = ", "),
+             "Scaling factors applied to baseline targets to assess sensitivity of solution cost and coverage")
+
+tryCatch({
+  target_results <- lapply(target_scalings, function(sc) {
+    log_info("  Target scaling = %.2fx", sc)
+    tgts <- pmin(targets_base * sc, 0.999)
+    res  <- solve_scenario(pu, tgts, name = paste0("target_", sc))
+    if (is.null(res)) {
+      log_warn("Cenario de alvo %.2fx nao produziu solucao.", sc)
+      return(NULL)
+    }
+    data.frame(target_scaling = sc,
+               mean_target    = mean(tgts),
+               cost           = res$total_cost,
+               targets_met    = res$targets_met,
+               n_selected     = res$n_selected)
+  })
+  target_df <- dplyr::bind_rows(Filter(Negate(is.null), target_results))
+  write.csv(target_df, file.path(output_dir, "target_sensitivity.csv"),
+            row.names = FALSE)
+  log_info("Target sensitivity done. %d / %d scenarios solved.", nrow(target_df), length(target_scalings))
+}, error = function(e) {
+  log_error("Falha em target_sensitivity: %s\nCausa provavel: falha do solver ou alvos fora do intervalo [0, 0.999].\nVerifique: valores de targets_base e instalacao do HiGHS.\nSkill anterior: spatial-prioritization (run_prioritization)", conditionMessage(e))
+  stop(e)
 })
-target_df <- dplyr::bind_rows(Filter(Negate(is.null), target_results))
-write.csv(target_df, file.path(output_dir, "target_sensitivity.csv"),
-          row.names = FALSE)
-cat("Target sensitivity done.\n")
 
 # ── 3. Cost Scenario Sensitivity ──────────────────────────────────────────────
-cat("Running cost scenario sensitivity analysis...\n")
-cost_scenarios <- list(
-  low      = pu * 0.70,
-  baseline = pu,
-  high     = pu * 1.30
-)
+log_step(6, "Cost scenario sensitivity analysis")
+log_info("Running cost scenario sensitivity analysis...")
+log_decision("cost_scenarios", "low=-30%, baseline, high=+30%",
+             "Standard cost uncertainty range to assess robustness of prioritization to cost data errors")
 
-cost_results <- lapply(names(cost_scenarios), function(name) {
-  cat(sprintf("  Cost scenario: %s\n", name))
-  res <- solve_scenario(cost_scenarios[[name]], targets_base, name = name)
-  if (is.null(res)) return(NULL)
-  data.frame(cost_scenario = name,
-             total_cost    = res$total_cost,
-             n_selected    = res$n_selected,
-             targets_met   = res$targets_met)
+tryCatch({
+  cost_scenarios <- list(
+    low      = pu * 0.70,
+    baseline = pu,
+    high     = pu * 1.30
+  )
+
+  cost_results <- lapply(names(cost_scenarios), function(name) {
+    log_info("  Cost scenario: %s", name)
+    res <- solve_scenario(cost_scenarios[[name]], targets_base, name = name)
+    if (is.null(res)) {
+      log_warn("Cenario de custo '%s' nao produziu solucao.", name)
+      return(NULL)
+    }
+    data.frame(cost_scenario = name,
+               total_cost    = res$total_cost,
+               n_selected    = res$n_selected,
+               targets_met   = res$targets_met)
+  })
+  cost_df <- dplyr::bind_rows(Filter(Negate(is.null), cost_results))
+  write.csv(cost_df, file.path(output_dir, "cost_scenario_sensitivity.csv"),
+            row.names = FALSE)
+  log_info("Cost scenario sensitivity done. %d / %d scenarios solved.", nrow(cost_df), length(cost_scenarios))
+}, error = function(e) {
+  log_error("Falha em cost_scenario_sensitivity: %s\nCausa provavel: falha do solver ou raster de custo invalido.\nVerifique: valores do raster pu e instalacao do HiGHS.\nSkill anterior: spatial-prioritization (run_prioritization)", conditionMessage(e))
+  stop(e)
 })
-cost_df <- dplyr::bind_rows(Filter(Negate(is.null), cost_results))
-write.csv(cost_df, file.path(output_dir, "cost_scenario_sensitivity.csv"),
-          row.names = FALSE)
-cat("Cost scenario sensitivity done.\n")
 
 # ── 4. Portfolio Irreplaceability ─────────────────────────────────────────────
-cat("Building portfolio irreplaceability (selection frequency across scenarios)...\n")
-# Collect all solutions computed above
-all_solutions <- list()
-for (blm in blm_values) {
-  res <- solve_scenario(pu, targets_base, blm_val = blm, name = paste0("blm_", blm))
-  if (!is.null(res)) all_solutions[[length(all_solutions) + 1]] <- res$solution
-}
-for (sc in target_scalings) {
-  tgts <- pmin(targets_base * sc, 0.999)
-  res  <- solve_scenario(pu, tgts, name = paste0("target_", sc))
-  if (!is.null(res)) all_solutions[[length(all_solutions) + 1]] <- res$solution
-}
+log_step(7, "Build portfolio irreplaceability (selection frequency across all scenarios)")
+log_info("Building portfolio irreplaceability (selection frequency across scenarios)...")
 
-if (length(all_solutions) > 1) {
-  freq_raster <- Reduce("+", all_solutions) / length(all_solutions)
-  names(freq_raster) <- "selection_frequency"
-  writeRaster(freq_raster, file.path(output_dir, "portfolio_frequency.tif"),
-              overwrite = TRUE)
-  cat(sprintf("Portfolio frequency raster saved (%d scenarios).\n",
-              length(all_solutions)))
-} else {
-  cat("Insufficient solutions for portfolio analysis.\n")
-}
+tryCatch({
+  # Collect all solutions computed above
+  all_solutions <- list()
+  for (blm in blm_values) {
+    res <- solve_scenario(pu, targets_base, blm_val = blm, name = paste0("blm_", blm))
+    if (!is.null(res)) all_solutions[[length(all_solutions) + 1]] <- res$solution
+  }
+  for (sc in target_scalings) {
+    tgts <- pmin(targets_base * sc, 0.999)
+    res  <- solve_scenario(pu, tgts, name = paste0("target_", sc))
+    if (!is.null(res)) all_solutions[[length(all_solutions) + 1]] <- res$solution
+  }
+
+  if (length(all_solutions) < 2) {
+    log_warn("Solucoes insuficientes para analise de portfolio (%d). Sao necessarias pelo menos 2.", length(all_solutions))
+  } else {
+    freq_raster <- Reduce("+", all_solutions) / length(all_solutions)
+    names(freq_raster) <- "selection_frequency"
+    writeRaster(freq_raster, file.path(output_dir, "portfolio_frequency.tif"),
+                overwrite = TRUE)
+    log_info("Portfolio frequency raster saved (%d scenarios).", length(all_solutions))
+  }
+}, error = function(e) {
+  log_error("Falha em portfolio_irreplaceability: %s\nCausa provavel: solucoes incompativeis (extensoes diferentes) ou falha na soma de rasters.\nVerifique: consistencia espacial das solucoes individuais.\nSkill anterior: spatial-prioritization (run_prioritization)", conditionMessage(e))
+  stop(e)
+})
 
 # ── Summary report ────────────────────────────────────────────────────────────
-cat("\n=== Sensitivity Analysis Summary ===\n")
-cat("BLM calibration:\n"); print(blm_df)
-cat("\nTarget sensitivity:\n"); print(target_df)
-cat("\nCost scenario sensitivity:\n"); print(cost_df)
-cat("\nSensitivity analysis complete.\n")
+log_step(8, "Print sensitivity analysis summary")
+log_info("=== Sensitivity Analysis Summary ===")
+log_info("BLM calibration:\n%s", paste(capture.output(print(blm_df)), collapse = "\n"))
+log_info("Target sensitivity:\n%s", paste(capture.output(print(target_df)), collapse = "\n"))
+log_info("Cost scenario sensitivity:\n%s", paste(capture.output(print(cost_df)), collapse = "\n"))
+log_info("Sensitivity analysis complete.")
