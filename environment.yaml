@@ -72,17 +72,33 @@ dependencies:
   - r-igraph=2.0.3
   - r-ggrepel=0.9.5
 
+  # ── R occurrence data download (v2.2.0) ───────────────────────────────
+  - r-rgbif=3.7.9
+  - r-geodata=0.6_2
+
   pip:
     # Python ecology (not on conda-forge)
     - pymannkendall==1.4.3
     - scikit-bio==0.6.2
     - elapid==1.1.2
 
+    # ── Occurrence data download (v2.2.0) ─────────────────────────────────
+    - pygbif==0.6.3
+    - pyinaturalist==0.19.0
+    - requests==2.32.3
+    - cdsapi==0.7.2
+
+    # ── Spatial predictor download (v2.2.0) ───────────────────────────────
+    - pystac-client==0.8.3
+    - stackstac==0.5.1
+    - planetary-computer==1.0.0
+
     # R packages not on conda-forge (install via renv after environment creation)
     # See renv.lock for: CoordinateCleaner, blockCV, maxnet, biomod2,
     #                    bfast, landscapemetrics, DHARMa, glmmTMB, betapart, SPEI,
     #                    camtrapR, overlap, circular, soundecology, tuneR,
-    #                    popbio, prioritizr, highs
+    #                    popbio, prioritizr, highs,
+    #                    rinat, auk, robis, rredlist (v2.2.0)
 
 variables:
   R_LIBS_USER: "${CONDA_PREFIX}/lib/R/library"

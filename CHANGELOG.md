@@ -5,6 +5,45 @@ Format: [version] — date — description
 
 ---
 
+## [2.2.0] — 2026-03-05 — Global occurrence download scripts and predictor data sources
+
+### Added — Occurrence download scripts (Entregável 1)
+Eight new scripts across four biodiversity data sources, each producing the **standard output schema**:
+`species, decimalLatitude, decimalLongitude, eventDate, countryCode, basisOfRecord, coordinateUncertaintyInMeters, datasetName, occurrenceID, source, download_doi`
+
+- **`skills/ecological-data-foundation/scripts/download_from_inat.R`** — rinat, quality_grade filter, captive=FALSE, year range, max 10 000 records
+- **`skills/ecological-data-foundation/scripts/download_from_inat.py`** — pyinaturalist, auto-pagination, same schema + research-grade validation
+- **`skills/ecological-data-foundation/scripts/download_from_ebird.R`** — auk EBD parser, Stationary+Traveling protocols, approved=TRUE; extra: `effort_distance_km, duration_minutes, observer_id`
+- **`skills/ecological-data-foundation/scripts/download_from_ebird.py`** — pandas chunked EBD reader (500 k rows/chunk), same filters and schema
+- **`skills/ecological-data-foundation/scripts/download_from_obis.R`** — robis, absence=FALSE, OBIS quality flags applied; extra: `depth, marine`
+- **`skills/ecological-data-foundation/scripts/download_from_obis.py`** — requests OBIS REST API v3, pagination, same flags and schema
+- **`skills/ecological-data-foundation/scripts/download_from_iucn.R`** — rredlist + IUCN API v3 (IUCN_REDLIST_KEY), country occurrences + habitats; extra: `rl_category, rl_criteria, population_trend, assessment_year`
+- **`skills/ecological-data-foundation/scripts/download_from_iucn.py`** — requests IUCN API v3, same assessment data and schema
+
+All scripts: globally generic (no hardcoded regions/taxa), inline logger, tryCatch/try-except error handling.
+
+### Added — Global predictor data sources (Entregável 2)
+- **`skills/geoprocessing-for-ecology/resources/global-predictor-sources.md`** — Reference table for 12 global data sources (WorldClim, CHELSA, TerraClimate, ERA5-Land, MODIS, Copernicus LC, SoilGrids, MERIT DEM, HydroSHEDS, GFW, ESA CCI LC, Human Footprint) with download code, resolution, DOI, and SDM guidance per source
+- **`skills/geoprocessing-for-ecology/scripts/download_predictors.R`** — WorldClim v2.1 (geodata), CHELSA v2.1 (direct URL), MODIS placeholder; optional WKT clipping; outputs `predictor_metadata.csv`
+- **`skills/geoprocessing-for-ecology/scripts/download_predictors.py`** — requests (WorldClim zip + CHELSA tiles), cdsapi (ERA5-Land), pystac placeholder; optional rasterio clipping; same metadata CSV
+
+### Added — Data citation guide (Entregável 3)
+- **`skills/ecological-data-foundation/resources/data-citation-guide.md`** — Citation formats for GBIF, iNaturalist, eBird, OBIS, IUCN, WorldClim/CHELSA; `occ_search` vs `occ_download` comparison table; CC licence compatibility matrix; data use policies; merge workflow
+
+### Updated — Dependency files
+- **`environment.yaml`**: Added `r-rgbif=3.7.9`, `r-geodata=0.6_2`, `requests=2.32.3`; pip: `pygbif==0.6.3`, `pyinaturalist==0.19.0`, `cdsapi==0.7.2`, `pystac-client==0.8.3`, `stackstac==0.5.1`, `planetary-computer==1.0.0`
+- **`renv.lock`**: Added rinat, auk, robis, rredlist, geodata (R packages managed via renv)
+- **`skills/SKILL_INDEX.json`**: Extended `primary_outputs` for `ecological-data-foundation` and `geoprocessing-for-ecology`; added 8 new trigger keywords for occurrence download
+
+### Added — Tests
+- **`tests/r/test-download-sources.R`** — 28 testthat tests: schema validation, coordinate filtering, OBIS quality flags, source column values, script file existence, Usage: line-1 compliance, suppressPackageStartupMessages, inline logger presence, resource file existence
+- **`tests/python/test_download_sources.py`** — 23 pytest tests: iNat/OBIS/IUCN/eBird standardise_records schema, OBIS quality flags, eBird EBD parsing, metadata write functions, predictor URL format, SHA256 helper, save_metadata CSV
+
+### CI
+- All existing tests pass (334+ tests); new tests add schema + argument validation coverage with zero live API calls
+
+---
+
 ## [2.1.0] — 2026-03-03 — Script quality: logging, error handling, new SDM and BACI scripts
 
 ### Added — Logging infrastructure

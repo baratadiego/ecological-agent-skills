@@ -141,7 +141,15 @@
         "data quality",
         "flagged records",
         "taxonomic harmonisation",
-        "data foundation"
+        "data foundation",
+        "iNaturalist",
+        "eBird",
+        "OBIS",
+        "IUCN Red List",
+        "occurrence download",
+        "biodiversity data",
+        "marine occurrence",
+        "conservation status"
       ],
       "min_inputs": {
         "raw_occurrence_or_survey_data": "required",
@@ -154,7 +162,14 @@
         "qa_report.md",
         "schema.yaml",
         "metadata.xml",
-        "flagged_records.csv"
+        "flagged_records.csv",
+        "occurrences_raw_GBIF_{species}_{date}.csv",
+        "occurrences_raw_iNat_{species}_{date}.csv",
+        "occurrences_raw_eBird_{species}_{date}.csv",
+        "occurrences_raw_OBIS_{species}_{date}.csv",
+        "iucn_status_{species}.csv",
+        "iucn_habitats_{species}.csv",
+        "download_metadata_{source}_{species}.txt"
       ],
       "depends_on_skills": [],
       "called_by_workflows": [
@@ -386,7 +401,11 @@
         "predictors_stack.tif",
         "points_with_env.csv",
         "study_area_buffered.gpkg",
-        "spatial_qa_report.md"
+        "spatial_qa_report.md",
+        "worldclim/wc2.1_{res}m_bio_{1..19}.tif",
+        "chelsa/CHELSA_bio{1..19}.tif",
+        "era5/era5_land_temp_precip_monthly.nc",
+        "predictor_metadata.csv"
       ],
       "depends_on_skills": [
         "ecological-data-foundation"
@@ -994,8 +1013,8 @@
   "_metadata": {
     "repository": "ecological-agent-skills",
     "index_version": "1.0.0",
-    "last_updated": "2026-03-01",
-    "total_skills": 12,
+    "last_updated": "2026-03-05",
+    "total_skills": 17,
     "total_workflows": 9
   }
 }
