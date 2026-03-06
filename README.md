@@ -145,6 +145,37 @@ If you are an AI agent operating in this repository, **read these two files firs
 
 ---
 
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [`docs/theoretical-foundations.md`](docs/theoretical-foundations.md) | Citable justifications for every methodological decision (spatial CV, ensemble, partial ROC, MESH, BACI, etc.) with primary references |
+| [`docs/global-examples-index.md`](docs/global-examples-index.md) | Inventory of all 14 worked examples with geographic, taxonomic, and thematic coverage analysis |
+| [`docs/comparison-with-alternatives.md`](docs/comparison-with-alternatives.md) | Objective comparison vs. Wallace, biomod2, kuenm, ENMTML, SDMtoolbox, Zonation, Vortex |
+| [`CATALOG.md`](CATALOG.md) | Skill-level metadata: inputs, outputs, trigger keywords, workflow linkages |
+
+---
+
+## Examples (14)
+
+| Region | Example |
+|--------|---------|
+| Amazon, Brazil | Jaguar SDM |
+| Cerrado, Brazil | Giant Anteater SDM |
+| Atlantic Forest, Brazil | Bird community, Puma occupancy, BACI road impact, Ecosystem services |
+| Amazon reservoirs | Phytoplankton community |
+| Western Europe | Grey Wolf recolonization + conflict |
+| Eastern Australia | Koala climate change SDM + MOP |
+| Indo-Pacific | Reef fish beta diversity |
+| Central Himalayas | Snow Leopard occupancy |
+| Borneo | Forest loss time series + BACI |
+| Arctic (Greenland/Canada) | Tundra vegetation greening |
+| Holarctic (global) | Red Fox — fully reproducible SDM |
+
+See [`docs/global-examples-index.md`](docs/global-examples-index.md) for full details with data sources and DOIs.
+
+---
+
 ## Contributing
 
 Follow the standard skill packaging pattern: one directory per skill, `SKILL.md` as the entry point, with optional `resources/`, `examples/`, and `scripts/` subdirectories.

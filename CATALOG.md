@@ -251,3 +251,25 @@ A quick-reference index for all 12 skills. Each row summarises the skill's domai
 |---|---|
 | `run-multispecies-screening/WORKFLOW.md` | 9th workflow — rapid multi-species SDM screening with priority classification |
 | All 8 existing WORKFLOWs | Added `## Decision Points` section with condition → diagnosis → action tables |
+
+---
+
+## Documentation (v2.3.0)
+
+| File | Description |
+|---|---|
+| `docs/theoretical-foundations.md` | Citable justifications for 10 methodological decisions: spatial CV, ensemble, partial ROC, M delimitation, Bray-Curtis, MESH, IIC/PC, OR10, RM calibration, BACI random effects |
+| `docs/global-examples-index.md` | Inventory of all 14 worked examples with coverage analysis (6 continents, 9 biomes, 7 taxonomic groups, 11 analysis types) |
+| `docs/comparison-with-alternatives.md` | Objective comparison vs. Wallace, SDMtoolbox, biomod2, kuenm, ENMTML, Zonation, Vortex |
+
+## New Examples (v2.3.0)
+
+| File | Species / System | Region | Analysis |
+|---|---|---|---|
+| `examples/sdm/wolf_recolonization_europe_example.md` | *Canis lupus* | Western Europe | SDM + recolonization + conflict |
+| `examples/sdm/koala_climate_change_example.md` | *Phascolarctos cinereus* | Eastern Australia | SDM + future SSP + MOP |
+| `examples/community/reef_fish_indopacific_example.md` | Reef fish (987 spp.) | Indo-Pacific | Beta diversity + PERMANOVA |
+| `examples/community/arctic_tundra_vegetation_example.md` | Tundra vegetation | Greenland / Canada | NDVI time series + community shift |
+| `examples/occupancy/snow_leopard_himalayas_example.md` | *Panthera uncia* | Central Himalayas | Occupancy + camera trap |
+| `examples/impact/forest_loss_borneo_timeseries_example.md` | Tropical forest | Borneo | BFAST + MESH + BACI |
+| `examples/reproducible/whittaker_biome_sdm_example.md` | *Vulpes vulpes* | Holarctic | Fully reproducible SDM pipeline |

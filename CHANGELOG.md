@@ -3,6 +3,26 @@
 All notable changes to this repository are documented here.
 Format: [version] — date — description
 
+## [2.3.0] — 2026-03-06 — Scientific documentation & global example coverage
+
+### Added — Documentation
+- `docs/theoretical-foundations.md` — Citable justifications for 10 methodological decisions (spatial CV, ensemble, partial ROC, calibration area, Bray-Curtis, MESH, IIC/PC, OR10, RM calibration, BACI random effects), with 17 primary references and consolidated bibliography
+- `docs/global-examples-index.md` — Full inventory of 14 worked examples with geographic/taxonomic/thematic coverage analysis; all 6 inhabited continents represented
+- `docs/comparison-with-alternatives.md` — Objective comparison vs. Wallace, SDMtoolbox, biomod2, kuenm, ENMTML, Zonation, Vortex across 12 criteria; includes honest limitations section
+
+### Added — Global Examples (7 new, 14 total)
+- `examples/sdm/wolf_recolonization_europe_example.md` — Grey wolf SDM + recolonization projection + livestock conflict analysis (Europe)
+- `examples/sdm/koala_climate_change_example.md` — Koala SDM + SSP2-4.5 / SSP5-8.5 projection + MOP extrapolation (Australia)
+- `examples/community/reef_fish_indopacific_example.md` — Reef fish beta diversity + depth gradient + PERMANOVA (Indo-Pacific)
+- `examples/community/arctic_tundra_vegetation_example.md` — NDVI greening time series + BFAST + community shift (Arctic)
+- `examples/occupancy/snow_leopard_himalayas_example.md` — Snow leopard single-season occupancy + camera trap detection (Himalayas)
+- `examples/impact/forest_loss_borneo_timeseries_example.md` — BFAST + MESH fragmentation + BACI for oil palm expansion (Borneo)
+- `examples/reproducible/whittaker_biome_sdm_example.md` — Fully reproducible red fox SDM with complete R code (Holarctic)
+
+### Changed
+- `README.md` — Added Documentation section linking to docs/ and Examples table with 14 entries
+- `CATALOG.md` — Added Documentation (v2.3.0) and New Examples (v2.3.0) sections
+
 ---
 
 ## [2.2.0] — 2026-03-05 — Global occurrence download scripts and predictor data sources
