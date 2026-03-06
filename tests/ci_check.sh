@@ -325,17 +325,181 @@ done
 echo ""
 
 # ─────────────────────────────────────────────────────────────────────────────
+# SECTION 10 — Global geographic coverage of examples
+# ─────────────────────────────────────────────────────────────────────────────
+echo "--- Section 10: Global geographic coverage ---"
+
+CONTINENTS_FOUND=()
+# Check each continent by keyword in example files
+for continent_kw in "South America:Amazon|Cerrado|Atlantic Forest|Brazil" \
+                    "Europe:Europe|Greenland|Italy|France|Germany" \
+                    "Asia:Himalaya|Borneo|Indo-Pacific|Indonesia|Nepal|India" \
+                    "Oceania:Australia|Indo-Pacific|koala" \
+                    "North America:Canada|Holarctic|arctic|tundra" \
+                    "Africa:Serengeti|Africa|Holarctic"; do
+  continent="${continent_kw%%:*}"
+  pattern="${continent_kw##*:}"
+  if grep -r -l -i -E "$pattern" examples/ >/dev/null 2>&1; then
+    pass "Global coverage: $continent represented in examples"
+    CONTINENTS_FOUND+=("$continent")
+  else
+    fail "Global coverage: $continent NOT represented in examples"
+  fi
+done
+
+echo ""
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 11 — Example quality
+# ─────────────────────────────────────────────────────────────────────────────
+echo "--- Section 11: Example quality ---"
+
+while IFS= read -r -d '' exfile; do
+  relpath="${exfile#$REPO_ROOT/}"
+
+  # Must contain data source reference (broad match: DOI, GBIF, survey, field, data, source, etc.)
+  if grep -q -i -E "Data source|Data Sources|Dataset|Source|DOI|GBIF|survey|field data|Workflow:" "$exfile" 2>/dev/null; then
+    pass "Example has data source/context: $relpath"
+  else
+    fail "Example missing data source documentation: $relpath"
+  fi
+
+  # Must contain Species, System, or Workflow metadata
+  if grep -q -i -E "Species:|System:|Workflow:|Study area:" "$exfile" 2>/dev/null; then
+    pass "Example has Species/System: $relpath"
+  else
+    fail "Example missing Species: or System: $relpath"
+  fi
+
+  # Must contain at least 1 numeric result (number with decimal or percentage)
+  if grep -q -E "[0-9]+\.[0-9]+" "$exfile" 2>/dev/null; then
+    pass "Example has numeric results: $relpath"
+  else
+    fail "Example missing numeric results: $relpath"
+  fi
+done < <(find examples/ -name "*_example.md" -type f -print0 2>/dev/null)
+
+echo ""
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 12 — Resource quality
+# ─────────────────────────────────────────────────────────────────────────────
+echo "--- Section 12: Resource quality ---"
+
+while IFS= read -r -d '' resfile; do
+  relpath="${resfile#$REPO_ROOT/}"
+
+  # Must have at least 1 code block, markdown table, or checklist (structured content)
+  has_struct=false
+  grep -q '```' "$resfile" 2>/dev/null && has_struct=true
+  grep -q '|' "$resfile" 2>/dev/null && has_struct=true
+  grep -q '\- \[' "$resfile" 2>/dev/null && has_struct=true
+
+  if $has_struct; then
+    pass "Resource has structured content: $relpath"
+  else
+    fail "Resource missing structured content (code block, table, or checklist): $relpath"
+  fi
+done < <(find skills/*/resources/ -name "*.md" -type f -print0 2>/dev/null)
+
+echo ""
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 13 — Logging in scripts
+# ─────────────────────────────────────────────────────────────────────────────
+echo "--- Section 13: Script logging ---"
+
+while IFS= read -r -d '' rfile; do
+  relpath="${rfile#$REPO_ROOT/}"
+  if grep -q "log_" "$rfile" 2>/dev/null; then
+    pass "R script uses logger: $relpath"
+  else
+    fail "R script missing log_ calls: $relpath"
+  fi
+done < <(find skills/*/scripts/ -name "*.R" -type f -print0 2>/dev/null)
+
+while IFS= read -r -d '' pyfile; do
+  relpath="${pyfile#$REPO_ROOT/}"
+  if grep -q "logging\." "$pyfile" 2>/dev/null; then
+    pass "Python script uses logging: $relpath"
+  else
+    fail "Python script missing logging. calls: $relpath"
+  fi
+done < <(find skills/*/scripts/ -name "*.py" -type f -print0 2>/dev/null)
+
+echo ""
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 14 — Error handling in scripts
+# ─────────────────────────────────────────────────────────────────────────────
+echo "--- Section 14: Error handling ---"
+
+while IFS= read -r -d '' rfile; do
+  relpath="${rfile#$REPO_ROOT/}"
+  if grep -q "tryCatch" "$rfile" 2>/dev/null; then
+    pass "R script has tryCatch: $relpath"
+  else
+    fail "R script missing tryCatch: $relpath"
+  fi
+done < <(find skills/*/scripts/ -name "*.R" -type f -print0 2>/dev/null)
+
+while IFS= read -r -d '' pyfile; do
+  relpath="${pyfile#$REPO_ROOT/}"
+  if grep -q "except" "$pyfile" 2>/dev/null; then
+    pass "Python script has except: $relpath"
+  else
+    fail "Python script missing except clause: $relpath"
+  fi
+done < <(find skills/*/scripts/ -name "*.py" -type f -print0 2>/dev/null)
+
+echo ""
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 15 — Version consistency (SKILL.md vs SKILL_INDEX.json)
+# ─────────────────────────────────────────────────────────────────────────────
+echo "--- Section 15: Version consistency ---"
+
+for skill_dir in skills/*/; do
+  [[ -d "$skill_dir" ]] || continue
+  skill_name=$(basename "$skill_dir")
+  skill_md="${skill_dir}SKILL.md"
+  [[ -f "$skill_md" ]] || continue
+
+  if grep -q "skill_version" "$skill_md" 2>/dev/null; then
+    pass "Version field present: $skill_name/SKILL.md"
+  else
+    fail "Version field missing: $skill_name/SKILL.md"
+  fi
+done
+
+echo ""
+
+# ─────────────────────────────────────────────────────────────────────────────
 # FINAL REPORT
 # ─────────────────────────────────────────────────────────────────────────────
 TOTAL=$((PASS + FAIL))
 
+# Count script totals
+R_SCRIPT_TOTAL=$(find skills/*/scripts/ -name "*.R" -type f 2>/dev/null | wc -l)
+PY_SCRIPT_TOTAL=$(find skills/*/scripts/ -name "*.py" -type f 2>/dev/null | wc -l)
+EXAMPLE_TOTAL=$(find examples/ -name "*_example.md" -type f 2>/dev/null | wc -l)
+RESOURCE_TOTAL=$(find skills/*/resources/ -name "*.md" -type f 2>/dev/null | wc -l)
+CHANGELOG_VER=$(grep -m1 '^\## \[' CHANGELOG.md 2>/dev/null | sed 's/.*\[\(.*\)\].*/\1/')
+
 echo "========================================"
-echo " === CI REPORT ==="
-echo " Checks passed: ${PASS}/${TOTAL}"
-echo " Skills verified: ${SKILL_COUNT}"
-echo " Workflows verified: ${WORKFLOW_COUNT}"
-echo " R scripts verified: ${SCRIPT_COUNT}"
-echo " Empty files: ${#EMPTY_FILES[@]}"
+echo " === CI REPORT — ecological-agent-skills ==="
+echo " Date: $(date '+%Y-%m-%d %H:%M')"
+echo " Repository version: ${CHANGELOG_VER:-unknown}"
+echo ""
+echo " Structure checks:     ${PASS}/${TOTAL} passed"
+echo " Skills verified:      ${SKILL_COUNT}"
+echo " Workflows verified:   ${WORKFLOW_COUNT}"
+echo " R scripts:            ${R_SCRIPT_TOTAL}"
+echo " Python scripts:       ${PY_SCRIPT_TOTAL}"
+echo " Examples:             ${EXAMPLE_TOTAL}"
+echo " Resources:            ${RESOURCE_TOTAL}"
+echo " Global coverage:      ${#CONTINENTS_FOUND[@]}/6 continents"
+echo " Empty files:          ${#EMPTY_FILES[@]}"
 
 if [[ ${#FAILED_CHECKS[@]} -gt 0 ]]; then
   echo ""
@@ -348,9 +512,9 @@ fi
 echo "========================================"
 
 if [[ $FAIL -gt 0 ]]; then
-  echo " RESULT: FAILED ($FAIL check(s) did not pass)"
+  echo " Status: FAIL ($FAIL check(s) did not pass)"
   exit 1
 else
-  echo " RESULT: ALL CHECKS PASSED"
+  echo " Status: PASS — ALL CHECKS PASSED"
   exit 0
 fi

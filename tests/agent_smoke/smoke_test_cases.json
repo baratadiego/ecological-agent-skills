@@ -1,0 +1,162 @@
+{
+  "smoke_test_version": "1.0.0",
+  "description": "Agent routing validation — verify correct skill invocation for representative prompts",
+  "last_updated": "2026-03-06",
+  "cases": [
+    {
+      "test_id": "smoke_001",
+      "description": "Full SDM pipeline invokes correct skills in order",
+      "input_prompt": "Build a species distribution model for Vulpes vulpes using occurrences from GBIF and WorldClim predictors",
+      "expected_skills_invoked": ["ecological-data-foundation", "geoprocessing-for-ecology", "predictive-modeling-best-practices", "species-distribution-modeling", "model-validation-and-uncertainty"],
+      "expected_skills_order": "ecological-data-foundation BEFORE species-distribution-modeling",
+      "expected_outputs_mentioned": ["suitability_current.tif", "variable_importance.csv"],
+      "should_NOT_invoke": ["community-ecology-ordination", "occupancy-and-detection"],
+      "edge_case": false
+    },
+    {
+      "test_id": "smoke_002",
+      "description": "Low sample size (n < 10) should NOT invoke SDM, should communicate limitation",
+      "input_prompt": "I have 8 occurrence records for a rare salamander. Run an SDM.",
+      "expected_skills_invoked": ["ecological-data-foundation"],
+      "expected_skills_order": null,
+      "expected_outputs_mentioned": [],
+      "should_NOT_invoke": ["species-distribution-modeling"],
+      "expected_decision": "Sample size too small for reliable SDM. Recommend: gather more records, consider presence-only methods with strong regularization, or use expert-based range delineation.",
+      "edge_case": true
+    },
+    {
+      "test_id": "smoke_003",
+      "description": "Camera trap data triggers camera-trap-processing skill",
+      "input_prompt": "I have camera trap images from 40 stations in Serengeti. Process detection events and estimate activity patterns.",
+      "expected_skills_invoked": ["camera-trap-processing"],
+      "expected_skills_order": null,
+      "expected_outputs_mentioned": ["detection events", "activity patterns"],
+      "should_NOT_invoke": [],
+      "edge_case": false
+    },
+    {
+      "test_id": "smoke_004",
+      "description": "Acoustic recordings trigger acoustic-monitoring skill",
+      "input_prompt": "Analyze AudioMoth recordings from tropical forest to compute acoustic indices and detect bird species with BirdNET.",
+      "expected_skills_invoked": ["acoustic-monitoring"],
+      "expected_skills_order": null,
+      "expected_outputs_mentioned": ["acoustic indices", "BirdNET detections"],
+      "should_NOT_invoke": [],
+      "edge_case": false
+    },
+    {
+      "test_id": "smoke_005",
+      "description": "Conceptual MaxEnt question answered directly without skill invocation",
+      "input_prompt": "What is the difference between MaxEnt features L, LQ, and LQH?",
+      "expected_skills_invoked": [],
+      "expected_skills_order": null,
+      "expected_outputs_mentioned": [],
+      "should_NOT_invoke": [],
+      "expected_decision": "Answer directly from knowledge: L = linear features, LQ = linear + quadratic, LQH = linear + quadratic + hinge. No skill invocation needed.",
+      "edge_case": true
+    },
+    {
+      "test_id": "smoke_006",
+      "description": "BACI design invokes impact-assessment, NOT community-ordination",
+      "input_prompt": "Assess the impact of a new dam on fish diversity using before-after-control-impact design.",
+      "expected_skills_invoked": ["ecological-data-foundation", "ecological-impact-assessment", "biostatistics-workbench"],
+      "expected_skills_order": "ecological-data-foundation BEFORE ecological-impact-assessment",
+      "expected_outputs_mentioned": ["BACI analysis results", "effect size estimates"],
+      "should_NOT_invoke": ["community-ecology-ordination"],
+      "edge_case": false
+    },
+    {
+      "test_id": "smoke_007",
+      "description": "Multi-species screening triggers multispecies workflow",
+      "input_prompt": "Screen these 20 mammal species for habitat suitability across the Cerrado biome.",
+      "expected_skills_invoked": ["ecological-data-foundation", "species-distribution-modeling"],
+      "expected_skills_order": "ecological-data-foundation BEFORE species-distribution-modeling",
+      "expected_outputs_mentioned": ["screening results", "priority classification"],
+      "should_NOT_invoke": [],
+      "expected_workflow": "run-multispecies-screening",
+      "edge_case": false
+    },
+    {
+      "test_id": "smoke_008",
+      "description": "Community data without impact question triggers community-ordination",
+      "input_prompt": "I have a species-by-site matrix for 90 bird survey sites. Run NMDS ordination and test for land use effects with PERMANOVA.",
+      "expected_skills_invoked": ["community-ecology-ordination", "biostatistics-workbench"],
+      "expected_skills_order": null,
+      "expected_outputs_mentioned": ["NMDS ordination plot", "PERMANOVA results"],
+      "should_NOT_invoke": ["ecological-impact-assessment"],
+      "edge_case": false
+    },
+    {
+      "test_id": "smoke_009",
+      "description": "NDVI time series triggers environmental-time-series skill",
+      "input_prompt": "Analyze 20 years of MODIS NDVI for trend detection and breakpoints in a deforested area.",
+      "expected_skills_invoked": ["environmental-time-series"],
+      "expected_skills_order": null,
+      "expected_outputs_mentioned": ["trend analysis", "breakpoint detection"],
+      "should_NOT_invoke": [],
+      "edge_case": false
+    },
+    {
+      "test_id": "smoke_010",
+      "description": "Conservation prioritization triggers spatial-prioritization skill",
+      "input_prompt": "Use prioritizr to identify the minimum set of planning units achieving 30% representation targets for 50 species.",
+      "expected_skills_invoked": ["spatial-prioritization"],
+      "expected_skills_order": null,
+      "expected_outputs_mentioned": ["prioritization solution", "planning unit selection"],
+      "should_NOT_invoke": [],
+      "edge_case": false
+    },
+    {
+      "test_id": "smoke_011",
+      "description": "SDM then prioritization pipeline invokes both in correct order",
+      "input_prompt": "Model habitat suitability for 10 endemic amphibians, then run spatial prioritization to identify conservation areas.",
+      "expected_skills_invoked": ["ecological-data-foundation", "species-distribution-modeling", "model-validation-and-uncertainty", "spatial-prioritization"],
+      "expected_skills_order": "species-distribution-modeling BEFORE spatial-prioritization",
+      "expected_outputs_mentioned": ["suitability maps", "conservation priority areas"],
+      "should_NOT_invoke": [],
+      "edge_case": false
+    },
+    {
+      "test_id": "smoke_012",
+      "description": "Low AUC model triggers decision point recommending revision",
+      "input_prompt": "My MaxEnt model has AUC = 0.55 and TSS = 0.08. What should I do?",
+      "expected_skills_invoked": ["model-validation-and-uncertainty"],
+      "expected_skills_order": null,
+      "expected_outputs_mentioned": [],
+      "should_NOT_invoke": [],
+      "expected_decision": "Model performs near random. Recommend: check data quality, reconsider predictors, verify calibration area M.",
+      "edge_case": true
+    },
+    {
+      "test_id": "smoke_013",
+      "description": "GoF failure in occupancy triggers detection covariate recommendation",
+      "input_prompt": "My single-season occupancy model fails the goodness-of-fit test (p = 0.02). How should I proceed?",
+      "expected_skills_invoked": ["occupancy-and-detection"],
+      "expected_skills_order": null,
+      "expected_outputs_mentioned": [],
+      "should_NOT_invoke": [],
+      "expected_decision": "Consider additional detection covariates or heterogeneous detection model.",
+      "edge_case": true
+    },
+    {
+      "test_id": "smoke_014",
+      "description": "Sampling bias question routes to predictive-modeling-best-practices",
+      "input_prompt": "My occurrence data has strong sampling bias toward roads and cities. How should I correct for this before modeling?",
+      "expected_skills_invoked": ["predictive-modeling-best-practices"],
+      "expected_skills_order": null,
+      "expected_outputs_mentioned": ["bias correction methods"],
+      "should_NOT_invoke": [],
+      "edge_case": false
+    },
+    {
+      "test_id": "smoke_015",
+      "description": "Marine fish data request verifies OBIS is suggested as data source",
+      "input_prompt": "I need occurrence records for reef fish species in the Indo-Pacific for an SDM study. Where should I download the data?",
+      "expected_skills_invoked": ["ecological-data-foundation"],
+      "expected_skills_order": null,
+      "expected_outputs_mentioned": ["OBIS mentioned as data source", "download_from_obis script referenced"],
+      "should_NOT_invoke": [],
+      "edge_case": false
+    }
+  ]
+}

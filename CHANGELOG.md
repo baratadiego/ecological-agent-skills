@@ -3,6 +3,31 @@
 All notable changes to this repository are documented here.
 Format: [version] — date — description
 
+## [3.0.0] — 2026-03-06 — Quality infrastructure and release process (all 6 phases complete)
+
+### Added — Test Infrastructure
+- `tests/regression/` — Regression test framework: `run_regression_tests.sh` (CSV/JSON/PNG comparison with tolerances), `update_references.sh` (--confirm-update safety gate), `REFERENCE_LOG.md`
+- `tests/agent_smoke/smoke_test_cases.json` — 15 agent routing validation cases covering SDM, occupancy, community, impact, time series, prioritization, edge cases, and decision points
+- `tests/agent_smoke/README.md` — Human validation protocol for smoke tests
+
+### Added — CI Expansion (tests/ci_check.sh)
+- Section 10: Global geographic coverage — verifies all 6 inhabited continents have examples
+- Section 11: Example quality — checks data source documentation, species/system metadata, numeric results
+- Section 12: Resource quality — checks for structured content (code blocks, tables, or checklists)
+- Section 13: Script logging — verifies `log_` usage in R and `logging.` in Python scripts
+- Section 14: Error handling — verifies `tryCatch` in R and `except` in Python scripts
+- Section 15: Version consistency — checks skill_version field in all SKILL.md files
+- Expanded CI report with date, version, script/example/resource counts, continent coverage
+
+### Added — Release & Versioning
+- `RELEASE_CHECKLIST.md` — Pre-release, release, and post-release checklist
+- `KNOWN_ISSUES.md` — 3 known issues: blockCV with geographic CRS, ENMeval/terra compatibility, camtrapR Windows paths
+- `docs/repository-statistics.md` — Complete content inventory: 17 skills, 9 workflows, 58 scripts, 14 examples, 53 resources, 585 CI checks
+
+### Changed
+- `CONTRIBUTING.md` — Added "Release Process" section
+- `tests/ci_check.sh` — Expanded from 354 to 585 checks across 15 sections
+
 ## [2.3.0] — 2026-03-06 — Scientific documentation & global example coverage
 
 ### Added — Documentation

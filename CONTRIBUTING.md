@@ -88,6 +88,14 @@ skills/<skill-name>/
 
 Update `CHANGELOG.md` for every release.
 
+### Release Process
+
+1. **Who can release:** Any maintainer with push access to the main branch.
+2. **When to release:** After completing a planned phase (minor/major) or after accumulating meaningful fixes (patch).
+3. **How to release:** Follow `RELEASE_CHECKLIST.md` step by step. Do not skip the CI or regression test steps.
+4. **Version numbering:** See the table below.
+5. **Backward compatibility:** Changes to `SKILL.md` Inputs, Outputs, or Steps that would break existing workflow invocations require a **major** version bump for both the skill and the repository.
+
 ### Per-Skill Versioning (skill_version field in SKILL.md)
 
 Every SKILL.md must contain a `skill_version` field in its YAML front-matter:
