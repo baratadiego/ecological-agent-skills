@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Usage: Rscript predict_distribution.R <model_rds> <predictor_stack_tif> <output_dir> [threshold_method] [scenario_label]
 # Predict suitability from a fitted SDM (maxnet, gbm, randomForest, or ensemble list).
 # Applies MaxTSS / P10 / MTP thresholding, computes MESS, and saves all rasters.

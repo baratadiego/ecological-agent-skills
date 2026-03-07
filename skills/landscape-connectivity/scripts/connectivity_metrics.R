@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Usage: Rscript connectivity_metrics.R <patches_shp> <output_dir> [dmax_m] [area_col]
 #
 # Computes graph-based landscape connectivity metrics (IIC, PC, dIIC, dPC,

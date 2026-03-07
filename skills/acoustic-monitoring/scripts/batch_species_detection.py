@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """
 Batch species detection using BirdNET-Analyzer for passive acoustic monitoring.
 

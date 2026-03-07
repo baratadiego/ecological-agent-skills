@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Usage: Rscript process_camtrap_data.R <image_dir> <camera_metadata_csv> <output_dir> [indep_threshold_min]
 
 # ── Inline logger ─────────────────────────────────────────────────────────────

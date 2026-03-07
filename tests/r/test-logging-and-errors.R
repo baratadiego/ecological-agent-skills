@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # test-logging-and-errors.R — testthat tests for v2.1.0 logging and new scripts
 library(testthat)
 

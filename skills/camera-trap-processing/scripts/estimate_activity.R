@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Usage: Rscript estimate_activity.R <record_table_csv> <species_name> <output_dir> [group_column]
 
 # ── Inline logger ─────────────────────────────────────────────────────────────

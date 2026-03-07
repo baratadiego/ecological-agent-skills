@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Tests for model-validation-and-uncertainty skill scripts
 # Covers: validate_sdm.R, extrapolation_risk.R
 library(testthat)

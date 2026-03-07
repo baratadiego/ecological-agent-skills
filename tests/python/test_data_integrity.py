@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """
 Tests that validate the integrity of all test datasets.
 These run first and act as the safety net for all other tests.

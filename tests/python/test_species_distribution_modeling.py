@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """Tests for species-distribution-modeling skill scripts.
 Covers: sdm_pipeline.py, prepare_future_layers (data checks)
 """

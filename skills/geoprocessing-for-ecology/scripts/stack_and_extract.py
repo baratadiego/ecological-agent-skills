@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """
 stack_and_extract.py
 Clip rasters to study area and extract values at points.

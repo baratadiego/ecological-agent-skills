@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Usage: Rscript power_analysis_baci.R <output_dir> [effect_size] [n_sites] [n_surveys] [alpha] [variance_estimate]
 # Compute statistical power for BACI designs and recommend minimum sample sizes.
 # Outputs: power_curves.png, power_summary.csv, minimum_n_recommendation.md

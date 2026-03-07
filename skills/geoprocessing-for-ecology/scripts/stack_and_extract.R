@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Usage: Rscript stack_and_extract.R <raster_dir> <points.csv> <study_area.shp> <output_dir>
 # Clip rasters to study area and extract values at points
 # Usage: Rscript stack_and_extract.R <raster_dir> <points_csv> <studyarea_shp> <output_dir>

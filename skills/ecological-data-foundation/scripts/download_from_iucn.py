@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """Download species assessment data from the IUCN Red List API v3.
 
 Usage: python download_from_iucn.py <species_name_or_list_csv> <output_dir> [include_range_maps]

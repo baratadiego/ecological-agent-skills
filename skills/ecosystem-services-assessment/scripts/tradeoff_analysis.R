@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Usage: Rscript tradeoff_analysis.R <es_summary_table.csv> <output_dir>
 # ES trade-off and synergy analysis across pixels or land cover units
 # Usage: Rscript tradeoff_analysis.R <es_summary_csv> <output_dir>

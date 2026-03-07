@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Usage: Rscript validate_sdm.R <model.rds> <test_data.csv> <output_dir> [threshold_method]
 # Compute AUC, TSS, Boyce index and calibration for SDM predictions
 # Usage: Rscript validate_sdm.R <predictions_csv> <output_dir>

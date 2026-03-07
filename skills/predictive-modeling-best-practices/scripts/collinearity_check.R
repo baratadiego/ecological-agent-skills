@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Usage: Rscript collinearity_check.R <predictors.csv> <output_dir> [vif_threshold] [cor_threshold]
 # Assess and reduce predictor collinearity
 # Usage: Rscript collinearity_check.R <env_matrix_csv> <output_dir> [vif_threshold]

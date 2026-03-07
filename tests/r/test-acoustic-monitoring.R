@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Tests for acoustic-monitoring skill scripts
 # Covers: compute_acoustic_indices.R, soundscape-ecology-guide.md logic
 library(testthat)

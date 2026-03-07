@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """Process camera trap detection records from CSV output of camtrapR.
 Usage: python process_camtrap_data.py <record_table_csv> <output_dir> [species_name]
 

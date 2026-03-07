@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """Download occurrence records from GBIF via pygbif.
 
 Usage: python download_from_gbif.py <species_name_or_list_csv> <output_dir> [country_code] [year_from] [year_to]

@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Usage: Rscript clean_occurrences.R <raw_occurrences.csv> <output_dir> [country_code]
 
 # ── Inline logger ─────────────────────────────────────────────────────────────

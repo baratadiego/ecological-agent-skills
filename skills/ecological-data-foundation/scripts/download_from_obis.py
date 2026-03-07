@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """Download marine occurrence records from OBIS (Ocean Biodiversity Information System).
 
 Usage: python download_from_obis.py <species_name_or_list_csv> <output_dir> [year_from] [year_to] [wkt_geometry]

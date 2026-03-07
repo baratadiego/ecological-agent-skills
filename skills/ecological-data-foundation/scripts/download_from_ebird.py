@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """Parse eBird Basic Dataset (EBD) for occurrence records.
 
 Usage: python download_from_ebird.py <ebd_file> <species_name_or_list_csv> <output_dir> [year_from] [year_to] [country_code]

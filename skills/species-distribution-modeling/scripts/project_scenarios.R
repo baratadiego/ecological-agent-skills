@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Usage: Rscript project_scenarios.R <model_rds> <scenarios_dir> <output_dir> [threshold_from_csv]
 # Project a fitted SDM across multiple future climate scenario stacks.
 # scenarios_dir must contain .tif files named: <ssp>_<year>.tif (e.g. ssp245_2050.tif)

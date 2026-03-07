@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Usage: Rscript prepare_future_layers.R <current_stack.tif> <future_layers_dir> <study_area.shp> <output_dir> [ssp_label] [year_label]
 
 # ── Inline logger ─────────────────────────────────────────────────────────────

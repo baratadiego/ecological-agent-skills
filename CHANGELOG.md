@@ -3,6 +3,20 @@
 All notable changes to this repository are documented here.
 Format: [version] — date — description
 
+## [Unreleased] — License change: MIT → GPL-3.0-or-later
+
+### Changed
+- **LICENSE** — Replaced MIT license with GNU General Public License v3.0. The change aligns the repository license with GPL-licensed R dependencies used throughout the library (vegan, lme4, ggplot2, terra, prioritizr).
+- All `.R` and `.py` scripts now carry SPDX `GPL-3.0-or-later` headers.
+- `README.md` — Added GPL v3 badge and License section.
+- `CONTRIBUTING.md` — Added GPL compatibility note for contributors.
+- `environment.yaml` — Added license field.
+
+### Added
+- `CITATION.cff` — Machine-readable citation metadata (CFF v1.2.0).
+
+---
+
 ## [3.0.0] — 2026-03-06 — Quality infrastructure and release process (all 6 phases complete)
 
 ### Added — Test Infrastructure

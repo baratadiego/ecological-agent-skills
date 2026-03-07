@@ -148,12 +148,11 @@ while IFS= read -r -d '' rfile; do
   SCRIPT_COUNT=$((SCRIPT_COUNT + 1))
   relpath="${rfile#$REPO_ROOT/}"
 
-  # Must start with # Usage:
-  first_line=$(head -1 "$rfile" 2>/dev/null || echo "")
-  if echo "$first_line" | grep -q "^# Usage:"; then
-    pass "R script has Usage comment on line 1: $relpath"
+  # Must contain # Usage: in first 5 lines (SPDX header may precede it)
+  if head -5 "$rfile" | grep -q "^# Usage:"; then
+    pass "R script has Usage comment in header: $relpath"
   else
-    fail "R script missing '# Usage:' on line 1: $relpath"
+    fail "R script missing '# Usage:' in header: $relpath"
   fi
 
   # Must contain suppressPackageStartupMessages

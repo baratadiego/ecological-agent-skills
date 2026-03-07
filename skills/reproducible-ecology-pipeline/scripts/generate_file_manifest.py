@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """
 generate_file_manifest.py
 Generate SHA256 checksums for all files in a directory and write a manifest.

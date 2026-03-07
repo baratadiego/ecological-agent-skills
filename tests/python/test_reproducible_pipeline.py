@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """Tests for reproducible-ecology-pipeline skill scripts.
 Covers: generate_file_manifest.py, init_project.sh (structure validation)
 """

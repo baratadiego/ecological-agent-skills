@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Usage: Rscript baci_analysis.R <baci_data.csv> <output_dir> [response_col] [random_effects]
 # BACI mixed-effects model for ecological impact assessment
 # Usage: Rscript baci_analysis.R <data_csv> <response_var> <output_dir>

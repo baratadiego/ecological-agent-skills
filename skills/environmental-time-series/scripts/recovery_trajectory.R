@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Usage: Rscript recovery_trajectory.R <timeseries.csv> <disturbance_date> <output_dir>
 # Estimate post-disturbance vegetation recovery trajectory
 # Usage: Rscript recovery_trajectory.R <timeseries_csv> <disturbance_date> <output_dir>

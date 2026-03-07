@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Usage: Rscript resistance_surface.R <landcover_tif> <resistance_csv> <output_dir>
 #        [dem_tif] [road_shp]
 #

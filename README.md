@@ -1,5 +1,7 @@
 # ecological-agent-skills
 
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
 A curated skill library for **quantitative ecology** workflows, compatible with the [Antigravity](https://github.com/ecological-agent-skills) agent framework.
 
 This repository provides 12 modular skills and 8 multi-step workflows covering the full spectrum of quantitative ecology: from raw data ingestion and geoprocessing to species distribution modeling, occupancy analysis, community ecology, ecological impact assessment, and reproducible reporting.
@@ -179,3 +181,9 @@ See [`docs/global-examples-index.md`](docs/global-examples-index.md) for full de
 ## Contributing
 
 Follow the standard skill packaging pattern: one directory per skill, `SKILL.md` as the entry point, with optional `resources/`, `examples/`, and `scripts/` subdirectories.
+
+---
+
+## License
+
+This project is licensed under the [GNU General Public License v3.0](LICENSE) or later. See `CITATION.cff` for citation metadata.

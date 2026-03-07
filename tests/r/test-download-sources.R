@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Tests for v2.2.0 occurrence download scripts (schema + argument validation).
 # No live API calls — all tests use mock data and pure logic.
 # Run: Rscript tests/r/test-download-sources.R

@@ -1,0 +1,76 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "ecological-agent-skills"
+type: software
+version: 3.0.0
+date-released: "2026-03-06"
+license: GPL-3.0-or-later
+repository-code: "https://github.com/baratadiego/ecological-agent-skills"
+
+authors:
+  - family-names: Barata
+    given-names: Francisco Diego Barros
+    orcid: ""
+
+keywords:
+  - ecology
+  - species distribution modeling
+  - SDM
+  - occupancy modeling
+  - community ecology
+  - ecological impact assessment
+  - environmental time series
+  - geoprocessing
+  - landscape connectivity
+  - population viability analysis
+  - spatial prioritization
+  - camera trap
+  - acoustic monitoring
+  - biostatistics
+  - reproducible research
+
+abstract: >-
+  A curated, modular skill library for quantitative ecology workflows,
+  compatible with Antigravity/Gemini CLI/Claude Code agent frameworks.
+  Provides 17 skills, 9 workflows, and 58 scripts covering data ingestion,
+  geoprocessing, species distribution modeling, occupancy analysis,
+  community ecology, ecological impact assessment, and reproducible reporting.
+
+references:
+  - type: article
+    authors:
+      - family-names: Roberts
+        given-names: David R.
+    title: "Cross-validation strategies for data with temporal, spatial, hierarchical, or phylogenetic structure"
+    journal: "Ecography"
+    year: 2017
+    doi: "10.1111/ecog.02881"
+
+  - type: article
+    authors:
+      - family-names: "Ara\xFAjo"
+        given-names: Miguel B.
+      - family-names: New
+        given-names: Mark
+    title: "Ensemble forecasting of species distributions"
+    journal: "Trends in Ecology & Evolution"
+    year: 2007
+    doi: "10.1016/j.tree.2006.09.010"
+
+  - type: article
+    authors:
+      - family-names: Peterson
+        given-names: A. Townsend
+    title: "Rethinking receiver operating characteristic analysis applications in ecological niche modeling"
+    journal: "Ecological Modelling"
+    year: 2008
+    doi: "10.1016/j.ecolmodel.2007.11.008"
+
+  - type: article
+    authors:
+      - family-names: Barve
+        given-names: Narayani
+    title: "The crucial role of the accessible area in ecological niche modeling and species distribution modeling"
+    journal: "Ecological Modelling"
+    year: 2011
+    doi: "10.1016/j.ecolmodel.2011.02.011"

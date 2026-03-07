@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Tests for environmental-time-series skill scripts
 # Covers: trend_analysis.R, recovery_trajectory.R
 library(testthat)

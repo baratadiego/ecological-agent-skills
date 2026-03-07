@@ -1,4 +1,5 @@
 name: ecological-agent-skills
+# SPDX-License-Identifier: GPL-3.0-or-later
 channels:
   - conda-forge
   - defaults

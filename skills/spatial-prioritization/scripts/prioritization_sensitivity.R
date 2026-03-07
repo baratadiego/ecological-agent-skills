@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Usage: Rscript prioritization_sensitivity.R <pu_raster> <features_dir>
 #        <output_dir> [targets] [locked_in_raster] [locked_out_raster]
 #

@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """
 Tests for occupancy-and-detection skill scripts.
 Run: pytest tests/python/test_occupancy.py -v

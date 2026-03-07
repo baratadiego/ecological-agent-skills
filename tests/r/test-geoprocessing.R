@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Tests for geoprocessing-for-ecology skill scripts
 # Covers: stack_and_extract.R
 library(testthat)

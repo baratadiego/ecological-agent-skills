@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Usage: Rscript community_analysis.R <species_site_matrix.csv> <metadata.csv> <output_dir> [method]
 # NMDS ordination, diversity metrics, PERMANOVA
 # Usage: Rscript community_analysis.R <species_matrix_csv> <metadata_csv> <output_dir>

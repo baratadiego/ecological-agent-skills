@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # test-ecological-data-foundation.R
 # testthat tests for ecological-data-foundation skill
 # Run: testthat::test_file("tests/r/test-ecological-data-foundation.R")

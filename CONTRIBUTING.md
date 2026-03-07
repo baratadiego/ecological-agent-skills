@@ -4,6 +4,12 @@ Thank you for contributing! This guide explains how to add or improve skills, wo
 
 ---
 
+## License Compatibility
+
+All contributions must be compatible with **GPL-3.0-or-later**. By submitting a pull request, you agree that your contribution is licensed under the same terms as this project.
+
+---
+
 ## Skill Structure
 
 Every skill must follow this structure exactly:

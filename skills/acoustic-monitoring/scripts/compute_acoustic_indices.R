@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Usage: Rscript compute_acoustic_indices.R <audio_dir> <output_dir> [time_resolution_min] [freq_min] [freq_max]
 #
 # Computes acoustic indices (ACI, BI, NDSI, H, ADI, AEI) for all .wav/.flac

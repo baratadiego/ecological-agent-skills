@@ -1,3 +1,6 @@
+# ecological-agent-skills / Copyright (C) 2026 Francisco Diego Barros Barata
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Usage: Rscript occupancy_analysis.R <detection_history.csv> <site_covariates.csv> <output_dir>
 # Single-season occupancy analysis with model selection
 # Usage: Rscript occupancy_analysis.R <detection_history_csv> <site_cov_csv> <output_dir>
