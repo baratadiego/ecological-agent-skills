@@ -1,4 +1,6 @@
 ---
+name: biostatistics-workbench
+description: "Runs frequentist statistical analyses including GLMs, GLMMs, model selection, and assumption diagnostics for ecological data. Use this skill when the user needs statistical tests, linear or mixed models, ANOVA, effect sizes, confidence intervals, AIC-based model selection, residual diagnostics, overdispersion checks, regression analysis, p-value interpretation, normality tests, or hypothesis testing on ecological datasets."
 skill_version: 1.0.0
 ---
 

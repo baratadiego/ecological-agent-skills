@@ -1,4 +1,6 @@
 ---
+name: reproducible-ecology-pipeline
+description: "Ensures full reproducibility of ecological analyses through provenance tracking, decision logging, parameter manifests, and environment documentation. Use this skill when the user mentions reproducibility, audit trails, data provenance, decision logs, file manifests, session info, renv, targets, DVC, MLflow, parameter versioning, checksums, or pipeline documentation and project initialization."
 skill_version: 1.0.0
 ---
 

@@ -1,4 +1,6 @@
 ---
+name: community-ecology-ordination
+description: "Performs multivariate community ecology analyses including ordination, diversity metrics, and assemblage comparisons. Use this skill when the user mentions species composition, NMDS, PCA ordination, PERMANOVA, beta diversity, alpha diversity, species richness, Bray-Curtis dissimilarity, indicator species analysis, cluster analysis, species-by-site matrices, diversity indices, or assemblage structure comparisons."
 skill_version: 1.0.0
 ---
 

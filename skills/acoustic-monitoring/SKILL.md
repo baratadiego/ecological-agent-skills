@@ -1,4 +1,6 @@
 ---
+name: acoustic-monitoring
+description: "Processes passive acoustic monitoring (PAM) data to compute soundscape indices and detect species from audio recordings. Use this skill when the user mentions acoustic monitoring, bioacoustics, soundscape ecology, acoustic indices (ACI, NDSI, ADI), BirdNET, AudioMoth, bat detectors, dawn chorus analysis, passive acoustic recorders, species detection from audio, or sound diversity metrics."
 skill_version: 1.0.0
 ---
 

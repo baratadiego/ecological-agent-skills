@@ -1,4 +1,6 @@
 ---
+name: species-distribution-modeling
+description: "Runs the complete species distribution modeling (SDM/ENM) pipeline: occurrence preparation, model fitting (MaxEnt, ensemble), thresholding, projection under climate scenarios, and interpretation. Use this skill when the user mentions habitat suitability, niche modeling, MaxEnt, biomod2, potential distribution, range maps, suitable area mapping, climate projections, invasion risk, range shift analysis, suitability mapping, ENM, ecological niche model, or calibration area definition."
 skill_version: 1.0.0
 ---
 

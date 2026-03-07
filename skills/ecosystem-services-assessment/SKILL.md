@@ -1,4 +1,6 @@
 ---
+name: ecosystem-services-assessment
+description: "Maps and quantifies ecosystem services including carbon stocks, water yield, soil erosion, and habitat quality with trade-off analysis. Use this skill when the user mentions ecosystem services, InVEST models, ES mapping, carbon sequestration, water yield estimation, RUSLE erosion modeling, habitat quality, pollination services, trade-off analysis, PES (payments for ecosystem services), natural capital, or ES valuation."
 skill_version: 1.0.0
 ---
 

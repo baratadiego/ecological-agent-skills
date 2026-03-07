@@ -1,4 +1,6 @@
 ---
+name: landscape-connectivity
+description: "Analyzes landscape connectivity using graph theory, resistance surfaces, and corridor identification for conservation planning. Use this skill when the user mentions habitat connectivity, wildlife corridors, Circuitscape, least-cost paths, resistance surfaces, IIC/dPC connectivity metrics, stepping stones, patch importance ranking, betweenness centrality, fragmentation analysis, landscape graphs, or pinchpoint identification."
 skill_version: 1.0.0
 ---
 

@@ -1,4 +1,6 @@
 ---
+name: model-validation-and-uncertainty
+description: "Validates predictive models and quantifies uncertainty including AUC/TSS metrics, calibration, extrapolation risk (MOP/MESS/ExDet), and ensemble uncertainty maps. Use this skill when the user needs model performance evaluation, ROC curves, cross-validation results, calibration curves, overfitting diagnostics, prediction intervals, bootstrap uncertainty, sensitivity/specificity assessment, or extrapolation risk analysis."
 skill_version: 1.0.0
 ---
 

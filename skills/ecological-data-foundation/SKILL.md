@@ -1,4 +1,6 @@
 ---
+name: ecological-data-foundation
+description: "Cleans, validates, and standardizes ecological occurrence records and downloads biodiversity data from global repositories. Use this skill when the user needs data cleaning, coordinate validation, duplicate removal, outlier detection, taxonomic harmonization, or downloads from GBIF, iNaturalist, eBird, OBIS, or IUCN Red List. Also triggers for Darwin Core formatting, data quality reports, flagged records, and biodiversity data preparation."
 skill_version: 1.0.0
 ---
 

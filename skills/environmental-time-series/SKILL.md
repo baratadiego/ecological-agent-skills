@@ -1,4 +1,6 @@
 ---
+name: environmental-time-series
+description: "Detects trends, breakpoints, and recovery trajectories in environmental time series data from remote sensing or field measurements. Use this skill when the user mentions time series analysis, NDVI/EVI/LST trends, Mann-Kendall tests, Sen slope, BFAST breakpoints, structural change detection, seasonal decomposition (STL), anomaly detection, recovery trajectories, regime shifts, or pixel-wise trend analysis."
 skill_version: 1.0.0
 ---
 

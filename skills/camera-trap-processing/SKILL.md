@@ -1,4 +1,6 @@
 ---
+name: camera-trap-processing
+description: "Processes camera trap image records into structured detection data, activity patterns, and trap effort summaries. Use this skill when the user mentions camera traps, wildlife cameras, trap nights, detection events, diel activity patterns, camtrapR, temporal overlap indices (Dhat), RAI (relative abundance index), camera station data, detection history generation, or independence thresholds for photo events."
 skill_version: 1.0.0
 ---
 

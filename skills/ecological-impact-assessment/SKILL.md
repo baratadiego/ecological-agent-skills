@@ -1,4 +1,6 @@
 ---
+name: ecological-impact-assessment
+description: "Quantifies ecological impacts using BACI designs, landscape fragmentation metrics, and pressure indices. Use this skill when the user mentions BACI analysis, before-after-control-impact, impact assessment, disturbance effects, land use change impacts, fragmentation metrics, landscape metrics, pressure or threat indices, intervention effectiveness, management outcome evaluation, or control-impact comparisons."
 skill_version: 1.0.0
 ---
 

@@ -1,4 +1,6 @@
 ---
+name: population-viability-analysis
+description: "Builds matrix population models (Leslie/Lefkovitch) and runs stochastic PVA simulations to assess extinction risk and IUCN criteria. Use this skill when the user mentions PVA, population viability, lambda growth rate, Leslie or Lefkovitch matrices, quasi-extinction thresholds, elasticity or sensitivity analysis, stochastic population projections, minimum viable population (MVP), or IUCN Criterion E assessment."
 skill_version: 1.0.0
 ---
 

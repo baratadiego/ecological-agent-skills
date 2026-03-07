@@ -1,4 +1,6 @@
 ---
+name: geoprocessing-for-ecology
+description: "Handles spatial data operations: reprojection, raster stacking, clipping, extraction, and environmental predictor downloads for ecological analyses. Use this skill when the user needs CRS reprojection, raster masking or cropping, spatial extraction, buffer creation, raster resampling, spatial joins, GeoTIFF processing, shapefile operations, WorldClim/CHELSA/ERA5 predictor downloads, GDAL operations, or predictor stack preparation."
 skill_version: 1.0.0
 ---
 

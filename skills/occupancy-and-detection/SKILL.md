@@ -1,4 +1,6 @@
 ---
+name: occupancy-and-detection
+description: "Fits single-season and dynamic occupancy models that account for imperfect detection in wildlife survey data. Use this skill when the user mentions occupancy estimation, detection probability, imperfect detection, detection histories, repeated visits, MacKenzie models, psi estimation, dynamic occupancy (colonization/extinction), goodness-of-fit testing (c-hat), site occupancy, or unmarked package analyses."
 skill_version: 1.0.0
 ---
 

@@ -1,4 +1,6 @@
 ---
+name: spatial-prioritization
+description: "Solves systematic conservation planning problems using integer linear programming (prioritizr), Marxan, or Zonation for protected area design. Use this skill when the user mentions conservation planning, 30x30 targets, Marxan, Zonation, prioritizr, irreplaceability, boundary length modifier (BLM), minimum set problems, representation targets, systematic conservation, or protected area network design."
 skill_version: 1.0.0
 ---
 

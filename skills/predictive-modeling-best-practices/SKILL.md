@@ -1,4 +1,6 @@
 ---
+name: predictive-modeling-best-practices
+description: "Guides predictor selection, collinearity checks, cross-validation strategy, and hyperparameter tuning for ecological predictive models. Use this skill when the user mentions VIF, collinearity, feature selection, spatial cross-validation, block CV, hyperparameter tuning, overfitting prevention, data leakage auditing, background point selection, pseudo-absence generation, ENMeval tuning, regularization, or spatial autocorrelation correction."
 skill_version: 1.0.0
 ---
 
