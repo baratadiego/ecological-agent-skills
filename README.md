@@ -2,7 +2,11 @@
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-A curated, agent-agnostic skill library for **quantitative ecology** workflows, designed for use with any AI coding agent.
+Teach your AI agent to do rigorous ecology.
+
+**ecological-agent-skills** is a structured instruction library that turns any AI coding agent into a quantitative ecology assistant — capable of cleaning occurrence data, fitting species distribution models, estimating occupancy, assessing landscape connectivity, running population viability analyses, and designing reserve networks, all with built-in decision logic, reproducibility tracking, and validated R/Python scripts.
+
+Works with Claude Code, Gemini CLI, Cursor, GitHub Copilot, and any agent that reads Markdown.
 
 **17 modular skills** | **13 multi-step workflows** | **58 R/Python scripts** | **14 worked examples across 6 continents**
 
