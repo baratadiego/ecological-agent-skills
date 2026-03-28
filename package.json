@@ -1,0 +1,43 @@
+{
+  "name": "ecological-agent-skills",
+  "version": "3.1.0",
+  "description": "17 modular skills for quantitative ecology — SDM, occupancy, PVA, connectivity, prioritization, and more. Works with Claude Code, Gemini CLI, Cursor, Copilot, and any AI agent.",
+  "keywords": [
+    "ecology",
+    "sdm",
+    "species-distribution-modeling",
+    "occupancy",
+    "population-viability",
+    "landscape-connectivity",
+    "conservation",
+    "ai-skills",
+    "claude-code",
+    "gemini-cli",
+    "cursor",
+    "copilot"
+  ],
+  "author": "Francisco Diego Barros Barata",
+  "license": "GPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/baratadiego/ecological-agent-skills.git"
+  },
+  "bin": {
+    "ecological-agent-skills": "./bin/install.mjs"
+  },
+  "files": [
+    "bin/",
+    "skills/",
+    "workflows/",
+    "templates/",
+    "examples/",
+    "docs/",
+    "AGENT_CONTEXT.md",
+    "CATALOG.md",
+    "environment.yaml",
+    "renv.lock"
+  ],
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -65,28 +65,62 @@ for Panthera onca in the Amazon biome using WorldClim v2.1 predictors.
 
 ## Installation
 
-### Option A — Clone (recommended)
+### Option A: npx (recommended)
+
+```bash
+npx ecological-agent-skills --claude
+```
+
+One command. Clones the repository, copies skills to the right location for your agent, and prints next steps.
+
+### Option B: Git clone
 
 ```bash
 git clone https://github.com/baratadiego/ecological-agent-skills.git
 ```
 
-### Option B — Download ZIP
+### Option C: Download ZIP
 
 Download from [Releases](https://github.com/baratadiego/ecological-agent-skills/releases) and extract to your preferred location.
 
-### Setup per agent framework
+---
 
-| Agent Framework | Setup |
-|----------------|-------|
-| **Claude Code** | Clone into your project or reference via `CLAUDE.md`. Add `Read AGENT_CONTEXT.md before any ecology task` to your system prompt or project instructions |
-| **Gemini CLI** | Clone to `~/.gemini/ecological-agent-skills/skills/`. Skills are auto-discovered |
-| **GitHub Copilot** | Clone into workspace. Reference `AGENT_CONTEXT.md` in `.github/copilot-instructions.md` |
-| **Cursor** | Clone into workspace. Add `AGENT_CONTEXT.md` path to Cursor Rules (`.cursor/rules/`) |
-| **Windsurf** | Clone into workspace. Reference in `.windsurfrules` |
-| **Any other agent** | Place at `.agent/skills/` in your project root, or point the agent to `AGENT_CONTEXT.md` directly |
+### Choose Your Tool
 
-### Environment setup (for running scripts)
+| Tool | Install command |
+|------|----------------|
+| **Claude Code** | `npx ecological-agent-skills --claude` |
+| **Gemini CLI / Antigravity** | `npx ecological-agent-skills --gemini` |
+| **Cursor** | `npx ecological-agent-skills --cursor` |
+| **GitHub Copilot** | `npx ecological-agent-skills --copilot` |
+| **Codex CLI** | `npx ecological-agent-skills --codex` |
+| **Custom path** | `npx ecological-agent-skills --path ./my-skills` |
+
+**What each flag does:**
+
+| Flag | Install path | Notes |
+|------|-------------|-------|
+| `--claude` | `.claude/skills/ecological-agent-skills/` | Project-local. Add reference to `CLAUDE.md` |
+| `--gemini` | `~/.gemini/ecological-agent-skills/skills/` | Global. Auto-discovered by Gemini CLI |
+| `--cursor` | `.cursor/skills/ecological-agent-skills/` | Project-local. Add reference to `.cursor/rules/` |
+| `--copilot` | `.github/skills/ecological-agent-skills/` | Project-local. Reference in `copilot-instructions.md` |
+| `--codex` | `.codex/skills/ecological-agent-skills/` | Project-local |
+| `--path <dir>` | Custom directory | For any agent or manual setup |
+
+### Manual setup per agent
+
+If you prefer to clone manually, here's how to wire it up for each tool:
+
+| Agent Framework | Setup after cloning |
+|----------------|---------------------|
+| **Claude Code** | Add to `CLAUDE.md`: `Read AGENT_CONTEXT.md from ecological-agent-skills/ before any ecology task` |
+| **Gemini CLI** | Move to `~/.gemini/ecological-agent-skills/skills/` — auto-discovered |
+| **Cursor** | Add to `.cursor/rules/`: `Read AGENT_CONTEXT.md from ecological-agent-skills/ before any ecology task` |
+| **GitHub Copilot** | Reference in `.github/copilot-instructions.md` |
+| **Windsurf** | Reference in `.windsurfrules` |
+| **Any agent** | Point the agent to `AGENT_CONTEXT.md` directly |
+
+### Environment setup (for running R/Python scripts)
 
 ```bash
 # Python + R environment via conda
