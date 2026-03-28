@@ -1,6 +1,6 @@
 # Skill Catalog — ecological-agent-skills
 
-A quick-reference index for all 12 skills. Each row summarises the skill's domain, when to invoke it, expected inputs, expected outputs, and which workflows depend on it.
+A quick-reference index for all 17 skills. Each row summarises the skill's domain, when to invoke it, expected inputs, expected outputs, and which workflows depend on it.
 
 ---
 
@@ -20,6 +20,11 @@ A quick-reference index for all 12 skills. Each row summarises the skill's domai
 | 10 | [environmental-time-series](#10-environmental-time-series) | Time series | 2 |
 | 11 | [ecosystem-services-assessment](#11-ecosystem-services-assessment) | ES valuation | 3 |
 | 12 | [reproducible-ecology-pipeline](#12-reproducible-ecology-pipeline) | Reproducibility | 1 |
+| 13 | [camera-trap-processing](#13-camera-trap-processing) | Camera traps / wildlife monitoring | 4 |
+| 14 | [acoustic-monitoring](#14-acoustic-monitoring) | Bioacoustics / soundscape ecology | 4 |
+| 15 | [landscape-connectivity](#15-landscape-connectivity) | Landscape connectivity / corridors | 4 |
+| 16 | [population-viability-analysis](#16-population-viability-analysis) | Population viability / extinction risk | 4 |
+| 17 | [spatial-prioritization](#17-spatial-prioritization) | Conservation planning / reserve design | 4 |
 
 ---
 
@@ -125,27 +130,72 @@ A quick-reference index for all 12 skills. Each row summarises the skill's domai
 ---
 
 ### 12. reproducible-ecology-pipeline
-**Domain:** Provenance tracking, parameter logging, decision audit, reproducibility checklist  
-**When to use:** Throughout every project; mandatory before any publication or technical report.  
-**Inputs:** Any intermediate or final analytical outputs, code, model parameters  
-**Outputs:** Reproducibility checklist, parameter manifest, decision log, audit trail  
-**Used by workflows:** all  
+**Domain:** Provenance tracking, parameter logging, decision audit, reproducibility checklist
+**When to use:** Throughout every project; mandatory before any publication or technical report.
+**Inputs:** Any intermediate or final analytical outputs, code, model parameters
+**Outputs:** Reproducibility checklist, parameter manifest, decision log, audit trail
+**Used by workflows:** all
+
+---
+
+### 13. camera-trap-processing
+**Domain:** Camera trap data processing, detection events, diel activity patterns, temporal overlap
+**When to use:** When processing camera trap image records into structured detection data, computing activity patterns, or generating detection histories for occupancy modeling.
+**Inputs:** Image directory, camera station metadata (GPS, deployment dates), species list, independence threshold (default 30 min)
+**Outputs:** Record table (CSV), detection history matrix, camera operation summary, trap effort table, activity overlap plots
+**Used by workflows:** (standalone; feeds into occupancy-and-detection)
+
+---
+
+### 14. acoustic-monitoring
+**Domain:** Passive acoustic monitoring, soundscape indices (ACI, NDSI, ADI), automated species detection
+**When to use:** When processing audio recordings from AudioMoth, SM4, or similar recorders to compute soundscape indices or detect species via BirdNET or similar classifiers.
+**Inputs:** Audio directory (WAV/FLAC), recording metadata, species list (optional), location coordinates
+**Outputs:** Acoustic indices time series (CSV), detection list with confidence scores, species accumulation curve, soundscape heatmap
+**Used by workflows:** (standalone; pairs with environmental-time-series)
+
+---
+
+### 15. landscape-connectivity
+**Domain:** Habitat connectivity, resistance surfaces, graph-theoretic metrics (IIC, dPC), corridor identification
+**When to use:** To assess landscape connectivity for a focal species, identify wildlife corridors, rank patches by importance, or detect pinchpoints using Circuitscape or graph-based approaches.
+**Inputs:** Habitat patch layer, dispersal distance (m), land cover raster, resistance value table
+**Outputs:** Patch importance metrics (CSV), resistance surface (TIF), connectivity graph plot, pinchpoint map
+**Used by workflows:** (standalone; depends on geoprocessing-for-ecology)
+
+---
+
+### 16. population-viability-analysis
+**Domain:** Matrix population models (Leslie/Lefkovitch), stochastic PVA, extinction risk, IUCN Criterion E
+**When to use:** To project population trajectories, estimate extinction probability, compute lambda/elasticity/sensitivity, or assess a species against IUCN Criterion E quantitative thresholds.
+**Inputs:** Vital rates (survival, fecundity per stage/age), initial population size, time horizon, quasi-extinction threshold
+**Outputs:** Lambda summary, sensitivity/elasticity matrices, stochastic PVA trajectories, extinction probability curve, IUCN Criterion E classification
+**Used by workflows:** (standalone; depends on biostatistics-workbench)
+
+---
+
+### 17. spatial-prioritization
+**Domain:** Systematic conservation planning, prioritizr (ILP), Marxan, Zonation, protected area network design
+**When to use:** To identify priority areas for conservation, design reserve networks with representation targets, calibrate boundary length modifier (BLM), or evaluate existing protected area coverage.
+**Inputs:** Planning unit raster, species/feature distribution rasters, representation targets, cost layer, locked-in/out areas
+**Outputs:** Optimal solution map (TIF), feature representation table, cost summary, irreplaceability map, BLM calibration curve, portfolio frequency map
+**Used by workflows:** (standalone; depends on species-distribution-modeling, ecosystem-services-assessment)
 
 ---
 
 ## Workflow × Skill Matrix
 
-|  | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 |
-|--|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:--:|:--:|:--:|
-| run-sdm-study | ✓ | ✓ | | ✓ | ✓ | ✓ | | | | | | ✓ |
-| assess-ecological-impact | ✓ | ✓ | ✓ | | ✓ | | | | ✓ | | | ✓ |
-| analyze-community-structure | ✓ | | ✓ | | ✓ | | | ✓ | | | | ✓ |
-| build-fire-risk-map | ✓ | ✓ | | ✓ | ✓ | | | | ✓ | ✓ | | |
-| run-occupancy-analysis | ✓ | | ✓ | | ✓ | | ✓ | | | | | ✓ |
-| analyze-environmental-change | ✓ | ✓ | | | | | | | ✓ | ✓ | | ✓ |
-| assess-ecosystem-services | ✓ | ✓ | ✓ | | | | | | | | ✓ | ✓ |
-| produce-technical-report | | | | | | | | | | | | ✓ |
-| run-multispecies-screening | ✓ | ✓ | | ✓ | ✓ | ✓ | | | | | | |
+|  | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 |
+|--|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+| run-sdm-study | ✓ | ✓ | | ✓ | ✓ | ✓ | | | | | | ✓ | | | | | |
+| assess-ecological-impact | ✓ | ✓ | ✓ | | ✓ | | | | ✓ | | | ✓ | | | | | |
+| analyze-community-structure | ✓ | | ✓ | | ✓ | | | ✓ | | | | ✓ | | | | | |
+| build-fire-risk-map | ✓ | ✓ | | ✓ | ✓ | | | | ✓ | ✓ | | | | | | | |
+| run-occupancy-analysis | ✓ | | ✓ | | ✓ | | ✓ | | | | | ✓ | ✓ | | | | |
+| analyze-environmental-change | ✓ | ✓ | | | | | | | ✓ | ✓ | | ✓ | | ✓ | | | |
+| assess-ecosystem-services | ✓ | ✓ | ✓ | | | | | | | | ✓ | ✓ | | | | | ✓ |
+| produce-technical-report | | | | | | | | | | | | ✓ | | | | | |
+| run-multispecies-screening | ✓ | ✓ | | ✓ | ✓ | ✓ | | | | | | | | | | | |
 
 ---
 
