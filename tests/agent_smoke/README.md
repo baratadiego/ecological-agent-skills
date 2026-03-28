@@ -8,7 +8,7 @@ These tests are designed for **human validation**, not automated execution. Each
 
 ## How to Run
 
-1. Open a session with the AI agent (Antigravity, Gemini CLI, Claude Code, or compatible)
+1. Open a session with the AI agent (Claude Code, Gemini CLI, GitHub Copilot, Cursor, or any compatible agent)
 2. Ensure the agent has loaded `AGENT_CONTEXT.md` and `skills/SKILL_INDEX.json`
 3. For each test case in `smoke_test_cases.json`:
    a. Copy the `input_prompt` and send it to the agent
@@ -24,7 +24,7 @@ Save results as `smoke_test_results_{YYYY-MM-DD}.json`:
 ```json
 {
   "date": "2026-03-06",
-  "agent": "Claude Code / Gemini CLI / etc.",
+  "agent": "Claude Code / Gemini CLI / Copilot / Cursor / etc.",
   "model": "model identifier",
   "results": [
     {

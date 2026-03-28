@@ -196,6 +196,10 @@ A quick-reference index for all 17 skills. Each row summarises the skill's domai
 | assess-ecosystem-services | ✓ | ✓ | ✓ | | | | | | | | ✓ | ✓ | | | | | ✓ |
 | produce-technical-report | | | | | | | | | | | | ✓ | | | | | |
 | run-multispecies-screening | ✓ | ✓ | | ✓ | ✓ | ✓ | | | | | | | | | | | |
+| run-camera-trap-occupancy | ✓ | | | | ✓ | | ✓ | | | | | ✓ | ✓ | | | | |
+| assess-landscape-connectivity | ✓ | ✓ | | | ✓ | | | | | | | ✓ | | | ✓ | | |
+| run-population-viability | ✓ | | ✓ | | ✓ | | | | | | | ✓ | | | | ✓ | |
+| run-conservation-prioritization | ✓ | ✓ | | | | ✓ | | | | | | ✓ | | | | | ✓ |
 
 ---
 

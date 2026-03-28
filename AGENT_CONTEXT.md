@@ -10,7 +10,7 @@ Do not skip sections. Every rule here is enforced at runtime.
 
 This repository is a modular skill library for quantitative ecology.
 It is structured for use by AI agents operating within agent frameworks
-(Claude Code, Gemini CLI, or compatible systems).
+(Claude Code, Gemini CLI, GitHub Copilot, Cursor, or any compatible system).
 
 **Skills** are self-contained analysis modules. Each skill:
 - Lives at `skills/<skill-id>/`

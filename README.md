@@ -2,20 +2,23 @@
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-A curated skill library for **quantitative ecology** workflows, compatible with the [Antigravity](https://github.com/ecological-agent-skills) agent framework.
+A curated, agent-agnostic skill library for **quantitative ecology** workflows, designed for use with any AI coding agent.
 
-This repository provides 17 modular skills and 9 multi-step workflows covering the full spectrum of quantitative ecology: from raw data ingestion and geoprocessing to species distribution modeling, occupancy analysis, community ecology, ecological impact assessment, and reproducible reporting.
+This repository provides 17 modular skills and 13 multi-step workflows covering the full spectrum of quantitative ecology: from raw data ingestion and geoprocessing to species distribution modeling, occupancy analysis, community ecology, ecological impact assessment, and reproducible reporting.
 
 ---
 
 ## Compatibility
 
-These skills are designed for use with **Antigravity**-compatible agents (e.g., Gemini CLI, Claude Code, or any agent that supports the `.agent/skills/` convention).
+These skills work with any AI agent that can read structured Markdown instructions and execute R/Python scripts. Tested frameworks include:
 
-Install paths:
-- **Antigravity / Gemini CLI:** `~/.gemini/ecological-agent-skills/skills/`
-- **Generic agent:** `.agent/skills/` (project root)
-- **Claude Code:** reference via system prompt or MCP configuration
+| Agent Framework | Install / Reference Path |
+|----------------|--------------------------|
+| **Claude Code** | Reference via system prompt, `CLAUDE.md`, or MCP configuration |
+| **Gemini CLI / Antigravity** | `~/.gemini/ecological-agent-skills/skills/` |
+| **GitHub Copilot** | Reference via `.github/copilot-instructions.md` or workspace context |
+| **Cursor / Windsurf** | Add as workspace folder; reference `AGENT_CONTEXT.md` in rules |
+| **Any agent** | `.agent/skills/` (project root) or direct file reference
 
 ---
 
@@ -79,7 +82,7 @@ See [CATALOG.md](CATALOG.md) for full metadata, inputs, outputs, and workflow li
 
 ---
 
-## Workflows (9)
+## Workflows (13)
 
 | Workflow | Skills Used |
 |----------|-------------|
@@ -87,17 +90,21 @@ See [CATALOG.md](CATALOG.md) for full metadata, inputs, outputs, and workflow li
 | `assess-ecological-impact` | 1 → 2 → 9 → 3 → 5 → 12 |
 | `analyze-community-structure` | 1 → 3 → 8 → 5 → 12 |
 | `build-fire-risk-map` | 1 → 2 → 10 → 4 → 5 → 9 |
-| `run-occupancy-analysis` | 1 → 3 → 7 → 13 → 5 → 12 |
-| `analyze-environmental-change` | 1 → 2 → 10 → 9 → 14 → 12 |
-| `assess-ecosystem-services` | 1 → 2 → 11 → 3 → 17 → 12 |
+| `run-occupancy-analysis` | 1 → 3 → 7 → 5 → 12 |
+| `analyze-environmental-change` | 1 → 2 → 10 → 9 → 12 |
+| `assess-ecosystem-services` | 1 → 2 → 11 → 3 → 12 |
 | `produce-technical-report` | 12 → outputs → template → synthesis |
 | `run-multispecies-screening` | 1 → 2 → 4 → 6 → 5 |
+| `run-camera-trap-occupancy` | 1 → 13 → 7 → 5 → 12 |
+| `assess-landscape-connectivity` | 1 → 2 → 15 → 5 → 12 |
+| `run-population-viability` | 1 → 3 → 16 → 5 → 12 |
+| `run-conservation-prioritization` | 1 → 2 → 6 → 17 → 12 |
 
 ---
 
 ## How to Use Skills
 
-### Natural invocation (Antigravity)
+### Natural invocation
 ```
 Use the species-distribution-modeling skill to build a MaxEnt model for Chrysocyon brachyurus.
 ```

@@ -2,8 +2,8 @@ cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 title: "ecological-agent-skills"
 type: software
-version: 3.0.0
-date-released: "2026-03-06"
+version: 3.1.0
+date-released: "2026-03-28"
 license: GPL-3.0-or-later
 repository-code: "https://github.com/baratadiego/ecological-agent-skills"
 
@@ -31,7 +31,7 @@ keywords:
 
 abstract: >-
   A curated, modular skill library for quantitative ecology workflows,
-  compatible with Antigravity/Gemini CLI/Claude Code agent frameworks.
+  compatible with Claude Code, Gemini CLI, GitHub Copilot, Cursor, and other AI agent frameworks.
   Provides 17 skills, 9 workflows, and 58 scripts covering data ingestion,
   geoprocessing, species distribution modeling, occupancy analysis,
   community ecology, ecological impact assessment, and reproducible reporting.
