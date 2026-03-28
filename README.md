@@ -4,7 +4,7 @@
 
 A curated skill library for **quantitative ecology** workflows, compatible with the [Antigravity](https://github.com/ecological-agent-skills) agent framework.
 
-This repository provides 12 modular skills and 8 multi-step workflows covering the full spectrum of quantitative ecology: from raw data ingestion and geoprocessing to species distribution modeling, occupancy analysis, community ecology, ecological impact assessment, and reproducible reporting.
+This repository provides 17 modular skills and 9 multi-step workflows covering the full spectrum of quantitative ecology: from raw data ingestion and geoprocessing to species distribution modeling, occupancy analysis, community ecology, ecological impact assessment, and reproducible reporting.
 
 ---
 
@@ -25,7 +25,7 @@ Install paths:
 ecological-agent-skills/
 ├── README.md
 ├── CATALOG.md                    ← skill index with metadata
-├── skills/                       ← 12 modular skills
+├── skills/                       ← 17 modular skills
 │   └── <skill-name>/
 │       ├── SKILL.md              ← main instructions
 │       ├── resources/            ← checklists, glossaries, templates
@@ -48,7 +48,7 @@ ecological-agent-skills/
 
 ---
 
-## Skills (12)
+## Skills (17)
 
 | # | Skill | Domain |
 |---|-------|--------|
@@ -79,7 +79,7 @@ See [CATALOG.md](CATALOG.md) for full metadata, inputs, outputs, and workflow li
 
 ---
 
-## Workflows (8)
+## Workflows (9)
 
 | Workflow | Skills Used |
 |----------|-------------|
@@ -87,10 +87,11 @@ See [CATALOG.md](CATALOG.md) for full metadata, inputs, outputs, and workflow li
 | `assess-ecological-impact` | 1 → 2 → 9 → 3 → 5 → 12 |
 | `analyze-community-structure` | 1 → 3 → 8 → 5 → 12 |
 | `build-fire-risk-map` | 1 → 2 → 10 → 4 → 5 → 9 |
-| `run-occupancy-analysis` | 1 → 3 → 7 → 5 → 12 |
-| `analyze-environmental-change` | 1 → 2 → 10 → 9 → 12 |
-| `assess-ecosystem-services` | 1 → 2 → 11 → 3 → 12 |
+| `run-occupancy-analysis` | 1 → 3 → 7 → 13 → 5 → 12 |
+| `analyze-environmental-change` | 1 → 2 → 10 → 9 → 14 → 12 |
+| `assess-ecosystem-services` | 1 → 2 → 11 → 3 → 17 → 12 |
 | `produce-technical-report` | 12 → outputs → template → synthesis |
+| `run-multispecies-screening` | 1 → 2 → 4 → 6 → 5 |
 
 ---
 

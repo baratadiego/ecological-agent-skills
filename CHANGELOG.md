@@ -3,14 +3,19 @@
 All notable changes to this repository are documented here.
 Format: [version] — date — description
 
-## [Unreleased] — License change: MIT → GPL-3.0-or-later
+## [Unreleased]
+
+---
+
+## [3.1.0] — 2026-03-28 — License migration, citation metadata, and catalog update
 
 ### Changed
 - **LICENSE** — Replaced MIT license with GNU General Public License v3.0. The change aligns the repository license with GPL-licensed R dependencies used throughout the library (vegan, lme4, ggplot2, terra, prioritizr).
 - All `.R` and `.py` scripts now carry SPDX `GPL-3.0-or-later` headers.
-- `README.md` — Added GPL v3 badge and License section.
+- `README.md` — Updated skill count (12 → 17), workflow count (8 → 9); added `run-multispecies-screening` to workflow table; corrected repository structure diagram; updated Phase 4 skill links in workflows table.
 - `CONTRIBUTING.md` — Added GPL compatibility note for contributors.
 - `environment.yaml` — Added license field.
+- `CATALOG.md` — Added Phase 4 skills (13-17) to index table, Skill Details section, and Workflow × Skill Matrix (expanded to 17 columns).
 
 ### Added
 - `CITATION.cff` — Machine-readable citation metadata (CFF v1.2.0).
