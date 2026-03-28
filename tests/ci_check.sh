@@ -115,6 +115,21 @@ done
 
 echo ""
 
+# Count assertions
+if [[ $SKILL_COUNT -ge 17 ]]; then
+  pass "Skill count ≥ 17 (found $SKILL_COUNT)"
+else
+  fail "Skill count < 17 (found $SKILL_COUNT, expected ≥ 17)"
+fi
+
+if [[ $WORKFLOW_COUNT -ge 13 ]]; then
+  pass "Workflow count ≥ 13 (found $WORKFLOW_COUNT)"
+else
+  fail "Workflow count < 13 (found $WORKFLOW_COUNT, expected ≥ 13)"
+fi
+
+echo ""
+
 # ─────────────────────────────────────────────────────────────────────────────
 # SECTION 4 — No empty files (.md, .R, .py)
 # ─────────────────────────────────────────────────────────────────────────────

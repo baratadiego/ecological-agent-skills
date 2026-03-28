@@ -171,7 +171,8 @@ mess_map <- tryCatch({
   if (!is.null(model_obj$training_ranges)) {
     ranges  <- model_obj$training_ranges
     pred_df <- as.data.frame(predictors, na.rm = FALSE)
-    # Simplified MESS: fraction of pixels within training range per variable
+    # Simplified MESS proxy: binary in-range check per variable (not Elith et al. 2010 full MESS).
+    # This underestimates novelty since it ignores the degree of extrapolation.
     in_range <- mapply(function(col, nm) {
       col >= ranges[nm, "min"] & col <= ranges[nm, "max"]
     }, pred_df, names(pred_df), SIMPLIFY = FALSE)
@@ -212,7 +213,14 @@ log_step(6, "Computing prediction summary statistics")
 
 total_cells    <- sum(!is.na(values(suit_mean)))
 suitable_cells <- sum(values(binary_map) == 1, na.rm = TRUE)
-cell_area_km2  <- prod(res(suit_mean)) / 1e6  # assumes metres CRS; adjust if degrees
+if (terra::is.lonlat(suit_mean)) {
+  # Geographic CRS: approximate cell area at centroid latitude
+  mid_lat <- mean(ext(suit_mean)[3:4])
+  cell_area_km2 <- prod(res(suit_mean)) * (111.32 * cos(mid_lat * pi / 180)) * 111.32
+  log_info("CRS is geographic (degrees). Approximating cell area at lat %.1f: %.4f km2", mid_lat, cell_area_km2)
+} else {
+  cell_area_km2 <- prod(res(suit_mean)) / 1e6  # projected CRS in metres
+}
 area_total_km2 <- total_cells    * cell_area_km2
 area_suit_km2  <- suitable_cells * cell_area_km2
 

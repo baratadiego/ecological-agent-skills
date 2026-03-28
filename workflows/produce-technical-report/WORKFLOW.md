@@ -1,7 +1,7 @@
 # Workflow: produce-technical-report
 
 **Purpose:** Synthesise analytical outputs into a publication-ready technical report  
-**Skills:** reproducible-ecology-pipeline → (read analytical outputs) → report template → technical synthesis
+**Skills:** reproducible-ecology-pipeline, biostatistics-workbench
 
 ---
 

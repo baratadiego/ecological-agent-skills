@@ -32,7 +32,7 @@ keywords:
 abstract: >-
   A curated, modular skill library for quantitative ecology workflows,
   compatible with Claude Code, Gemini CLI, GitHub Copilot, Cursor, and other AI agent frameworks.
-  Provides 17 skills, 9 workflows, and 58 scripts covering data ingestion,
+  Provides 17 skills, 13 workflows, and 58 scripts covering data ingestion,
   geoprocessing, species distribution modeling, occupancy analysis,
   community ecology, ecological impact assessment, and reproducible reporting.
 

@@ -216,6 +216,8 @@ if train_ranges is not None:
     try:
         mess_vals = np.full(rows * cols, np.nan, dtype=np.float32)
         X_v       = X[valid_mask]
+        # Simplified MESS proxy: binary in-range check per variable (not Elith et al. 2010 full MESS).
+        # This underestimates novelty since it ignores the degree of extrapolation.
         in_range  = np.ones(len(X_v), dtype=np.float32)
         for j, nm in enumerate(feat_names or band_names):
             if nm in train_ranges:

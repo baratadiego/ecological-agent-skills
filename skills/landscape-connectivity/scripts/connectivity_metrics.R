@@ -89,7 +89,11 @@ centroids <- st_centroid(patches)
 # Reproject to projected CRS if needed
 if (st_is_longlat(centroids)) {
   log_warn("Entrada em CRS geografico. Reprojetando para UTM para calculo de distancias")
-  utm_crs <- 32700 + round((mean(st_coordinates(centroids)[, 1]) + 180) / 6) + 1
+  lon_mean <- mean(st_coordinates(centroids)[, 1])
+  lat_mean <- mean(st_coordinates(centroids)[, 2])
+  zone_num <- floor((lon_mean + 180) / 6) + 1
+  utm_base <- if (lat_mean >= 0) 32600L else 32700L
+  utm_crs  <- utm_base + zone_num
   centroids <- st_transform(centroids, crs = utm_crs)
   log_info("CRS UTM usado: EPSG:%d", utm_crs)
 }

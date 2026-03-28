@@ -167,6 +167,7 @@ blm_values <- c(0, 0.001, 0.01, 0.05, 0.1, 0.5, 1.0)
 log_decision("blm_values", paste(blm_values, collapse = ", "),
              "Standard BLM range spanning several orders of magnitude to identify elbow in cost-boundary tradeoff")
 
+blm_solutions <- list()  # cache solutions for portfolio reuse
 tryCatch({
   blm_results <- lapply(blm_values, function(blm) {
     log_info("  BLM = %g", blm)
@@ -176,6 +177,7 @@ tryCatch({
       log_warn("Cenario BLM=%g nao produziu solucao.", blm)
       return(NULL)
     }
+    blm_solutions[[paste0("blm_", blm)]] <<- res$solution
     data.frame(blm = blm, cost = res$total_cost,
                boundary = res$boundary, n_selected = res$n_selected)
   })
@@ -222,6 +224,7 @@ target_scalings <- c(0.50, 0.75, 1.00, 1.25, 1.50)
 log_decision("target_scalings", paste(target_scalings, collapse = ", "),
              "Scaling factors applied to baseline targets to assess sensitivity of solution cost and coverage")
 
+target_solutions <- list()  # cache solutions for portfolio reuse
 tryCatch({
   target_results <- lapply(target_scalings, function(sc) {
     log_info("  Target scaling = %.2fx", sc)
@@ -231,6 +234,7 @@ tryCatch({
       log_warn("Cenario de alvo %.2fx nao produziu solucao.", sc)
       return(NULL)
     }
+    target_solutions[[paste0("target_", sc)]] <<- res$solution
     data.frame(target_scaling = sc,
                mean_target    = mean(tgts),
                cost           = res$total_cost,
@@ -285,17 +289,8 @@ log_step(7, "Build portfolio irreplaceability (selection frequency across all sc
 log_info("Building portfolio irreplaceability (selection frequency across scenarios)...")
 
 tryCatch({
-  # Collect all solutions computed above
-  all_solutions <- list()
-  for (blm in blm_values) {
-    res <- solve_scenario(pu, targets_base, blm_val = blm, name = paste0("blm_", blm))
-    if (!is.null(res)) all_solutions[[length(all_solutions) + 1]] <- res$solution
-  }
-  for (sc in target_scalings) {
-    tgts <- pmin(targets_base * sc, 0.999)
-    res  <- solve_scenario(pu, tgts, name = paste0("target_", sc))
-    if (!is.null(res)) all_solutions[[length(all_solutions) + 1]] <- res$solution
-  }
+  # Reuse cached solutions from BLM and target analyses (avoid re-solving ILPs)
+  all_solutions <- c(blm_solutions, target_solutions)
 
   if (length(all_solutions) < 2) {
     log_warn("Solucoes insuficientes para analise de portfolio (%d). Sao necessarias pelo menos 2.", length(all_solutions))

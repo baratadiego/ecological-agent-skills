@@ -148,7 +148,8 @@ def compute_pc(G: nx.Graph, total_area: float) -> float:
     G_prob = nx.Graph()
     G_prob.add_nodes_from(G.nodes(data=True))
     for u, v, data in G.edges(data=True):
-        neg_log_p = -math.log(data.get("prob", 1e-9) + 1e-12)
+        p = data.get("prob", 0)
+        neg_log_p = -math.log(p) if p > 0.001 else float("inf")
         G_prob.add_edge(u, v, weight=neg_log_p)
 
     for i, ni in enumerate(nodes):
@@ -304,7 +305,8 @@ def main():
         G_prob = nx.Graph()
         G_prob.add_nodes_from(G.nodes(data=True))
         for u, v, data in G.edges(data=True):
-            neg_log_p = -math.log(data.get("prob", 1e-9) + 1e-12)
+            p = data.get("prob", 0)
+            neg_log_p = -math.log(p) if p > 0.001 else float("inf")
             G_prob.add_edge(u, v, weight=neg_log_p)
 
         for p1, p2 in combinations(patches, 2):

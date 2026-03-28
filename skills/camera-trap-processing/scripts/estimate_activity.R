@@ -30,7 +30,7 @@ if (length(args) < 3) {
 record_csv   <- args[1]
 species_name <- args[2]
 output_dir   <- args[3]
-group_col    <- ifelse(length(args) >= 4, args[4], NULL)
+group_col    <- if (length(args) >= 4) args[4] else NULL
 
 # ── Input precondition checks ────────────────────────────────────────────────
 if (!file.exists(record_csv)) {

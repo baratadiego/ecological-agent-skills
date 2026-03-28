@@ -12,7 +12,7 @@ Format: [version] — date — description
 ### Changed
 - **LICENSE** — Replaced MIT license with GNU General Public License v3.0. The change aligns the repository license with GPL-licensed R dependencies used throughout the library (vegan, lme4, ggplot2, terra, prioritizr).
 - All `.R` and `.py` scripts now carry SPDX `GPL-3.0-or-later` headers.
-- `README.md` — Updated skill count (12 → 17), workflow count (8 → 9); added `run-multispecies-screening` to workflow table; corrected repository structure diagram; updated Phase 4 skill links in workflows table.
+- `README.md` — Updated skill count (12 → 17), workflow count (9 → 13); added 4 Phase 4 workflows and `run-multispecies-screening` to workflow table; added Table of Contents, Start Here, Installation with npx; corrected repository structure diagram.
 - `CONTRIBUTING.md` — Added GPL compatibility note for contributors.
 - `environment.yaml` — Added license field.
 - `CATALOG.md` — Added Phase 4 skills (13-17) to index table, Skill Details section, and Workflow × Skill Matrix (expanded to 17 columns).

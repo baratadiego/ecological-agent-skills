@@ -225,7 +225,7 @@ rec_lines <- c(
   "## Current Design Power",
   paste0("**Statistical power = ", round(power_current * 100, 1), "%** (", adequacy, ")"),
   "",
-  ifelse(adequacy == "INADEQUATE",
+  ifelse(adequacy == "INSUFFICIENT",
     "> ⚠️ **WARNING:** The current design has insufficient power to detect the target effect.",
     "> ✅ The current design has adequate power to detect the target effect."),
   "",

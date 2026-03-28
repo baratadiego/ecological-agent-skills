@@ -48,7 +48,9 @@
       "called_by_workflows": [
         "assess-ecological-impact",
         "analyze-community-structure",
-        "run-occupancy-analysis"
+        "run-occupancy-analysis",
+        "assess-ecosystem-services",
+        "run-population-viability"
       ],
       "decision_points": {
         "n_min_glm": 20,
@@ -476,7 +478,13 @@
       "called_by_workflows": [
         "run-sdm-study",
         "run-multispecies-screening",
-        "assess-ecosystem-services"
+        "assess-ecological-impact",
+        "analyze-community-structure",
+        "build-fire-risk-map",
+        "run-occupancy-analysis",
+        "run-camera-trap-occupancy",
+        "assess-landscape-connectivity",
+        "run-population-viability"
       ],
       "decision_points": {
         "auc_min_acceptable": 0.7,
@@ -660,7 +668,12 @@
         "analyze-community-structure",
         "analyze-environmental-change",
         "assess-ecosystem-services",
-        "produce-technical-report"
+        "produce-technical-report",
+        "run-camera-trap-occupancy",
+        "assess-landscape-connectivity",
+        "run-population-viability",
+        "run-conservation-prioritization",
+        "run-multispecies-screening"
       ],
       "decision_points": {
         "action_if_not_reproducible_from_params": "complete parameter manifest before finalising any report",

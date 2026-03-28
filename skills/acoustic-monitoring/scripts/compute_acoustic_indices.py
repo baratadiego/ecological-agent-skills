@@ -245,7 +245,7 @@ def write_summary(rows: list[dict], output_dir: Path) -> None:
                                                for v in vals) / max(len(vals)-1, 1)), 3)]
                 else:
                     row += ["", ""]
-            row.append(sum(len(hour_data[h][k]) for k in ("ACI",)) // 1)  # n per hour
+            row.append(len(hour_data[h]["ACI"]) + len(hour_data[h]["BI"]) + len(hour_data[h]["NDSI"]) + len(hour_data[h]["H"]))  # total valid index values per hour
             writer.writerow(row)
     logger.info("Resumo escrito: %s", path)
 

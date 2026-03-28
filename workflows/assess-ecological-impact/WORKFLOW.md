@@ -66,7 +66,6 @@ Invoke when the user wants to evaluate the impact of a disturbance (deforestatio
 
 | Condition | Diagnosis | Recommended Action |
 |---|---|---|
-| PERMDISP significant beyond PERMANOVA | Difference in group dispersion, not just centroid | Report both tests; do not interpret PERMANOVA alone as evidence of composition difference |
 | BACI interaction p > 0.10 | Effect not detected at current statistical power | Calculate post-hoc power; recommend minimum additional n in report |
 | Pseudo-replication detected (sites not independent) | Type I error inflation | Use random effects (LMM/GLMM) or aggregate to independent units |
 | Pre-impact period < 2 years | Insufficient baseline for trend estimation | Flag limitation explicitly; conduct sensitivity analysis with different baseline lengths |

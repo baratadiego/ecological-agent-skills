@@ -1,6 +1,6 @@
 {
   "name": "ecological-agent-skills",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "17 modular skills for quantitative ecology — SDM, occupancy, PVA, connectivity, prioritization, and more. Works with Claude Code, Gemini CLI, Cursor, Copilot, and any AI agent.",
   "keywords": [
     "ecology",

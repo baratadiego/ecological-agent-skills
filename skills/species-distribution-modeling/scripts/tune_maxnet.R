@@ -173,7 +173,7 @@ log_decision(
 eval_out <- tryCatch({
   ENMevaluate(
     occs       = occ_pts,
-    envs       = NULL,          # using occs.testing below when envs is NULL
+    envs       = envs_stack,    # SpatRaster required for block partitioning
     bg         = bg_pts,
     occs.testing = NULL,
     algorithm  = "maxnet",
@@ -184,9 +184,7 @@ eval_out <- tryCatch({
     ),
     other.settings = list(
       abs.auc.diff = FALSE
-    ),
-    occs.grp   = NULL,
-    bg.grp     = NULL
+    )
   )
 }, error = function(e) {
   log_error(

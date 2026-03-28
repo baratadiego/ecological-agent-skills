@@ -2,8 +2,23 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # Tests for species-distribution-modeling skill scripts
-# Covers: run_ensemble_sdm.R, tune_maxnet.R, prepare_future_layers.R
+# Covers: predict_distribution.R, run_ensemble_sdm.R, tune_maxnet.R, prepare_future_layers.R
 library(testthat)
+
+test_that("SDM scripts exist in skill directory", {
+  skill_dir <- file.path(dirname(dirname(getwd())),
+                         "skills", "species-distribution-modeling", "scripts")
+  # Fallback for CI: try relative from repo root
+  if (!dir.exists(skill_dir)) {
+    skill_dir <- "skills/species-distribution-modeling/scripts"
+  }
+  if (dir.exists(skill_dir)) {
+    r_scripts <- list.files(skill_dir, pattern = "\\.R$")
+    expect_true(length(r_scripts) >= 1, info = "At least 1 R script in SDM skill")
+    expect_true("predict_distribution.R" %in% r_scripts,
+                info = "predict_distribution.R must exist")
+  }
+})
 
 test_that("occurrence data has required columns", {
   occ <- data.frame(

@@ -2,9 +2,21 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 """Tests for species-distribution-modeling skill scripts.
-Covers: sdm_pipeline.py, prepare_future_layers (data checks)
+Covers: predict_distribution.py, sdm_pipeline.py, prepare_future_layers (data checks)
 """
+import os
 import pytest
+
+SKILL_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "skills",
+                         "species-distribution-modeling", "scripts")
+
+
+def test_sdm_scripts_exist():
+    """Key SDM scripts must exist in the skill scripts directory."""
+    expected = ["predict_distribution.py"]
+    for script in expected:
+        path = os.path.join(SKILL_DIR, script)
+        assert os.path.isfile(path), f"SDM script missing: {path}"
 
 
 def test_occurrence_minimum_sample_size():

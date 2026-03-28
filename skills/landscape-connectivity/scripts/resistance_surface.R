@@ -192,7 +192,12 @@ log_decision("max_cap_resistance", max_cap,
              "resistencia maxima para evitar instabilidade numerica nos algoritmos de menor custo")
 
 # Rescale so minimum = 1
-min_val  <- global(combined, "min", na.rm = TRUE)[[1]]
+min_val <- global(combined, "min", na.rm = TRUE)[[1]]
+if (is.na(min_val) || min_val <= 0) {
+  log_warn("Resistencia minima = %g; definindo piso em 1 antes de reescalonar", min_val)
+  combined[combined <= 0] <- 1
+  min_val <- 1
+}
 combined <- combined / min_val
 combined_path <- file.path(output_dir, "resistance_combined.tif")
 writeRaster(combined, combined_path, overwrite = TRUE)
@@ -203,10 +208,12 @@ log_step(5, "Calculando estatisticas da superficie de resistencia")
 vals <- values(combined, na.rm = TRUE)
 stats_df <- data.frame(
   statistic = c("min", "q25", "median", "mean", "q75", "q95", "max"),
-  value     = round(quantile(vals, c(0, 0.25, 0.5, NA, 0.75, 0.95, 1),
-                              na.rm = TRUE), 3)
+  value = round(c(
+    quantile(vals, c(0, 0.25, 0.5), na.rm = TRUE),
+    mean(vals, na.rm = TRUE),
+    quantile(vals, c(0.75, 0.95, 1), na.rm = TRUE)
+  ), 3)
 )
-stats_df$value[4] <- round(mean(vals, na.rm = TRUE), 3)
 stats_path <- file.path(output_dir, "resistance_stats.csv")
 write.csv(stats_df, stats_path, row.names = FALSE)
 log_info("Estatisticas da superficie de resistencia:")

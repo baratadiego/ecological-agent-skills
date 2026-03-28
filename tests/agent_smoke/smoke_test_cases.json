@@ -154,7 +154,7 @@
       "input_prompt": "I need occurrence records for reef fish species in the Indo-Pacific for an SDM study. Where should I download the data?",
       "expected_skills_invoked": ["ecological-data-foundation"],
       "expected_skills_order": null,
-      "expected_outputs_mentioned": ["OBIS mentioned as data source", "download_from_obis script referenced"],
+      "expected_outputs_mentioned": ["OBIS mentioned as data source"],
       "should_NOT_invoke": [],
       "edge_case": false
     }

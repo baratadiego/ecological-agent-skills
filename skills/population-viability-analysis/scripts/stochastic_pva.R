@@ -264,12 +264,18 @@ tryCatch({
     log_warn("Menos de 10 extincoes observadas (%d). Intervalo de confianca do MTE nao calculado.", length(valid_ext))
   }
 
-  # Stochastic growth rate (log lambda_s)
+  # Stochastic growth rate (log lambda_s) — SURVIVOR-CONDITIONED
   log_Ns <- log(all_N[, ncol(all_N)])
+  n_surviving <- sum(is.finite(log_Ns) & log_Ns > 0)
+  n_total_sims <- nrow(all_N)
   log_Ns <- log_Ns[is.finite(log_Ns) & log_Ns > 0]
   lambda_s <- if (length(log_Ns) > 0) exp(mean(log_Ns - log(n0)) / t_max) else NA
+  if (n_surviving < n_total_sims) {
+    log_warn("lambda_s is conditioned on %d/%d surviving simulations (%.1f%% extinct). Estimate is biased upward.",
+             n_surviving, n_total_sims, (1 - n_surviving / n_total_sims) * 100)
+  }
   log_decision("lambda_s", ifelse(is.na(lambda_s), "NA", round(lambda_s, 4)),
-               "Stochastic growth rate estimated from surviving simulation endpoints")
+               sprintf("Stochastic growth rate from %d/%d surviving simulations (survivor-conditioned)", n_surviving, n_total_sims))
 
   # Results summary
   results_df <- data.frame(

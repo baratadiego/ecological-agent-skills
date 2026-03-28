@@ -191,9 +191,9 @@ A quick-reference index for all 17 skills. Each row summarises the skill's domai
 | assess-ecological-impact | ✓ | ✓ | ✓ | | ✓ | | | | ✓ | | | ✓ | | | | | |
 | analyze-community-structure | ✓ | | ✓ | | ✓ | | | ✓ | | | | ✓ | | | | | |
 | build-fire-risk-map | ✓ | ✓ | | ✓ | ✓ | | | | ✓ | ✓ | | | | | | | |
-| run-occupancy-analysis | ✓ | | ✓ | | ✓ | | ✓ | | | | | ✓ | ✓ | | | | |
+| run-occupancy-analysis | ✓ | | ✓ | | ✓ | | ✓ | | | | | ✓ | | | | | |
 | analyze-environmental-change | ✓ | ✓ | | | | | | | ✓ | ✓ | | ✓ | | ✓ | | | |
-| assess-ecosystem-services | ✓ | ✓ | ✓ | | | | | | | | ✓ | ✓ | | | | | ✓ |
+| assess-ecosystem-services | ✓ | ✓ | ✓ | | | | | | | | ✓ | ✓ | | | | | |
 | produce-technical-report | | | | | | | | | | | | ✓ | | | | | |
 | run-multispecies-screening | ✓ | ✓ | | ✓ | ✓ | ✓ | | | | | | | | | | | |
 | run-camera-trap-occupancy | ✓ | | | | ✓ | | ✓ | | | | | ✓ | ✓ | | | | |

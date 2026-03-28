@@ -120,7 +120,11 @@ def stable_stage(A: np.ndarray) -> np.ndarray:
 
 
 def sensitivity_matrix(A: np.ndarray) -> np.ndarray:
-    """Sensitivity matrix S_ij = ∂λ/∂a_ij = w_i * v_j / <w,v>."""
+    """Sensitivity matrix S_ij = v_i * w_j / <v,w> (Caswell 2001).
+
+    w = right eigenvector (stable stage distribution)
+    v = left eigenvector (reproductive value)
+    """
     evals, evecs_right = la.eig(A)
     dom_idx = np.argmax(evals.real)
     w = evecs_right[:, dom_idx].real
@@ -129,7 +133,7 @@ def sensitivity_matrix(A: np.ndarray) -> np.ndarray:
     v = evecs_left[:, dom_idx_l].real
     w, v = np.abs(w), np.abs(v)
     inner = np.dot(v, w)
-    S = np.outer(w, v) / inner
+    S = np.outer(v, w) / inner
     return S
 
 

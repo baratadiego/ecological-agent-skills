@@ -142,8 +142,9 @@ log_decision("mop_percentile", "10th percentile of pixel-to-calibration distance
 tryCatch({
   log_info("Computing MOP layer (this may take a few minutes)...")
 
-  # Compute the centroid distance of each calibration point
-  cal_centroid_dist <- sqrt(rowSums(cal_scaled^2))
+  # Compute pairwise distances among calibration points (reference distribution)
+  cal_pairwise_dist <- as.matrix(dist(cal_scaled))
+  cal_ref_dist <- apply(cal_pairwise_dist, 1, function(x) quantile(x[x > 0], 0.1, na.rm = TRUE))
 
   # Apply MOP computation pixel by pixel using terra::app
   proj_vals <- as.data.frame(proj_stack, na.rm = FALSE, xy = TRUE)
@@ -159,10 +160,11 @@ tryCatch({
     # Euclidean distance from this pixel to every calibration point
     d_px_to_cal <- sqrt(rowSums(sweep(cal_scaled, 2, px_scaled, "-")^2))
 
-    # MOP = proportion of calibration points whose centroid distance
-    # is less than the 10th percentile of distances from this pixel
-    ref_dist <- quantile(d_px_to_cal, 0.1)
-    sum(cal_centroid_dist < ref_dist) / n_cal
+    # MOP (Owens et al. 2013): proportion of calibration points whose
+    # nearest-neighbour distance (10th percentile of pairwise distances)
+    # is greater than the pixel-to-calibration distance at the same percentile
+    px_ref_dist <- quantile(d_px_to_cal, 0.1)
+    sum(cal_ref_dist >= px_ref_dist) / n_cal
   }
 
   mop_vals <- apply(proj_vals[, env_cols], 1, mop_compute)
