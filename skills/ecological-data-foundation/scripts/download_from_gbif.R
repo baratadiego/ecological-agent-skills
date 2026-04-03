@@ -31,7 +31,7 @@ suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(readr))
 
 # ── 1. Parse arguments ──────────────────────────────────────────────────────
-log_step(1, "Analisar argumentos da linha de comando")
+log_step(1, "Parse command-line arguments")
 args <- commandArgs(trailingOnly = TRUE)
 
 if (length(args) < 2) {
@@ -40,7 +40,7 @@ if (length(args) < 2) {
   country_code  <- NULL
   year_from     <- 1950
   year_to       <- as.integer(format(Sys.Date(), "%Y"))
-  log_warn("Menos de 2 argumentos fornecidos. Usando valores padrao para teste.")
+  log_warn("Fewer than 2 arguments provided. Using default values for testing.")
 } else {
   species_input <- args[1]
   output_dir    <- args[2]
@@ -52,40 +52,40 @@ if (length(args) < 2) {
 log_info("Script: download_from_gbif.R | Skill: %s", SKILL_NAME)
 log_info("Species input : %s", species_input)
 log_info("Output dir   : %s", output_dir)
-log_info("Country code : %s", ifelse(is.null(country_code), "nenhum", country_code))
+log_info("Country code : %s", ifelse(is.null(country_code), "none", country_code))
 log_info("Year range   : %d - %d", year_from, year_to)
 
-log_decision("year_from", year_from, "limite inferior do periodo de registros; 1950 = pos-era moderna")
-log_decision("year_to",   year_to,   "limite superior do periodo de registros; ano corrente por padrao")
+log_decision("year_from", year_from, "lower bound of record period; 1950 = post-modern era")
+log_decision("year_to",   year_to,   "upper bound of record period; current year by default")
 log_decision(
   "coord_uncertainty_max_m", "10000",
   "excluir registros com incerteza de coordenada > 10 km (imprecisao inaceitavel para SDM)"
 )
 
 # ── 2. Create output directory ───────────────────────────────────────────────
-log_step(2, "Criar diretorio de saida")
+log_step(2, "Create output directory")
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
-log_info("Diretorio de saida pronto: %s", output_dir)
+log_info("Output directory ready: %s", output_dir)
 
 # ── 3. Build species list ────────────────────────────────────────────────────
-log_step(3, "Construir lista de especies")
+log_step(3, "Build species list")
 # If input is a CSV file, read the scientificName column; otherwise treat as species name
 if (grepl("\\.csv$", species_input, ignore.case = TRUE) && file.exists(species_input)) {
   tryCatch({
     species_df   <- read_csv(species_input, show_col_types = FALSE)
     if (!"scientificName" %in% names(species_df)) {
       log_error(
-        "Coluna 'scientificName' nao encontrada em: %s\nCausa provavel: CSV de lista de especies mal formatado.\nVerifique o cabecalho do arquivo.\nSkill anterior: ecological-data-foundation",
+        "Coluna 'scientificName' nao encontrada em: %s\nProbable cause: CSV de lista de especies mal formatado.\nCheck o cabecalho do arquivo.\nPrevious skill: ecological-data-foundation",
         species_input
       )
       stop("Missing column 'scientificName' in: ", species_input)
     }
     species_list <- unique(trimws(species_df$scientificName))
-    log_info("Modo batch: %d especies carregadas de %s", length(species_list), species_input)
-    log_decision("mode", "batch", "argumento e um CSV valido com coluna scientificName")
+    log_info("Batch mode: %d species loaded from %s", length(species_list), species_input)
+    log_decision("mode", "batch", "argument is a valid CSV with scientificName column")
   }, error = function(e) {
     log_error(
-      "Falha ao ler lista de especies: %s\nCausa provavel: arquivo CSV invalido ou ausente.\nVerifique: %s\nSkill anterior: ecological-data-foundation",
+      "Failed to read lista de especies: %s\nProbable cause: CSV file invalido ou missing.\nCheck: %s\nPrevious skill: ecological-data-foundation",
       conditionMessage(e), species_input
     )
     stop(e)
@@ -93,11 +93,11 @@ if (grepl("\\.csv$", species_input, ignore.case = TRUE) && file.exists(species_i
 } else {
   species_list <- trimws(species_input)
   log_info("Modo especie unica: %s", species_list)
-  log_decision("mode", "single_species", "argumento nao e um arquivo CSV existente")
+  log_decision("mode", "single_species", "argument is not an existing CSV file")
 }
 
 # ── 4. Default filters ───────────────────────────────────────────────────────
-log_step(4, "Definir filtros padrao de download")
+log_step(4, "Define default download filters")
 # Applied to all downloads regardless of species:
 # - hasCoordinate=TRUE: only georeferenced records
 # - occurrenceStatus=PRESENT: no absence records
@@ -126,7 +126,7 @@ download_species <- function(sp_name) {
     name_backbone(name = sp_name, rank = "SPECIES"),
     error = function(e) {
       log_error(
-        "Falha ao buscar taxon key no backbone GBIF para '%s': %s\nCausa provavel: sem conexao com a internet ou API do GBIF indisponivel.\nVerifique sua conexao e tente novamente.\nSkill anterior: ecological-data-foundation",
+        "Failed to fetch taxon key from GBIF backbone for '%s': %s\nProbable cause: no internet connection or GBIF API unavailable.\nCheck your connection and try again.\nPrevious skill: ecological-data-foundation",
         sp_name, conditionMessage(e)
       )
       stop(e)
@@ -134,11 +134,11 @@ download_species <- function(sp_name) {
   )
 
   if (is.null(taxon_match$usageKey)) {
-    log_warn("Taxon key GBIF nao encontrado para '%s'. Pulando.", sp_name)
+    log_warn("GBIF taxon key not found for '%s'. Skipping.", sp_name)
     return(invisible(NULL))
   }
   taxon_key <- taxon_match$usageKey
-  log_info("Taxon key GBIF: %d para '%s'", taxon_key, sp_name)
+  log_info("GBIF taxon key: %d for '%s'", taxon_key, sp_name)
 
   # Build predicates for occ_download
   preds <- list(
@@ -152,7 +152,7 @@ download_species <- function(sp_name) {
   )
   if (!is.null(country_code)) {
     preds <- c(preds, list(pred("country", country_code)))
-    log_info("Filtro de pais aplicado: %s", country_code)
+    log_info("Country filter applied: %s", country_code)
   }
 
   # Decide between occ_search (quick, no DOI) and occ_download (DOI, reproducible)
@@ -164,11 +164,11 @@ download_species <- function(sp_name) {
       occurrenceStatus = "PRESENT"
     ),
     error = function(e) {
-      log_warn("Falha ao consultar contagem de registros para '%s': %s. Assumindo dataset pequeno.", sp_name, conditionMessage(e))
+      log_warn("Failed to query record count for '%s': %s. Assuming small dataset.", sp_name, conditionMessage(e))
       0L
     }
   )
-  log_info("Contagem aproximada de registros (sem filtros): %d", count_check)
+  log_info("Approximate record count (without filters): %d", count_check)
 
   if (count_check > 50000) {
     log_decision(
@@ -181,7 +181,7 @@ download_species <- function(sp_name) {
       do.call(occ_download, preds),
       error = function(e) {
         log_error(
-          "Falha ao iniciar occ_download para '%s': %s\nCausa provavel: credenciais GBIF ausentes (GBIF_USER, GBIF_PWD, GBIF_EMAIL) ou API indisponivel.\nVerifique: usethis::edit_r_environ() e adicione as variaveis GBIF.\nSkill anterior: ecological-data-foundation",
+          "Failed to start occ_download for '%s': %s\nProbable cause: GBIF credentials missing (GBIF_USER, GBIF_PWD, GBIF_EMAIL) or API unavailable.\nCheck: usethis::edit_r_environ() and add the GBIF variables.\nPrevious skill: ecological-data-foundation",
           sp_name, conditionMessage(e)
         )
         stop(e)
@@ -202,7 +202,7 @@ download_species <- function(sp_name) {
         occ_download_import()
     }, error = function(e) {
       log_error(
-        "Falha ao importar download do GBIF para '%s': %s\nCausa provavel: arquivo de download corrompido ou expirado.\nVerifique o status em: https://www.gbif.org/user/download\nSkill anterior: ecological-data-foundation",
+        "Failed to import GBIF download for '%s': %s\nProbable cause: corrupted or expired download file.\nCheck status at: https://www.gbif.org/user/download\nPrevious skill: ecological-data-foundation",
         sp_name, conditionMessage(e)
       )
       stop(e)
@@ -211,10 +211,10 @@ download_species <- function(sp_name) {
   } else {
     log_decision(
       "download_method", "occ_search",
-      sprintf("dataset pequeno (%d registros) -> occ_search e mais rapido; sem DOI", count_check)
+      sprintf("small dataset (%d records) -> occ_search is faster; no DOI generated", count_check)
     )
-    log_info("Usando occ_search (dataset pequeno)...")
-    log_warn("occ_search nao gera DOI. Para publicacoes, use occ_download.")
+    log_info("Using occ_search (small dataset)...")
+    log_warn("occ_search does not generate a DOI. For publications, use occ_download.")
     doi <- NA_character_
     dl_key <- NA_character_
 
@@ -232,7 +232,7 @@ download_species <- function(sp_name) {
       )$data
     }, error = function(e) {
       log_error(
-        "Falha em occ_search para '%s': %s\nCausa provavel: sem conexao com a internet ou API do GBIF indisponivel.\nVerifique sua conexao e tente novamente.\nSkill anterior: ecological-data-foundation",
+        "Failed in occ_search for '%s': %s\nProbable cause: no internet connection or GBIF API unavailable.\nCheck your connection and try again.\nPrevious skill: ecological-data-foundation",
         sp_name, conditionMessage(e)
       )
       stop(e)
@@ -240,11 +240,11 @@ download_species <- function(sp_name) {
   }
 
   n_raw <- nrow(occ_raw)
-  log_info("Registros recuperados: %d", n_raw)
+  log_info("Records retrieved: %d", n_raw)
 
   if (n_raw < 30) {
     log_warn(
-      "Registros insuficientes para SDM confiavel (n = %d). Considere: (1) relaxar filtros, (2) ampliar escopo geografico, (3) usar outra base de dados.",
+      "Insufficient records for reliable SDM (n = %d). Consider: (1) relaxing filters, (2) expanding geographic scope, (3) using additional data sources.",
       n_raw
     )
   }
@@ -254,10 +254,10 @@ download_species <- function(sp_name) {
                          paste0("occurrences_raw_GBIF_", safe_name, "_", today_str, ".csv"))
   tryCatch({
     write_csv(occ_raw, csv_name)
-    log_info("Gravado: %s", csv_name)
+    log_info("Written: %s", csv_name)
   }, error = function(e) {
     log_error(
-      "Falha ao gravar CSV de ocorrencias para '%s': %s\nCausa provavel: sem permissao de escrita em '%s'.\nSkill anterior: ecological-data-foundation",
+      "Failed to gravar CSV de ocorrencias para '%s': %s\nProbable cause: sem permissao de escrita em '%s'.\nPrevious skill: ecological-data-foundation",
       sp_name, conditionMessage(e), output_dir
     )
     stop(e)
@@ -286,10 +286,10 @@ download_species <- function(sp_name) {
   meta_path <- file.path(output_dir, paste0("download_metadata_", safe_name, ".txt"))
   tryCatch({
     writeLines(meta_text, meta_path)
-    log_info("Gravado: %s", meta_path)
+    log_info("Written: %s", meta_path)
   }, error = function(e) {
     log_error(
-      "Falha ao gravar metadados para '%s': %s\nCausa provavel: sem permissao de escrita em '%s'.\nSkill anterior: ecological-data-foundation",
+      "Failed to save metadata for '%s': %s\nProbable cause: sem permissao de escrita em '%s'.\nPrevious skill: ecological-data-foundation",
       sp_name, conditionMessage(e), output_dir
     )
     stop(e)
@@ -299,17 +299,17 @@ download_species <- function(sp_name) {
 }
 
 # ── 6. Run for all species ───────────────────────────────────────────────────
-log_step(5, "Executar download para todas as especies")
+log_step(5, "Run download for all species")
 for (sp in species_list) {
   tryCatch(
     download_species(sp),
     error = function(e) {
       log_error(
-        "Falha ao baixar '%s': %s\nCausa provavel: problema de rede, taxon nao encontrado ou credenciais GBIF invalidas.\nVerifique os logs acima para detalhes.\nSkill anterior: ecological-data-foundation",
+        "Failed to download '%s': %s\nProbable cause: network error, taxon not found, or invalid GBIF credentials.\nCheck logs above for details.\nPrevious skill: ecological-data-foundation",
         sp, conditionMessage(e)
       )
     }
   )
 }
 
-log_info("Todos os downloads concluidos. Verifique: %s", output_dir)
+log_info("All downloads completed. Check: %s", output_dir)

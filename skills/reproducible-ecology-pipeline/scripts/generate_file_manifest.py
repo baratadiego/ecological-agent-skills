@@ -54,9 +54,9 @@ def main():
 
     if not target_dir.exists():
         logger.error(
-            "Input nao encontrado: %s\n"
-            "  Causa provavel: passo anterior nao concluiu.\n"
-            "  Skill anterior que deveria ter produzido este input: geoprocessing-for-ecology",
+            "Input not found: %s\n"
+            "  Probable cause: previous step did not complete.\n"
+            "  Previous skill que deveria ter produzido este input: geoprocessing-for-ecology",
             target_dir
         )
         sys.exit(1)

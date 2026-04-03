@@ -97,9 +97,9 @@ def main():
     if not Path(pred_file).exists():
         logger.error(
             "Predictions file not found: %s\n"
-            "Causa provavel: caminho incorreto ou modelo nao gerou predicoes ainda\n"
-            "Verifique: o argumento predictions_csv e que o modelo foi ajustado\n"
-            "Skill anterior: species-distribution-modelling",
+            "Probable cause: incorrect path or model has not yet generated predictions\n"
+            "Check: o argumento predictions_csv e que o modelo foi ajustado\n"
+            "Previous skill: species-distribution-modelling",
             pred_file
         )
         sys.exit(1)
@@ -112,9 +112,9 @@ def main():
     except Exception as e:
         logger.error(
             "Unexpected error in load data: %s\n"
-            "Causa provavel: CSV malformado ou permissoes insuficientes\n"
-            "Verifique: encoding e estrutura do arquivo de predicoes\n"
-            "Skill anterior: species-distribution-modelling",
+            "Probable cause: CSV malformado ou insufficient permissions\n"
+            "Check: encoding e estrutura do arquivo de predicoes\n"
+            "Previous skill: species-distribution-modelling",
             e
         )
         raise
@@ -122,9 +122,9 @@ def main():
     if "observed" not in dat.columns or "predicted" not in dat.columns:
         logger.error(
             "Required columns missing. Expected: 'observed', 'predicted'. Found: %s\n"
-            "Causa provavel: cabecalho do CSV nao padronizado\n"
-            "Verifique: que o arquivo tem colunas 'observed' (0/1) e 'predicted' (probabilidade)\n"
-            "Skill anterior: species-distribution-modelling",
+            "Probable cause: CSV header nao padronizado\n"
+            "Check: que o arquivo tem colunas 'observed' (0/1) e 'predicted' (probabilidade)\n"
+            "Previous skill: species-distribution-modelling",
             list(dat.columns)
         )
         sys.exit(1)
@@ -162,9 +162,9 @@ def main():
     except Exception as e:
         logger.error(
             "Unexpected error in AUC-ROC: %s\n"
-            "Causa provavel: apenas uma classe em 'observed' ou valores NA\n"
-            "Verifique: que 'observed' contem tanto 0 quanto 1 e 'predicted' nao tem NA\n"
-            "Skill anterior: species-distribution-modelling",
+            "Probable cause: apenas uma classe em 'observed' ou valores NA\n"
+            "Check: que 'observed' contem tanto 0 quanto 1 e 'predicted' nao tem NA\n"
+            "Previous skill: species-distribution-modelling",
             e
         )
         raise
@@ -181,9 +181,9 @@ def main():
     except Exception as e:
         logger.error(
             "Unexpected error in TSS computation: %s\n"
-            "Causa provavel: valores NA ou classe unica em 'observed'\n"
-            "Verifique: que 'observed' contem tanto 0 quanto 1\n"
-            "Skill anterior: species-distribution-modelling",
+            "Probable cause: valores NA ou classe unica em 'observed'\n"
+            "Check: que 'observed' contem tanto 0 quanto 1\n"
+            "Previous skill: species-distribution-modelling",
             e
         )
         raise
@@ -197,9 +197,9 @@ def main():
     except Exception as e:
         logger.error(
             "Unexpected error in save metrics: %s\n"
-            "Causa provavel: diretorio sem permissao de escrita\n"
-            "Verifique: output_dir e permissoes do sistema de arquivos\n"
-            "Skill anterior: model-validation-and-uncertainty (metrics computation)",
+            "Probable cause: directory sem permissao de escrita\n"
+            "Check: output_dir e permissoes do sistema de arquivos\n"
+            "Previous skill: model-validation-and-uncertainty (metrics computation)",
             e
         )
         raise
@@ -213,9 +213,9 @@ def main():
     except Exception as e:
         logger.error(
             "Unexpected error in diagnostic plots: %s\n"
-            "Causa provavel: dados insuficientes por bin ou backend matplotlib indisponivel\n"
-            "Verifique: distribuicao dos valores preditos e configuracao do matplotlib\n"
-            "Skill anterior: model-validation-and-uncertainty (metrics computation)",
+            "Probable cause: insufficient data per bin or matplotlib backend unavailable\n"
+            "Check: distribuicao dos valores preditos e configuracao do matplotlib\n"
+            "Previous skill: model-validation-and-uncertainty (metrics computation)",
             e
         )
         raise

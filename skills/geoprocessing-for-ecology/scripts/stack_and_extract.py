@@ -90,27 +90,27 @@ def main():
 
     if not Path(raster_dir).exists():
         logger.error(
-            "Input nao encontrado: %s\n"
-            "  Causa provavel: passo anterior nao concluiu.\n"
-            "  Skill anterior que deveria ter produzido este input: reproducible-ecology-pipeline",
+            "Input not found: %s\n"
+            "  Probable cause: previous step did not complete.\n"
+            "  Previous skill expected to have produced this input: reproducible-ecology-pipeline",
             raster_dir
         )
         sys.exit(1)
 
     if not Path(points_file).exists():
         logger.error(
-            "Input nao encontrado: %s\n"
-            "  Causa provavel: passo anterior nao concluiu.\n"
-            "  Skill anterior que deveria ter produzido este input: reproducible-ecology-pipeline",
+            "Input not found: %s\n"
+            "  Probable cause: previous step did not complete.\n"
+            "  Previous skill expected to have produced this input: reproducible-ecology-pipeline",
             points_file
         )
         sys.exit(1)
 
     if not Path(area_file).exists():
         logger.error(
-            "Input nao encontrado: %s\n"
-            "  Causa provavel: passo anterior nao concluiu.\n"
-            "  Skill anterior que deveria ter produzido este input: reproducible-ecology-pipeline",
+            "Input not found: %s\n"
+            "  Probable cause: previous step did not complete.\n"
+            "  Previous skill expected to have produced this input: reproducible-ecology-pipeline",
             area_file
         )
         sys.exit(1)

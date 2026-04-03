@@ -48,14 +48,14 @@ log_decision("proj_path",  proj_path,  "raster stack for the projection area/per
 
 if (!file.exists(train_path)) {
   log_error(
-    "Falha em validate inputs: raster de treinamento nao encontrado: %s\nCausa provavel: caminho incorreto ou arquivo GeoTIFF nao gerado\nVerifique: o argumento training_raster_stack.tif e o diretorio de trabalho\nSkill anterior: species-distribution-modelling",
+    "Failed to validate inputs: training raster not found: %s\nProbable cause: incorrect path or GeoTIFF file not generated\nCheck: the training_raster_stack.tif argument and the working directory\nPrevious skill: species-distribution-modelling",
     train_path
   )
   stop("Training raster not found.")
 }
 if (!file.exists(proj_path)) {
   log_error(
-    "Falha em validate inputs: raster de projecao nao encontrado: %s\nCausa provavel: caminho incorreto ou arquivo GeoTIFF nao gerado\nVerifique: o argumento projection_raster_stack.tif e o diretorio de trabalho\nSkill anterior: species-distribution-modelling",
+    "Failed in validate inputs: projection raster not found: %s\nProbable cause: incorrect path or GeoTIFF file not yet generated\nCheck: the projection_raster_stack.tif argument and working directory\nPrevious skill: species-distribution-modelling",
     proj_path
   )
   stop("Projection raster not found.")
@@ -74,7 +74,7 @@ tryCatch({
   proj_stack  <- rast(proj_path)
 }, error = function(e) {
   log_error(
-    "Falha em load rasters: %s\nCausa provavel: arquivo GeoTIFF corrompido ou formato nao suportado\nVerifique: integridade dos arquivos TIF com gdalinfo\nSkill anterior: species-distribution-modelling",
+    "Failed in load rasters: %s\nProbable cause: corrupted GeoTIFF file or format not supported\nCheck: TIF file integrity using gdalinfo\nPrevious skill: species-distribution-modelling",
     conditionMessage(e)
   )
   stop(e)
@@ -84,7 +84,7 @@ tryCatch({
 if (!setequal(names(train_stack), names(proj_stack))) {
   mismatched <- setdiff(names(train_stack), names(proj_stack))
   log_error(
-    "Falha em validate layers: nomes de camadas divergem entre stacks de treinamento e projecao.\nCamadas ausentes na projecao: %s\nCausa provavel: stacks gerados com variaveis diferentes\nVerifique: que ambos os TIFs tem as mesmas bandas nomeadas\nSkill anterior: species-distribution-modelling",
+    "Failed in validate layers: layer names differ between training and projection stacks.\nLayers missing in projection: %s\nProbable cause: stacks generated with different variables\nCheck: that both TIFs have the same named bands\nPrevious skill: species-distribution-modelling",
     paste(mismatched, collapse = ", ")
   )
   stop("Layer name mismatch between training and projection stacks.\n  Missing in projection: ",
@@ -123,7 +123,7 @@ tryCatch({
   log_decision("mop_scaling", "z-score using calibration mean/sd", "ensures all variables contribute equally to Euclidean distance")
 }, error = function(e) {
   log_error(
-    "Falha em extract calibration values: %s\nCausa provavel: raster de treinamento com todos os pixels NA\nVerifique: mascara e extent do raster de treinamento\nSkill anterior: species-distribution-modelling",
+    "Failed in extract calibration values: %s\nProbable cause: training raster with all NA pixels\nCheck: training raster mask and extent\nPrevious skill: species-distribution-modelling",
     conditionMessage(e)
   )
   stop(e)
@@ -185,7 +185,7 @@ tryCatch({
   log_info("Saved: %s", mop_path)
 }, error = function(e) {
   log_error(
-    "Falha em MOP computation: %s\nCausa provavel: memoria insuficiente para rasters grandes ou valores NA inesperados\nVerifique: tamanho do raster de projecao e memoria disponivel\nSkill anterior: model-validation-and-uncertainty (calibration extraction)",
+    "Failed in MOP computation: %s\nProbable cause: insufficient memory for large rasters or unexpected NA values\nCheck: projection raster size and available memory\nPrevious skill: model-validation-and-uncertainty (calibration extraction)",
     conditionMessage(e)
   )
   stop(e)
@@ -201,15 +201,10 @@ log_step(5, "Compute MESS layer (Elith et al. 2010)")
 tryCatch({
   log_info("Computing MESS layer...")
 
-  # dismo::mess requires a RasterStack (terra → raster conversion for compatibility)
-  suppressPackageStartupMessages(library(raster))
-  proj_raster <- raster::stack(proj_stack)
-  train_df    <- cal_vals  # reference points
+  # terra::mess computes MESS natively (no raster package needed, terra >= 1.6)
+  train_df <- cal_vals  # reference points
 
-  mess_result <- dismo::mess(proj_raster, train_df, full = FALSE)
-
-  # Convert back to terra SpatRaster
-  mess_rast  <- rast(mess_result)
+  mess_rast <- terra::mess(proj_stack, train_df)
   names(mess_rast) <- "MESS"
 
   # Save MESS raster
@@ -218,7 +213,7 @@ tryCatch({
   log_info("Saved: %s", mess_path)
 }, error = function(e) {
   log_error(
-    "Falha em MESS computation: %s\nCausa provavel: incompatibilidade entre pacotes terra/raster ou raster sem CRS\nVerifique: versoes de terra e dismo, e que os rasters tem CRS definido\nSkill anterior: model-validation-and-uncertainty (calibration extraction)",
+    "Failed in MESS computation: %s\nProbable cause: incompatibility between terra/raster packages or raster without CRS\nCheck: terra and dismo versions, and that rasters have CRS defined\nPrevious skill: model-validation-and-uncertainty (calibration extraction)",
     conditionMessage(e)
   )
   stop(e)
@@ -255,7 +250,7 @@ tryCatch({
   log_info("Saved: %s", csv_path)
 }, error = function(e) {
   log_error(
-    "Falha em summary statistics: %s\nCausa provavel: rasters MOP ou MESS invalidos\nVerifique: etapas anteriores para mensagens de erro\nSkill anterior: model-validation-and-uncertainty (MOP/MESS computation)",
+    "Failed in summary statistics: %s\nProbable cause: invalid MOP or MESS rasters\nCheck: previous steps for error messages\nPrevious skill: model-validation-and-uncertainty (MOP/MESS computation)",
     conditionMessage(e)
   )
   stop(e)
@@ -302,7 +297,7 @@ tryCatch({
   log_info("Saved: %s", file.path(output_dir, "extrapolation_plots.png"))
 }, error = function(e) {
   log_error(
-    "Falha em diagnostic plots: %s\nCausa provavel: dispositivo grafico nao disponivel ou rasters invalidos\nVerifique: disponibilidade de X11/display e integridade dos rasters\nSkill anterior: model-validation-and-uncertainty (MOP/MESS computation)",
+    "Failed in diagnostic plots: %s\nProbable cause: graphics device not available or invalid rasters\nCheck: X11/display availability and raster integrity\nPrevious skill: model-validation-and-uncertainty (MOP/MESS computation)",
     conditionMessage(e)
   )
   stop(e)

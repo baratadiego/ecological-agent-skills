@@ -77,8 +77,8 @@ log_decision("scenario", args.scenario, "Embedded in output filenames")
 if not Path(args.model_pkl).exists():
     logger.error(
         "Model file not found: %s\n"
-        "  Causa provavel: sdm_pipeline.py nao foi executado ou falhou.\n"
-        "  Skill anterior que deveria ter produzido este input: species-distribution-modeling",
+        "  Probable cause: sdm_pipeline.py nao foi executado ou falhou.\n"
+        "  Previous skill que deveria ter produzido este input: species-distribution-modeling",
         args.model_pkl,
     )
     sys.exit(1)
@@ -86,8 +86,8 @@ if not Path(args.model_pkl).exists():
 if not Path(args.predictor_tif).exists():
     logger.error(
         "Predictor stack not found: %s\n"
-        "  Causa provavel: stack nao preparado.\n"
-        "  Skill anterior que deveria ter produzido este input: geoprocessing-for-ecology",
+        "  Probable cause: stack nao preparado.\n"
+        "  Previous skill que deveria ter produzido este input: geoprocessing-for-ecology",
         args.predictor_tif,
     )
     sys.exit(1)
@@ -106,9 +106,9 @@ try:
     logger.info("Model loaded: %s", type(model_obj).__name__)
 except Exception as e:
     logger.error(
-        "Falha ao carregar modelo: %s\n"
-        "  Causa provavel: arquivo corrompido ou versao incompativel do sklearn.\n"
-        "  Verifique: o modelo foi salvo com a mesma versao do sklearn.",
+        "Failed to load modelo: %s\n"
+        "  Probable cause: corrupted file ou versao incompativel do sklearn.\n"
+        "  Check: o modelo foi salvo com a mesma versao do sklearn.",
         e,
     )
     raise
@@ -137,7 +137,7 @@ try:
         band_names  = [src.descriptions[i] or f"band{i+1}" for i in range(src.count)]
     logger.info("Stack: %d bands, shape %s, CRS=%s", band_data.shape[0], band_data.shape[1:], crs)
 except Exception as e:
-    logger.error("Falha ao ler predictor stack: %s\n  Verifique: arquivo GeoTIFF valido com multiplas bandas.", e)
+    logger.error("Failed to read predictor stack: %s\n  Check: valid GeoTIFF file with multiple bands.", e)
     raise
 
 n_bands, rows, cols = band_data.shape
@@ -187,7 +187,7 @@ try:
         dst.write(suit_out[np.newaxis, :, :])
     logger.info("Suitability raster saved: %s", suit_file)
 except Exception as e:
-    logger.error("Falha ao salvar suitability raster: %s\n  Verifique: permissao de escrita em %s.", e, args.output_dir)
+    logger.error("Failed to save suitability raster: %s\n  Check: write permission in %s.", e, args.output_dir)
     raise
 
 # ── Step 4: Threshold → binary map ───────────────────────────────────────────
@@ -281,7 +281,8 @@ with open(sum_file, "w", newline="", encoding="utf-8") as f:
 logger.info("Suitable area: %.1f km2 (%.1f%% of %.1f km2)", area_suit_km2, pct_suit, area_total_km2)
 logger.info("Summary saved: %s", sum_file)
 
-log_step(7, "Done — all outputs in: %s", args.output_dir)
+log_step(7, "Done")
+logger.info("All outputs in: %s", args.output_dir)
 
 
 if __name__ == "__main__":

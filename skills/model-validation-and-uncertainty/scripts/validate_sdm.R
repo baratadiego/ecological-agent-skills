@@ -28,7 +28,7 @@ output_dir <- ifelse(length(args) >= 2, args[2], "outputs/validation")
 log_step(1, "Validate inputs")
 if (!file.exists(pred_file)) {
   log_error(
-    "Falha em validate inputs: arquivo de predicoes nao encontrado: %s\nCausa provavel: caminho incorreto ou modelo nao gerou predicoes ainda\nVerifique: o argumento predictions_csv e que o modelo foi ajustado\nSkill anterior: species-distribution-modelling",
+    "Failed in validate inputs: predictions file not found: %s\nProbable cause: incorrect path or model has not yet generated predictions\nCheck: the predictions_csv argument and that the model has been fitted\nPrevious skill: species-distribution-modelling",
     pred_file
   )
   stop("Predictions file not found.")
@@ -41,7 +41,7 @@ tryCatch({
   dat <- read.csv(pred_file)
 }, error = function(e) {
   log_error(
-    "Falha em load data: %s\nCausa provavel: CSV malformado ou permissoes insuficientes\nVerifique: encoding e estrutura do arquivo de predicoes\nSkill anterior: species-distribution-modelling",
+    "Failed in load data: %s\nProbable cause: CSV malformado ou insufficient permissions\nCheck: encoding e estrutura do arquivo de predicoes\nPrevious skill: species-distribution-modelling",
     conditionMessage(e)
   )
   stop(e)
@@ -49,7 +49,7 @@ tryCatch({
 
 if (!all(c("observed", "predicted") %in% names(dat))) {
   log_error(
-    "Falha em validate columns: colunas obrigatorias ausentes. Esperado: 'observed', 'predicted'. Encontrado: %s\nCausa provavel: cabecalho do CSV nao padronizado\nVerifique: que o arquivo tem colunas 'observed' (0/1) e 'predicted' (probabilidade)\nSkill anterior: species-distribution-modelling",
+    "Failed in validate columns: required columns missing. Esperado: 'observed', 'predicted'. Encontrado: %s\nProbable cause: CSV header nao padronizado\nCheck: que o arquivo tem colunas 'observed' (0/1) e 'predicted' (probabilidade)\nPrevious skill: species-distribution-modelling",
     paste(names(dat), collapse = ", ")
   )
   stop("Required columns 'observed' and 'predicted' not found.")
@@ -85,7 +85,7 @@ tryCatch({
   }
 }, error = function(e) {
   log_error(
-    "Falha em AUC-ROC: %s\nCausa provavel: valores NA em 'observed' ou 'predicted', ou apenas uma classe\nVerifique: que 'observed' contem 0 e 1 e 'predicted' nao tem NA\nSkill anterior: species-distribution-modelling",
+    "Failed in AUC-ROC: %s\nProbable cause: valores NA em 'observed' ou 'predicted', ou apenas uma classe\nCheck: que 'observed' contem 0 e 1 e 'predicted' nao tem NA\nPrevious skill: species-distribution-modelling",
     conditionMessage(e)
   )
   stop(e)
@@ -114,7 +114,7 @@ tryCatch({
   }
 }, error = function(e) {
   log_error(
-    "Falha em TSS computation: %s\nCausa provavel: valores NA ou classe unica em 'observed'\nVerifique: que 'observed' contem tanto 0 quanto 1\nSkill anterior: species-distribution-modelling",
+    "Failed in TSS computation: %s\nProbable cause: valores NA ou classe unica em 'observed'\nCheck: que 'observed' contem tanto 0 quanto 1\nPrevious skill: species-distribution-modelling",
     conditionMessage(e)
   )
   stop(e)
@@ -130,7 +130,7 @@ tryCatch({
   log_info("Performance metrics saved.")
 }, error = function(e) {
   log_error(
-    "Falha em save metrics: %s\nCausa provavel: diretorio sem permissao de escrita\nVerifique: output_dir e permissoes do sistema de arquivos\nSkill anterior: model-validation-and-uncertainty (metrics computation)",
+    "Failed in save metrics: %s\nProbable cause: directory sem permissao de escrita\nCheck: output_dir e permissoes do sistema de arquivos\nPrevious skill: model-validation-and-uncertainty (metrics computation)",
     conditionMessage(e)
   )
   stop(e)
@@ -155,7 +155,7 @@ tryCatch({
   log_info("Calibration plot written.")
 }, error = function(e) {
   log_error(
-    "Falha em calibration plot: %s\nCausa provavel: dados insuficientes por bin ou valores extremos de predicao\nVerifique: distribuicao dos valores preditos e numero de registros\nSkill anterior: model-validation-and-uncertainty (metrics computation)",
+    "Failed in calibration plot: %s\nProbable cause: insufficient data por bin ou valores extremos de predicao\nCheck: distribuicao dos valores preditos e number oe registros\nPrevious skill: model-validation-and-uncertainty (metrics computation)",
     conditionMessage(e)
   )
   stop(e)

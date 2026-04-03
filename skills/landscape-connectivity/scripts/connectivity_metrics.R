@@ -47,29 +47,29 @@ area_col     <- if (length(args) >= 4) args[4] else "area_ha"
 
 # ── Input precondition checks ────────────────────────────────────────────────
 if (!file.exists(patches_path)) {
-  log_error("Input nao encontrado: %s\nCausa provavel: arquivo shapefile/GeoPackage nao existe ou caminho incorreto\nVerifique: se o arquivo .shp ou .gpkg existe no caminho especificado\nSkill anterior: [nenhuma — etapa inicial ou saida de processamento GIS]", patches_path)
+  log_error("Input not found: %s\nProbable cause: shapefile/GeoPackage file does not exist or incorrect path\nCheck: that the .shp or .gpkg file exists at the specified path\nPrevious skill: [none — initial step or GIS processing output]", patches_path)
   stop("Missing patches file: ", patches_path)
 }
 
 log_decision("dmax_m", dmax_m,
-             "distancia maxima de dispersao em metros; define conectividade estrutural entre manchas")
+             "maximum dispersal distance in metres; defines structural connectivity between patches")
 log_decision("area_col", area_col,
              "coluna de area das manchas; usada para calculo de IIC e PC ponderados por area")
 
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
-log_step(1, "Carregando camada de manchas de habitat")
+log_step(1, "Loading habitat patch layer")
 # ── Load patches ────────────────────────────────────────────────────────────
 patches <- tryCatch({
   sf::st_read(patches_path, quiet = TRUE)
 }, error = function(e) {
-  log_error("Falha ao ler shapefile de manchas: %s\nCausa provavel: arquivo corrompido ou CRS invalido\nVerifique: integridade do shapefile\nSkill anterior: [nenhuma]", conditionMessage(e))
+  log_error("Failed to read patch shapefile: %s\nProbable cause: corrupted file or invalid CRS\nCheck: shapefile integrity\nPrevious skill: [none]", conditionMessage(e))
   stop(e)
 })
 
 if (!area_col %in% names(patches)) {
   # Compute area from geometry if column missing
-  log_warn("Coluna '%s' nao encontrada; calculando area a partir da geometria", area_col)
+  log_warn("Column '%s' not found; computing area from geometry", area_col)
   patches[[area_col]] <- as.numeric(st_area(patches)) / 10000  # m² → ha
 }
 
@@ -78,17 +78,17 @@ A   <- sum(patches[[area_col]])  # total landscape area proxy (sum of patch area
 log_info("Manchas carregadas: %d. Area total das manchas: %.1f ha", n, A)
 
 if (n < 3) {
-  log_error("Minimo de 3 manchas necessario para analise de conectividade. Encontradas: %d\nCausa provavel: dado de entrada com poucas feicoes\nVerifique: arquivo de manchas e filtros de area minima\nSkill anterior: [nenhuma]", n)
+  log_error("Minimum of 3 patches required for connectivity analysis. Found: %d\nProbable cause: input data with few features\nCheck: patch file and minimum area filters\nPrevious skill: [none]", n)
   stop("At least 3 patches required for connectivity analysis. ",
        "Found ", n, " patches.")
 }
 
-log_step(2, "Calculando distancias entre centroides das manchas")
+log_step(2, "Computing distances between patch centroids")
 # ── Compute pairwise distances between patch centroids ──────────────────────
 centroids <- st_centroid(patches)
 # Reproject to projected CRS if needed
 if (st_is_longlat(centroids)) {
-  log_warn("Entrada em CRS geografico. Reprojetando para UTM para calculo de distancias")
+  log_warn("Input in geographic CRS. Reprojecting to UTM for distance calculation")
   lon_mean <- mean(st_coordinates(centroids)[, 1])
   lat_mean <- mean(st_coordinates(centroids)[, 2])
   zone_num <- floor((lon_mean + 180) / 6) + 1
@@ -100,7 +100,7 @@ if (st_is_longlat(centroids)) {
 coords   <- st_coordinates(centroids)
 dist_mat <- as.matrix(dist(coords))  # metres
 
-log_step(3, "Construindo grafo de adjacencia binaria")
+log_step(3, "Building binary adjacency graph")
 # ── Build adjacency matrix (binary, distance < dmax) ───────────────────────
 adj_binary <- (dist_mat < dmax_m) * 1
 diag(adj_binary) <- 0
@@ -112,10 +112,10 @@ sp_hops <- distances(g_binary, algorithm = "bfs")
 n_edges <- sum(adj_binary) / 2
 log_info("Grafo construido: %d nos, %d arestas (dmax = %g m)", n, n_edges, dmax_m)
 if (n_edges == 0) {
-  log_warn("Nenhuma mancha conectada dentro de dmax = %g m; aumente dmax_m ou verifique CRS", dmax_m)
+  log_warn("No patches connected within dmax = %g m; increase dmax_m or check CRS", dmax_m)
 }
 
-log_step(4, "Calculando IIC — Integral Index of Connectivity")
+log_step(4, "Computing IIC — Integral Index of Connectivity")
 # ── IIC (Integral Index of Connectivity) ────────────────────────────────────
 areas <- patches[[area_col]]
 
@@ -136,9 +136,9 @@ compute_iic_internal <- function(areas_vec, sp_hops_mat) {
 IIC_full <- compute_iic_internal(areas, sp_hops)
 log_info("IIC (paisagem completa) = %.6f", IIC_full)
 
-log_step(5, "Calculando dIIC por mancha (leave-one-out)")
+log_step(5, "Computing dIIC per patch (leave-one-out)")
 # ── dIIC per patch ──────────────────────────────────────────────────────────
-log_info("Calculando dIIC para cada mancha (pode levar um momento)...")
+log_info("Computing dIIC for each patch (may take a moment)...")
 dIIC_vec <- numeric(n)
 for (i in seq_len(n)) {
   areas_i  <- areas[-i]
@@ -149,7 +149,7 @@ for (i in seq_len(n)) {
   dIIC_vec[i] <- (IIC_full - IIC_i) / IIC_full * 100
 }
 
-log_step(6, "Calculando PC — Probability of Connectivity")
+log_step(6, "Computing PC — Probability of Connectivity")
 # ── PC (Probability of Connectivity) ────────────────────────────────────────
 # Dispersal probability: p = exp(-d / dmax)  (negative exponential kernel)
 # dmax serves as mean dispersal distance parameter
@@ -170,9 +170,9 @@ pij_star <- exp(-sp_prob_dist)  # convert back to probability
 PC_full <- sum(outer(areas, areas) * pij_star) / sum(areas)^2
 log_info("PC (paisagem completa) = %.6f", PC_full)
 
-log_step(7, "Calculando dPC por mancha (leave-one-out)")
+log_step(7, "Computing dPC per patch (leave-one-out)")
 # ── dPC per patch ────────────────────────────────────────────────────────────
-log_info("Calculando dPC para cada mancha...")
+log_info("Computing dPC for each patch...")
 dPC_vec <- numeric(n)
 for (i in seq_len(n)) {
   areas_i  <- areas[-i]
@@ -189,7 +189,7 @@ for (i in seq_len(n)) {
 # ── Betweenness centrality ───────────────────────────────────────────────────
 BC <- betweenness(g_binary, normalized = TRUE)
 
-log_step(8, "Escrevendo resumo da paisagem e metricas por mancha")
+log_step(8, "Writing landscape summary and per-patch metrics")
 # ── Landscape summary ────────────────────────────────────────────────────────
 components_g <- components(g_binary)
 largest_comp  <- max(components_g$csize)
@@ -202,10 +202,10 @@ summary_df <- data.frame(
 )
 sum_path <- file.path(output_dir, "landscape_summary.csv")
 write.csv(summary_df, sum_path, row.names = FALSE)
-log_info("Resumo da paisagem gravado: %s", sum_path)
+log_info("Landscape summary saved: %s", sum_path)
 
 if (components_g$no > n / 2) {
-  log_warn("Paisagem altamente fragmentada: %d componentes para %d manchas; considere aumentar dmax_m",
+  log_warn("Highly fragmented landscape: %d components for %d patches; consider increasing dmax_m",
            components_g$no, n)
 }
 
@@ -223,7 +223,7 @@ patch_metrics <- patch_metrics[order(-patch_metrics$dPC_pct), ]
 
 patch_path <- file.path(output_dir, "patch_metrics.csv")
 write.csv(patch_metrics, patch_path, row.names = FALSE)
-log_info("Metricas por mancha gravadas: %s (%d manchas)", patch_path, n)
+log_info("Per-patch metrics saved: %s (%d patches)", patch_path, n)
 
 # Report top patches
 log_info("Top 5 manchas por dPC:")
@@ -233,7 +233,7 @@ for (r in seq_len(nrow(top5))) {
            top5$patch_id[r], top5$area_ha[r], top5$dPC_pct[r], top5$BC_norm[r])
 }
 
-log_step(9, "Gerando visualizacao do grafo de conectividade")
+log_step(9, "Generating connectivity graph visualisation")
 # ── Network visualisation ────────────────────────────────────────────────────
 V(g_binary)$dPC <- dPC_vec
 V(g_binary)$area <- areas
@@ -270,9 +270,9 @@ p <- ggplot() +
 plot_path <- file.path(output_dir, "connectivity_graph.png")
 tryCatch({
   ggsave(plot_path, p, width = 8, height = 7, dpi = 150)
-  log_info("Visualizacao do grafo salva: %s", plot_path)
+  log_info("Graph visualisation saved: %s", plot_path)
 }, error = function(e) {
-  log_warn("Nao foi possivel salvar visualizacao do grafo: %s", conditionMessage(e))
+  log_warn("Could not save graph visualisation: %s", conditionMessage(e))
 })
 
-log_info("Analise de conectividade concluida")
+log_info("Connectivity analysis completed")

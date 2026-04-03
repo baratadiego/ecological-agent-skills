@@ -36,7 +36,7 @@ suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(readr))
 
 # ── 1. Parse arguments ───────────────────────────────────────────────────────
-log_step(1, "Analisar argumentos da linha de comando")
+log_step(1, "Parse command-line arguments")
 args <- commandArgs(trailingOnly = TRUE)
 
 if (length(args) < 2) {
@@ -45,7 +45,7 @@ if (length(args) < 2) {
   year_from     <- 2000
   year_to       <- as.integer(format(Sys.Date(), "%Y"))
   quality_grade <- "research"
-  log_warn("Menos de 2 argumentos fornecidos. Usando valores padrao para teste.")
+  log_warn("Fewer than 2 arguments provided. Using default values for testing.")
 } else {
   species_input <- args[1]
   output_dir    <- args[2]
@@ -62,33 +62,33 @@ log_info("Quality grade  : %s", quality_grade)
 
 log_decision("quality_grade", quality_grade,
              "research = comunidade validou ID + possui coordenadas; recomendado para SDM")
-log_decision("year_from", year_from, "filtro temporal; 2000 equilibra tamanho de dataset e qualidade")
+log_decision("year_from", year_from, "temporal filter; 2000 balances dataset size and quality")
 log_decision("captive", "FALSE",
              "excluir organismos em cativeiro/cultivados (nao representam distribuicao selvagem)")
 
 # ── 2. Create output directory ───────────────────────────────────────────────
-log_step(2, "Criar diretorio de saida")
+log_step(2, "Create output directory")
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
-log_info("Diretorio de saida pronto: %s", output_dir)
+log_info("Output directory ready: %s", output_dir)
 
 # ── 3. Build species list ────────────────────────────────────────────────────
-log_step(3, "Construir lista de especies")
+log_step(3, "Build species list")
 if (grepl("\\.csv$", species_input, ignore.case = TRUE) && file.exists(species_input)) {
   tryCatch({
     species_df <- read_csv(species_input, show_col_types = FALSE)
     if (!"scientificName" %in% names(species_df)) {
       log_error(
-        "Coluna 'scientificName' nao encontrada em: %s\nCausa provavel: CSV mal formatado.\nVerifique o cabecalho do arquivo.\nSkill anterior: ecological-data-foundation",
+        "Coluna 'scientificName' nao encontrada em: %s\nProbable cause: CSV mal formatado.\nCheck o cabecalho do arquivo.\nPrevious skill: ecological-data-foundation",
         species_input
       )
       stop("Missing column 'scientificName'")
     }
     species_list <- unique(trimws(species_df$scientificName))
-    log_info("Modo batch: %d especies carregadas de %s", length(species_list), species_input)
-    log_decision("mode", "batch", "argumento e um CSV valido com coluna scientificName")
+    log_info("Batch mode: %d species loaded from %s", length(species_list), species_input)
+    log_decision("mode", "batch", "argument is a valid CSV with scientificName column")
   }, error = function(e) {
     log_error(
-      "Falha ao ler lista de especies: %s\nCausa provavel: arquivo CSV invalido.\nVerifique: %s\nSkill anterior: ecological-data-foundation",
+      "Failed to read lista de especies: %s\nProbable cause: CSV file invalido.\nCheck: %s\nPrevious skill: ecological-data-foundation",
       conditionMessage(e), species_input
     )
     stop(e)
@@ -96,7 +96,7 @@ if (grepl("\\.csv$", species_input, ignore.case = TRUE) && file.exists(species_i
 } else {
   species_list <- trimws(species_input)
   log_info("Modo especie unica: %s", species_list)
-  log_decision("mode", "single_species", "argumento nao e arquivo CSV")
+  log_decision("mode", "single_species", "argument is not a CSV file")
 }
 
 # ── 4. Download function ─────────────────────────────────────────────────────
@@ -121,19 +121,19 @@ download_inat_species <- function(sp_name) {
     )
   }, error = function(e) {
     log_error(
-      "Falha em get_inat_obs para '%s': %s\nCausa provavel: sem conexao com a internet ou API iNaturalist indisponivel.\nVerifique sua conexao e tente novamente.\nSkill anterior: ecological-data-foundation",
+      "Failed in get_inat_obs for '%s': %s\nProbable cause: no internet connection or iNaturalist API unavailable.\nCheck your connection and try again.\nPrevious skill: ecological-data-foundation",
       sp_name, conditionMessage(e)
     )
     stop(e)
   })
 
   if (is.null(occ_raw) || nrow(occ_raw) == 0) {
-    log_warn("Nenhum registro encontrado para '%s' no iNaturalist.", sp_name)
+    log_warn("No records found for '%s' in iNaturalist.", sp_name)
     return(invisible(NULL))
   }
 
   n_raw <- nrow(occ_raw)
-  log_info("Registros brutos recuperados: %d", n_raw)
+  log_info("Raw records recuperados: %d", n_raw)
 
   # ── Filter by year range ───────────────────────────────────────────────────
   if ("observed_on" %in% names(occ_raw)) {
@@ -141,7 +141,7 @@ download_inat_species <- function(sp_name) {
     occ_raw <- occ_raw[!is.na(occ_raw$obs_year) &
                          occ_raw$obs_year >= year_from &
                          occ_raw$obs_year <= year_to, ]
-    log_info("Registros apos filtro de ano (%d-%d): %d", year_from, year_to, nrow(occ_raw))
+    log_info("Records after year filter (%d-%d): %d", year_from, year_to, nrow(occ_raw))
   }
 
   # ── Standardise to output schema ──────────────────────────────────────────
@@ -165,15 +165,15 @@ download_inat_species <- function(sp_name) {
   std <- std[!is.na(std$decimalLatitude) & !is.na(std$decimalLongitude), ]
   n_removed <- n_before - nrow(std)
   if (n_removed > 0) {
-    log_warn("%d registros removidos por coordenadas ausentes.", n_removed)
+    log_warn("%d registros removidos por coordenadas missing.", n_removed)
   }
 
   n_final <- nrow(std)
-  log_info("Registros com coordenadas validas: %d", n_final)
+  log_info("Records with valid coordinates: %d", n_final)
 
   if (n_final < 30) {
     log_warn(
-      "Registros insuficientes para SDM confiavel (n = %d). Considere: (1) ampliar periodo, (2) usar quality='any', (3) combinar com outras fontes.",
+      "Insufficient records for reliable SDM (n = %d). Consider: (1) expanding the time period, (2) using quality='any', (3) combining with other data sources.",
       n_final
     )
   }
@@ -182,10 +182,10 @@ download_inat_species <- function(sp_name) {
   csv_path <- file.path(output_dir, paste0("occurrences_raw_iNat_", safe_name, "_", today_str, ".csv"))
   tryCatch({
     write_csv(std, csv_path)
-    log_info("Gravado: %s (%d registros)", csv_path, n_final)
+    log_info("Written: %s (%d registros)", csv_path, n_final)
   }, error = function(e) {
     log_error(
-      "Falha ao gravar CSV para '%s': %s\nCausa provavel: sem permissao de escrita em '%s'.\nSkill anterior: ecological-data-foundation",
+      "Failed to gravar CSV para '%s': %s\nProbable cause: sem permissao de escrita em '%s'.\nPrevious skill: ecological-data-foundation",
       sp_name, conditionMessage(e), output_dir
     )
     stop(e)
@@ -209,10 +209,10 @@ download_inat_species <- function(sp_name) {
   meta_path <- file.path(output_dir, paste0("download_metadata_iNat_", safe_name, ".txt"))
   tryCatch({
     writeLines(meta_lines, meta_path)
-    log_info("Gravado: %s", meta_path)
+    log_info("Written: %s", meta_path)
   }, error = function(e) {
     log_error(
-      "Falha ao gravar metadados para '%s': %s\nCausa provavel: sem permissao de escrita.\nSkill anterior: ecological-data-foundation",
+      "Failed to save metadata for '%s': %s\nProbable cause: sem permissao de escrita.\nPrevious skill: ecological-data-foundation",
       sp_name, conditionMessage(e)
     )
     stop(e)
@@ -222,17 +222,17 @@ download_inat_species <- function(sp_name) {
 }
 
 # ── 5. Run for all species ───────────────────────────────────────────────────
-log_step(4, "Executar download iNaturalist para todas as especies")
+log_step(4, "Run iNaturalist download for all species")
 for (sp in species_list) {
   tryCatch(
     download_inat_species(sp),
     error = function(e) {
       log_error(
-        "Falha ao baixar '%s' do iNaturalist: %s\nCausa provavel: problema de rede ou especie nao encontrada.\nVerifique os logs acima.\nSkill anterior: ecological-data-foundation",
+        "Failed to download '%s' from iNaturalist: %s\nProbable cause: network error or species not found.\nCheck logs above.\nPrevious skill: ecological-data-foundation",
         sp, conditionMessage(e)
       )
     }
   )
 }
 
-log_info("Todos os downloads iNaturalist concluidos. Verifique: %s", output_dir)
+log_info("All iNaturalist downloads completed. Check: %s", output_dir)

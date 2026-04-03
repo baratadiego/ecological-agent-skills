@@ -28,7 +28,7 @@ vif_threshold <- ifelse(length(args) >= 3, as.numeric(args[3]), 5)
 
 # ── Input precondition checks ─────────────────────────────────────────────────
 if (!file.exists(env_file)) {
-  log_error("Input nao encontrado: %s\nCausa provavel: passo anterior nao concluiu.\nVerifique: outputs do skill anterior.\nSkill anterior: species-distribution-modeling", env_file)
+  log_error("Input not found: %s\nProbable cause: previous step did not complete.\nCheck: outputs of the previous skill.\nPrevious skill: species-distribution-modeling", env_file)
   stop("Missing input: ", env_file)
 }
 
@@ -44,14 +44,14 @@ tryCatch({
   log_info("Variables: %d | Rows: %d", ncol(env), nrow(env))
 
   if (nrow(env) < 30) {
-    log_warn("Numero de linhas baixo (%d). Estimativas de correlacao podem ser instáveis com n < 30.", nrow(env))
+    log_warn("Low row count (%d). Correlation estimates may be unstable with n < 30.", nrow(env))
   }
   if (ncol(env) < 2) {
-    log_error("Apenas %d variavel encontrada. Analise de colinearidade requer pelo menos 2 preditores.\nCausa provavel: CSV incorreto ou sem preditores numericos.\nVerifique: formato do arquivo env_matrix_csv.\nSkill anterior: species-distribution-modeling", ncol(env))
+    log_error("Only %d variable found. Collinearity analysis requires at least 2 predictors.\nProbable cause: Incorrect CSV or no numeric predictors.\nCheck: env_matrix_csv file format.\nPrevious skill: species-distribution-modeling", ncol(env))
     stop("At least 2 predictor columns required for collinearity analysis.")
   }
 }, error = function(e) {
-  log_error("Falha em load_env_matrix: %s\nCausa provavel: arquivo CSV ausente, malformado ou sem colunas numericas.\nVerifique: caminho e formato do CSV de preditores.\nSkill anterior: species-distribution-modeling", conditionMessage(e))
+  log_error("Failed in load_env_matrix: %s\nProbable cause: CSV file missing, malformed, or without numeric columns.\nCheck: path and format of predictor CSV.\nPrevious skill: species-distribution-modeling", conditionMessage(e))
   stop(e)
 })
 
@@ -68,12 +68,12 @@ tryCatch({
 
   log_info("Highly correlated pairs (|r| > 0.7): %d pairs found.", nrow(high_cor_pairs))
   if (nrow(high_cor_pairs) > 0) {
-    log_warn("%d pares de preditores altamente correlacionados (|r| > 0.70) detectados. Reducao de colinearidade necessaria.", nrow(high_cor_pairs))
+    log_warn("%d highly correlated predictor pairs (|r| > 0.70) detected. Collinearity reduction required.", nrow(high_cor_pairs))
     log_info("Highly correlated pairs:\n%s",
              paste(capture.output(print(high_cor_pairs)), collapse = "\n"))
   }
 }, error = function(e) {
-  log_error("Falha em pairwise_correlation: %s\nCausa provavel: colunas nao numericas ou valores NA remanescentes.\nVerifique: tipos de dados do CSV e resultado do na.omit.\nSkill anterior: species-distribution-modeling", conditionMessage(e))
+  log_error("Failed in pairwise_correlation: %s\nProbable cause: non-numeric columns or remaining NA values.\nCheck: CSV data types and result of na.omit.\nPrevious skill: species-distribution-modeling", conditionMessage(e))
   stop(e)
 })
 
@@ -92,10 +92,10 @@ tryCatch({
 
   n_removed <- ncol(env) - length(selected)
   if (n_removed > 0) {
-    log_warn("%d preditores removidos por VIF > %g. Revise se variaveis ecologicamente importantes foram excluidas.", n_removed, vif_threshold)
+    log_warn("%d predictors removed by VIF > %g. Review whether ecologically important variables were excluded.", n_removed, vif_threshold)
   }
 }, error = function(e) {
-  log_error("Falha em vif_stepwise_reduction: %s\nCausa provavel: matriz singular, preditores constantes, ou falha no pacote usdm.\nVerifique: variancia de cada preditor e instalacao do pacote usdm.\nSkill anterior: species-distribution-modeling", conditionMessage(e))
+  log_error("Failed in vif_stepwise_reduction: %s\nProbable cause: singular matrix, constant predictors, or usdm package failure.\nCheck: variance of each predictor and usdm package installation.\nPrevious skill: species-distribution-modeling", conditionMessage(e))
   stop(e)
 })
 
@@ -107,6 +107,6 @@ tryCatch({
   writeLines(selected, file.path(output_dir, "selected_predictors.txt"))
   log_info("Outputs written to: %s", output_dir)
 }, error = function(e) {
-  log_error("Falha em write_outputs: %s\nCausa provavel: permissoes de escrita ou diretorio de saida inexistente.\nVerifique: output_dir e permissoes do sistema de arquivos.\nSkill anterior: species-distribution-modeling", conditionMessage(e))
+  log_error("Failed in write_outputs: %s\nProbable cause: write permissions or non-existent output directory.\nCheck: output_dir and filesystem permissions.\nPrevious skill: species-distribution-modeling", conditionMessage(e))
   stop(e)
 })

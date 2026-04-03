@@ -53,7 +53,7 @@ quasi_ext <- if (length(args) >= 5) as.numeric(args[5]) else 50
 
 # ── Input precondition checks ─────────────────────────────────────────────────
 if (!file.exists(vr_path)) {
-  log_error("Input nao encontrado: %s\nCausa provavel: passo anterior nao concluiu.\nVerifique: outputs do skill anterior.\nSkill anterior: species-distribution-modeling", vr_path)
+  log_error("Input not found: %s\nProbable cause: previous step did not complete.\nCheck: outputs of the previous skill.\nPrevious skill: species-distribution-modeling", vr_path)
   stop("Missing input: ", vr_path)
 }
 
@@ -69,7 +69,7 @@ tryCatch({
   vr <- read.csv(vr_path)
   log_info("Loaded vital rates: %d rows, %d columns.", nrow(vr), ncol(vr))
 }, error = function(e) {
-  log_error("Falha em load_vital_rates: %s\nCausa provavel: arquivo CSV malformado ou permissoes de leitura.\nVerifique: formato do CSV e caminho correto.\nSkill anterior: species-distribution-modeling", conditionMessage(e))
+  log_error("Failed in load_vital_rates: %s\nProbable cause: malformed CSV file or read permissions.\nCheck: CSV format and correct path.\nPrevious skill: species-distribution-modeling", conditionMessage(e))
   stop(e)
 })
 
@@ -79,7 +79,7 @@ log_step(2, "Detect matrix structure from column names")
 mat_cols <- grep("^a_[0-9]+_[0-9]+$", names(vr), value = TRUE)
 
 if (length(mat_cols) == 0) {
-  log_error("Nenhuma coluna de elemento de matriz encontrada.\nCausa provavel: CSV nao tem colunas no padrao a_i_j.\nVerifique: nomes das colunas do arquivo de taxas vitais.")
+  log_error("No matrix element columns found.\nProbable cause: CSV has no columns in the a_i_j pattern.\nCheck: column names in vital rates file.")
   stop("No matrix element columns found. Columns should be named a_1_1, a_1_2, ...")
 }
 
@@ -103,7 +103,7 @@ tryCatch({
   log_info("Mean matrix A built successfully.")
   log_info("Mean matrix A:\n%s", paste(capture.output(print(round(A_mean, 4))), collapse = "\n"))
 }, error = function(e) {
-  log_error("Falha em build_mean_matrix: %s\nCausa provavel: indices de coluna inconsistentes ou valores NA excessivos.\nVerifique: integridade dos dados de taxas vitais.\nSkill anterior: species-distribution-modeling", conditionMessage(e))
+  log_error("Failed in build_mean_matrix: %s\nProbable cause: inconsistent column indices or excessive NA values.\nCheck: vital rates data integrity.\nPrevious skill: species-distribution-modeling", conditionMessage(e))
   stop(e)
 })
 
@@ -114,9 +114,9 @@ tryCatch({
   log_info("lambda (dominant eigenvalue) = %.4f", lambda_val)
 
   if (lambda_val < 0.95) {
-    log_warn("lambda < 0.95 (%.4f) — populacao em declinio rapido. Recomenda-se PVA estocastico e calculo de MTE.", lambda_val)
+    log_warn("lambda < 0.95 (%.4f) — population in rapid decline. Stochastic PVA and MTE calculation recommended.", lambda_val)
   } else if (lambda_val < 1.0) {
-    log_warn("lambda < 1.0 (%.4f) — populacao em declinio (pode ser lento).", lambda_val)
+    log_warn("lambda < 1.0 (%.4f) — population declining (may be slow).", lambda_val)
   }
 
   SS  <- stable.stage(A_mean)
@@ -128,7 +128,7 @@ tryCatch({
   log_info("Reproductive value: %s", paste(round(RV, 3), collapse = " "))
   log_info("Sum of elasticities = %.4f", sum(E))
 }, error = function(e) {
-  log_error("Falha em deterministic_analysis: %s\nCausa provavel: matriz singular ou eigenvalor complexo.\nVerifique: estrutura da matriz de transicao e taxas vitais.\nSkill anterior: species-distribution-modeling", conditionMessage(e))
+  log_error("Failed in deterministic_analysis: %s\nProbable cause: singular matrix or complex eigenvalue.\nCheck: structure of transition matrix and vital rates.\nPrevious skill: species-distribution-modeling", conditionMessage(e))
   stop(e)
 })
 
@@ -164,7 +164,7 @@ tryCatch({
   write.csv(SE_df, file.path(output_dir, "sensitivity_elasticity.csv"), row.names = FALSE)
   log_info("Sensitivity/elasticity written.")
 }, error = function(e) {
-  log_error("Falha em write_lambda_summary: %s\nCausa provavel: permissoes de escrita ou diretorio de saida inexistente.\nVerifique: output_dir e permissoes do sistema de arquivos.\nSkill anterior: species-distribution-modeling", conditionMessage(e))
+  log_error("Failed in write_lambda_summary: %s\nProbable cause: write permissions or non-existent output directory.\nCheck: output_dir and filesystem permissions.\nPrevious skill: species-distribution-modeling", conditionMessage(e))
   stop(e)
 })
 
@@ -201,7 +201,7 @@ tryCatch({
          width = 8, height = 5, dpi = 150)
   log_info("Projection plot saved.")
 }, error = function(e) {
-  log_error("Falha em deterministic_projection: %s\nCausa provavel: n_init invalido ou erro na multiplicacao de matrizes.\nVerifique: dimensao da matriz e valor de n_init.\nSkill anterior: species-distribution-modeling", conditionMessage(e))
+  log_error("Failed in deterministic_projection: %s\nProbable cause: invalid n_init or matrix multiplication error.\nCheck: matrix dimension and n_init value.\nPrevious skill: species-distribution-modeling", conditionMessage(e))
   stop(e)
 })
 
@@ -228,7 +228,7 @@ tryCatch({
          width = 5, height = 4.5, dpi = 150)
   log_info("Elasticity heatmap saved.")
 }, error = function(e) {
-  log_error("Falha em elasticity_heatmap: %s\nCausa provavel: erro no ggplot2 ou permissoes de escrita.\nVerifique: instalacao do ggplot2 e output_dir.\nSkill anterior: species-distribution-modeling", conditionMessage(e))
+  log_error("Failed in elasticity_heatmap: %s\nProbable cause: ggplot2 error or write permissions.\nCheck: ggplot2 installation and output_dir.\nPrevious skill: species-distribution-modeling", conditionMessage(e))
   stop(e)
 })
 
@@ -244,14 +244,14 @@ tryCatch({
   log_info("Vital rate coefficients of variation computed for %d elements.", nrow(cv_df))
 
   if (nrow(high_cv) > 0) {
-    log_warn("Elementos com CV alto (> 0.30) detectados (%d) — PVA estocastico recomendado: %s",
+    log_warn("Elements with high CV (> 0.30) detected (%d) — stochastic PVA recommended: %s",
              nrow(high_cv), paste(high_cv$element, collapse = ", "))
   }
 
   write.csv(cv_df, file.path(output_dir, "vital_rate_cv.csv"), row.names = FALSE)
   log_info("Vital rate CV table written.")
 }, error = function(e) {
-  log_error("Falha em cv_check: %s\nCausa provavel: serie temporal muito curta ou valores NA excessivos.\nVerifique: numero de anos no CSV de taxas vitais.\nSkill anterior: species-distribution-modeling", conditionMessage(e))
+  log_error("Failed in cv_check: %s\nProbable cause: time series too short or excessive NA values.\nCheck: number of years in vital rates CSV.\nPrevious skill: species-distribution-modeling", conditionMessage(e))
   stop(e)
 })
 

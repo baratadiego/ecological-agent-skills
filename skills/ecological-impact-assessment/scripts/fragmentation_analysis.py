@@ -91,9 +91,9 @@ def main():
 
     if not Path(tif_file).exists():
         logger.error(
-            "Input nao encontrado: %s\n"
-            "  Causa provavel: passo anterior nao concluiu.\n"
-            "  Skill anterior que deveria ter produzido este input: geoprocessing-for-ecology",
+            "Input not found: %s\n"
+            "  Probable cause: previous step did not complete.\n"
+            "  Previous skill que deveria ter produzido este input: geoprocessing-for-ecology",
             tif_file
         )
         sys.exit(1)

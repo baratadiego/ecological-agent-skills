@@ -60,11 +60,11 @@ budget        <- if (length(args) >= 8 && args[8] != "NA") as.numeric(args[8]) e
 
 # ── Input precondition checks ─────────────────────────────────────────────────
 if (!file.exists(pu_path)) {
-  log_error("Input nao encontrado: %s\nCausa provavel: passo anterior nao concluiu.\nVerifique: outputs do skill anterior.\nSkill anterior: species-distribution-modeling", pu_path)
+  log_error("Input not found: %s\nProbable cause: previous step did not complete.\nCheck: outputs of the previous skill.\nPrevious skill: species-distribution-modeling", pu_path)
   stop("Missing input: ", pu_path)
 }
 if (!dir.exists(features_dir)) {
-  log_error("Diretorio de features nao encontrado: %s\nCausa provavel: passo anterior nao concluiu ou caminho incorreto.\nVerifique: outputs do skill anterior.\nSkill anterior: species-distribution-modeling", features_dir)
+  log_error("Features directory not found: %s\nProbable cause: previous step did not complete or incorrect path.\nCheck: outputs of the previous skill.\nPrevious skill: species-distribution-modeling", features_dir)
   stop("Missing features directory: ", features_dir)
 }
 
@@ -87,10 +87,10 @@ tryCatch({
   log_info("Valid planning units: %d", n_pu_total)
 
   if (n_pu_total < 10) {
-    log_warn("Numero muito baixo de unidades de planejamento validas (%d). Verifique a mascara de NA no raster pu.", n_pu_total)
+    log_warn("Very low number of valid planning units (%d). Check the NA mask in the pu raster.", n_pu_total)
   }
 }, error = function(e) {
-  log_error("Falha em load_planning_units: %s\nCausa provavel: raster corrompido, caminho incorreto ou CRS ausente.\nVerifique: arquivo pu_raster e sua integridade.\nSkill anterior: species-distribution-modeling", conditionMessage(e))
+  log_error("Failed in load_planning_units: %s\nProbable cause: corrupted raster, incorrect path, or missing CRS.\nCheck: pu_raster file and its integrity.\nPrevious skill: species-distribution-modeling", conditionMessage(e))
   stop(e)
 })
 
@@ -100,7 +100,7 @@ tryCatch({
   feat_files <- list.files(features_dir, pattern = "\\.tif$",
                             full.names = TRUE, ignore.case = TRUE)
   if (length(feat_files) == 0) {
-    log_error("Nenhum arquivo .tif encontrado em: %s\nCausa provavel: features nao geradas ou caminho incorreto.\nVerifique: conteudo do diretorio features_dir.\nSkill anterior: species-distribution-modeling", features_dir)
+    log_error("No .tif files found in: %s\nProbable cause: features not generated or incorrect path.\nCheck: contents of directory features_dir.\nPrevious skill: species-distribution-modeling", features_dir)
     stop("No .tif feature files found in: ", features_dir)
   }
   log_info("Loading %d feature layers...", length(feat_files))
@@ -114,7 +114,7 @@ tryCatch({
   feat_sums <- global(features, "sum", na.rm = TRUE)[[1]]
   zero_feats <- names(features)[feat_sums == 0]
   if (length(zero_feats) > 0) {
-    log_warn("%d features com soma zero excluidas (nenhuma ocorrencia na area de estudo): %s",
+    log_warn("%d zero-sum features excluded (no occurrences in study area): %s",
              length(zero_feats), paste(zero_feats, collapse = ", "))
     features <- features[[!names(features) %in% zero_feats]]
   }
@@ -122,11 +122,11 @@ tryCatch({
   log_info("Features loaded: %d (after removing zero-sum)", n_feats)
 
   if (n_feats == 0) {
-    log_error("Nenhuma feature valida apos remocao de zero-sum.\nCausa provavel: features nao sobrepõem a area de planejamento.\nVerifique: extensao e CRS dos rasters de features vs pu_raster.\nSkill anterior: species-distribution-modeling")
+    log_error("No valid features after zero-sum removal.\nProbable cause: features do not overlap with the planning area.\nCheck: extent and CRS of feature rasters vs pu_raster.\nPrevious skill: species-distribution-modeling")
     stop("No valid features remaining after zero-sum removal.")
   }
 }, error = function(e) {
-  log_error("Falha em load_features: %s\nCausa provavel: rasters corrompidos, incompativeis ou diretorio vazio.\nVerifique: arquivos .tif em features_dir e compatibilidade com pu_raster.\nSkill anterior: species-distribution-modeling", conditionMessage(e))
+  log_error("Failed in load_features: %s\nProbable cause: corrupted or incompatible rasters, or empty directory.\nCheck: .tif files in features_dir and compatibility with pu_raster.\nPrevious skill: species-distribution-modeling", conditionMessage(e))
   stop(e)
 })
 
@@ -139,7 +139,7 @@ tryCatch({
     na_targets  <- is.na(targets_vec)
     targets_vec[na_targets] <- 0.30  # default for unmatched features
     if (any(na_targets)) {
-      log_warn("Alvo nao encontrado para %d features; usando padrao 0.30: %s",
+      log_warn("Target not found for %d features; using default 0.30: %s",
                sum(na_targets), paste(names(features)[na_targets], collapse = ", "))
     }
     log_decision("targets_vec", "from_csv", paste0("Per-feature targets loaded from ", targets_arg))
@@ -151,10 +151,10 @@ tryCatch({
            min(targets_vec), mean(targets_vec), max(targets_vec))
 
   if (any(targets_vec > 0.90)) {
-    log_warn("%d features com alvo > 90%%. Alvos muito altos podem tornar o problema inviavel.", sum(targets_vec > 0.90))
+    log_warn("%d features with target > 90%%. Very high targets may make the problem infeasible.", sum(targets_vec > 0.90))
   }
 }, error = function(e) {
-  log_error("Falha em set_targets: %s\nCausa provavel: CSV de alvos malformado ou proporcao invalida fora de [0,1].\nVerifique: formato do arquivo de alvos e nomes das features.\nSkill anterior: species-distribution-modeling", conditionMessage(e))
+  log_error("Failed in set_targets: %s\nProbable cause: malformed targets CSV or invalid proportion outside [0,1].\nCheck: targets file format and feature names.\nPrevious skill: species-distribution-modeling", conditionMessage(e))
   stop(e)
 })
 
@@ -188,7 +188,7 @@ tryCatch({
     n_li <- sum(values(li) == 1, na.rm = TRUE)
     log_info("Locked-in: %d PUs", n_li)
     if (n_li == 0) {
-      log_warn("Raster locked-in fornecido mas nenhuma PU com valor 1 encontrada.")
+      log_warn("Locked-in raster provided but no PU with value 1 found.")
     }
   }
 
@@ -200,7 +200,7 @@ tryCatch({
     n_lo <- sum(values(lo) == 1, na.rm = TRUE)
     log_info("Locked-out: %d PUs", n_lo)
     if (n_lo == 0) {
-      log_warn("Raster locked-out fornecido mas nenhuma PU com valor 1 encontrada.")
+      log_warn("Locked-out raster provided but no PU with value 1 found.")
     }
   }
 
@@ -216,7 +216,7 @@ tryCatch({
 
   log_info("Problem built successfully.")
 }, error = function(e) {
-  log_error("Falha em build_problem: %s\nCausa provavel: incompatibilidade entre rasters, alvos invalidos ou pacote prioritizr desatualizado.\nVerifique: versoes de prioritizr e terra, e compatibilidade espacial dos rasters.\nSkill anterior: species-distribution-modeling", conditionMessage(e))
+  log_error("Failed in build_problem: %s\nProbable cause: incompatibility between rasters, invalid targets, or outdated prioritizr package.\nCheck: prioritizr and terra versions, and spatial compatibility of rasters.\nPrevious skill: species-distribution-modeling", conditionMessage(e))
   stop(e)
 })
 
@@ -227,14 +227,14 @@ tryCatch({
   s <- tryCatch(
     solve(p),
     error = function(e) {
-      log_warn("HiGHS falhou: %s. Tentando fallback para lpsymphony...", conditionMessage(e))
+      log_warn("HiGHS failed: %s. Trying fallback to lpsymphony...", conditionMessage(e))
       p2 <- p %>% add_lpsymphony_solver(gap = 0.05, time_limit = 600)
       solve(p2)
     }
   )
   log_info("Solver completed successfully.")
 }, error = function(e) {
-  log_error("Falha em solve_problem: %s\nCausa provavel: problema inviavel (alvos inalcancaveis), solver nao instalado, ou timeout.\nVerifique: alvos vs disponibilidade de features, e instalacao do HiGHS/lpsymphony.\nSkill anterior: species-distribution-modeling", conditionMessage(e))
+  log_error("Failed in solve_problem: %s\nProbable cause: infeasible problem (unreachable targets), solver not installed, or timeout.\nCheck: targets vs feature availability, and HiGHS/lpsymphony installation.\nPrevious skill: species-distribution-modeling", conditionMessage(e))
   stop(e)
 })
 
@@ -248,13 +248,13 @@ tryCatch({
            n_selected, n_selected / n_pu_total * 100)
 
   if (n_selected == 0) {
-    log_warn("Nenhuma PU selecionada na solucao. Verifique viabilidade do problema e restricoes locked-out.")
+    log_warn("No PUs selected in solution. Check problem feasibility and locked-out constraints.")
   }
   if (n_selected / n_pu_total > 0.80) {
-    log_warn("Mais de 80%% das PUs selecionadas (%.1f%%). Alvos podem ser muito altos ou area de estudo muito restrita.", n_selected / n_pu_total * 100)
+    log_warn("More than 80%% of PUs selected (%.1f%%). Targets may be too high or study area too restricted.", n_selected / n_pu_total * 100)
   }
 }, error = function(e) {
-  log_error("Falha em write_solution: %s\nCausa provavel: permissoes de escrita ou solucao invalida.\nVerifique: output_dir e resultado do solver.\nSkill anterior: species-distribution-modeling", conditionMessage(e))
+  log_error("Failed in write_solution: %s\nProbable cause: write permissions or invalid solution.\nCheck: output_dir and solver result.\nPrevious skill: species-distribution-modeling", conditionMessage(e))
   stop(e)
 })
 
@@ -271,10 +271,10 @@ tryCatch({
   log_info("Targets met: %d / %d features", n_targets_met, n_feats)
 
   if (n_targets_met < n_feats) {
-    log_warn("%d features nao atingiram seus alvos de representacao. Verifique viabilidade e restricoes.", n_feats - n_targets_met)
+    log_warn("%d features did not meet their representation targets. Check feasibility and constraints.", n_feats - n_targets_met)
   }
 }, error = function(e) {
-  log_error("Falha em feature_representation: %s\nCausa provavel: incompatibilidade entre problema e solucao, ou falha na avaliacao.\nVerifique: objetos p e s e versao do prioritizr.\nSkill anterior: species-distribution-modeling", conditionMessage(e))
+  log_error("Failed in feature_representation: %s\nProbable cause: incompatibility between problem and solution, or evaluation failure.\nCheck: objects p and s and prioritizr version.\nPrevious skill: species-distribution-modeling", conditionMessage(e))
   stop(e)
 })
 
@@ -292,7 +292,7 @@ tryCatch({
   write.csv(cost_df, file.path(output_dir, "cost_summary.csv"), row.names = FALSE)
   log_info("Cost summary:\n%s", paste(capture.output(print(cost_df)), collapse = "\n"))
 }, error = function(e) {
-  log_error("Falha em cost_summary: %s\nCausa provavel: falha na avaliacao de custo ou permissoes de escrita.\nVerifique: objetos p e s e output_dir.\nSkill anterior: species-distribution-modeling", conditionMessage(e))
+  log_error("Failed in cost_summary: %s\nProbable cause: cost evaluation failure or write permissions.\nCheck: objects p and s and output_dir.\nPrevious skill: species-distribution-modeling", conditionMessage(e))
   stop(e)
 })
 
@@ -303,7 +303,7 @@ tryCatch({
   writeRaster(irr, file.path(output_dir, "irreplaceability.tif"), overwrite = TRUE)
   log_info("Irreplaceability map written.")
 }, error = function(e) {
-  log_error("Falha em irreplaceability: %s\nCausa provavel: falha na avaliacao de raridade ou permissoes de escrita.\nVerifique: objetos p e s e output_dir.\nSkill anterior: species-distribution-modeling", conditionMessage(e))
+  log_error("Failed in irreplaceability: %s\nProbable cause: rarity evaluation failure or write permissions.\nCheck: objects p and s and output_dir.\nPrevious skill: species-distribution-modeling", conditionMessage(e))
   stop(e)
 })
 
@@ -330,7 +330,7 @@ tryCatch({
          width = 9, height = 7, dpi = 150)
   log_info("Prioritization map saved.")
 }, error = function(e) {
-  log_warn("Nao foi possivel gerar o mapa de priorizacao: %s. Continuando sem o grafico.", conditionMessage(e))
+  log_warn("Could not generate prioritisation map: %s. Continuing without plot.", conditionMessage(e))
 })
 
 log_info("Prioritization complete.")

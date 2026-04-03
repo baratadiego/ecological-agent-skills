@@ -103,7 +103,7 @@ Select relevant services for the context:
 
 ## Tools and Libraries
 
-**R:** `raster`, `terra`, `dplyr`, `ggplot2`, `corrplot`  
+**R:** `terra`, `dplyr`, `ggplot2`, `corrplot`  
 **Python:** `rasterio`, `geopandas`, `seaborn`  
 **Dedicated:** InVEST (Stanford Natural Capital Project), ARIES, Co$ting Nature
 

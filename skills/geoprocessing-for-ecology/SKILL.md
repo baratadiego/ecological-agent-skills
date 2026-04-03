@@ -102,7 +102,7 @@ Guides the agent through spatial data operations needed in quantitative ecology:
 
 ## Tools and Libraries
 
-**R:** `terra`, `sf`, `rgdal`, `raster`, `landscapemetrics`  
+**R:** `terra`, `sf`, `landscapemetrics`  
 **Python:** `rasterio`, `geopandas`, `pyproj`, `rasterstats`, `fiona`  
 **CLI:** `GDAL/OGR` (gdalwarp, ogr2ogr, gdal_calc)
 

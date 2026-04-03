@@ -48,11 +48,11 @@ locked_out_p <- if (length(args) >= 6 && args[6] != "NA") args[6] else NULL
 
 # ── Input precondition checks ─────────────────────────────────────────────────
 if (!file.exists(pu_path)) {
-  log_error("Input nao encontrado: %s\nCausa provavel: passo anterior nao concluiu.\nVerifique: outputs do skill anterior.\nSkill anterior: spatial-prioritization (run_prioritization)", pu_path)
+  log_error("Input not found: %s\nProbable cause: previous step did not complete.\nCheck: outputs of the previous skill.\nPrevious skill: spatial-prioritization (run_prioritization)", pu_path)
   stop("Missing input: ", pu_path)
 }
 if (!dir.exists(features_dir)) {
-  log_error("Diretorio de features nao encontrado: %s\nCausa provavel: passo anterior nao concluiu ou caminho incorreto.\nVerifique: outputs do skill anterior.\nSkill anterior: spatial-prioritization (run_prioritization)", features_dir)
+  log_error("Features directory not found: %s\nProbable cause: previous step did not complete or incorrect path.\nCheck: outputs of the previous skill.\nPrevious skill: spatial-prioritization (run_prioritization)", features_dir)
   stop("Missing features directory: ", features_dir)
 }
 
@@ -69,7 +69,7 @@ tryCatch({
   feat_files <- list.files(features_dir, pattern = "\\.tif$",
                             full.names = TRUE, ignore.case = TRUE)
   if (length(feat_files) == 0) {
-    log_error("Nenhum arquivo .tif encontrado em: %s\nCausa provavel: features_dir incorreto ou features nao geradas.\nVerifique: conteudo do diretorio de features.\nSkill anterior: spatial-prioritization (run_prioritization)", features_dir)
+    log_error("No .tif files found in: %s\nProbable cause: incorrect features_dir or features not generated.\nCheck: contents of features directory.\nPrevious skill: spatial-prioritization (run_prioritization)", features_dir)
     stop("No .tif feature files found in: ", features_dir)
   }
   features   <- rast(feat_files)
@@ -80,7 +80,7 @@ tryCatch({
   feat_sums <- global(features, "sum", na.rm = TRUE)[[1]]
   zero_feats <- names(features)[feat_sums == 0]
   if (length(zero_feats) > 0) {
-    log_warn("%d features com soma zero excluidas: %s", length(zero_feats), paste(zero_feats, collapse = ", "))
+    log_warn("%d features with zero sum excluded: %s", length(zero_feats), paste(zero_feats, collapse = ", "))
   }
   features  <- features[[feat_sums > 0]]
   n_feats   <- nlyr(features)
@@ -88,11 +88,11 @@ tryCatch({
   log_info("Feature layers loaded: %d (after removing zero-sum).", n_feats)
 
   if (n_feats < 1) {
-    log_error("Nenhuma feature valida apos remocao de zero-sum.\nCausa provavel: todas as features tem distribuicao zero na area de estudo.\nVerifique: extensao espacial dos rasters de features.\nSkill anterior: spatial-prioritization (run_prioritization)")
+    log_error("No valid features after zero-sum removal.\nProbable cause: all features have zero distribution in study area.\nCheck: spatial extent of feature rasters.\nPrevious skill: spatial-prioritization (run_prioritization)")
     stop("No valid feature layers remaining after zero-sum removal.")
   }
 }, error = function(e) {
-  log_error("Falha em load_data: %s\nCausa provavel: rasters corrompidos, incompativeis ou caminho incorreto.\nVerifique: arquivos .tif e resolucao espacial.\nSkill anterior: spatial-prioritization (run_prioritization)", conditionMessage(e))
+  log_error("Failed in load_data: %s\nProbable cause: corrupted or incompatible rasters, or incorrect path.\nCheck: .tif files and spatial resolution compatibility.\nPrevious skill: spatial-prioritization (run_prioritization)", conditionMessage(e))
   stop(e)
 })
 
@@ -115,7 +115,7 @@ tryCatch({
   log_info("Baseline targets: min=%.2f, mean=%.2f, max=%.2f",
            min(targets_base), mean(targets_base), max(targets_base))
 }, error = function(e) {
-  log_error("Falha em set_targets: %s\nCausa provavel: CSV de alvos malformado ou proporcao invalida.\nVerifique: formato do arquivo de alvos e nomes das features.\nSkill anterior: spatial-prioritization (run_prioritization)", conditionMessage(e))
+  log_error("Failed in set_targets: %s\nProbable cause: malformed targets CSV or invalid proportion.\nCheck: targets file format and feature names.\nPrevious skill: spatial-prioritization (run_prioritization)", conditionMessage(e))
   stop(e)
 })
 
@@ -140,7 +140,7 @@ solve_scenario <- function(cost_r, targets_v, blm_val = 0, name = "scenario") {
   }
 
   s <- tryCatch(solve(p), error = function(e) {
-    log_warn("Solver falhou para cenario '%s': %s. Retornando NULL.", name, conditionMessage(e))
+    log_warn("Solver failed for scenario '%s': %s. Returning NULL.", name, conditionMessage(e))
     return(NULL)
   })
   if (is.null(s)) return(NULL)
@@ -174,7 +174,7 @@ tryCatch({
     res <- solve_scenario(pu, targets_base, blm_val = blm,
                           name = paste0("blm_", blm))
     if (is.null(res)) {
-      log_warn("Cenario BLM=%g nao produziu solucao.", blm)
+      log_warn("BLM=%g scenario produced no solution.", blm)
       return(NULL)
     }
     blm_solutions[[paste0("blm_", blm)]] <<- res$solution
@@ -186,10 +186,10 @@ tryCatch({
   log_info("BLM calibration done. %d / %d scenarios solved successfully.", nrow(blm_df), length(blm_values))
 
   if (nrow(blm_df) < 3) {
-    log_warn("Menos de 3 cenarios BLM resolvidos. Grafico de cotovelo pode ser insuficiente para selecao de BLM.")
+    log_warn("Fewer than 3 BLM scenarios solved. Elbow plot may be insufficient for BLM selection.")
   }
 }, error = function(e) {
-  log_error("Falha em blm_calibration: %s\nCausa provavel: falha do solver HiGHS ou dados raster invalidos.\nVerifique: instalacao do HiGHS e integridade dos rasters.\nSkill anterior: spatial-prioritization (run_prioritization)", conditionMessage(e))
+  log_error("Failed in blm_calibration: %s\nProbable cause: HiGHS solver failure or invalid raster data.\nCheck: HiGHS installation and raster integrity.\nPrevious skill: spatial-prioritization (run_prioritization)", conditionMessage(e))
   stop(e)
 })
 
@@ -207,14 +207,14 @@ if (nrow(blm_df) > 2) {
     tryCatch(
       ggsave(file.path(output_dir, "blm_calibration_plot.png"), p_blm,
              width = 7, height = 5, dpi = 150),
-      error = function(e) log_warn("BLM plot falhou ao salvar: %s", conditionMessage(e))
+      error = function(e) log_warn("BLM plot failed to save: %s", conditionMessage(e))
     )
     log_info("BLM calibration plot saved.")
   }, error = function(e) {
-    log_warn("Falha ao gerar grafico BLM: %s. Continuando sem o grafico.", conditionMessage(e))
+    log_warn("Failed to generate plot BLM: %s. Continuando sem o grafico.", conditionMessage(e))
   })
 } else {
-  log_warn("Dados insuficientes para grafico BLM (menos de 3 pontos). Grafico nao gerado.")
+  log_warn("Insufficient data for BLM plot (fewer than 3 points). Plot not generated.")
 }
 
 # ── 2. Target Sensitivity ─────────────────────────────────────────────────────
@@ -231,7 +231,7 @@ tryCatch({
     tgts <- pmin(targets_base * sc, 0.999)
     res  <- solve_scenario(pu, tgts, name = paste0("target_", sc))
     if (is.null(res)) {
-      log_warn("Cenario de alvo %.2fx nao produziu solucao.", sc)
+      log_warn("Target %.2fx scenario produced no solution.", sc)
       return(NULL)
     }
     target_solutions[[paste0("target_", sc)]] <<- res$solution
@@ -246,7 +246,7 @@ tryCatch({
             row.names = FALSE)
   log_info("Target sensitivity done. %d / %d scenarios solved.", nrow(target_df), length(target_scalings))
 }, error = function(e) {
-  log_error("Falha em target_sensitivity: %s\nCausa provavel: falha do solver ou alvos fora do intervalo [0, 0.999].\nVerifique: valores de targets_base e instalacao do HiGHS.\nSkill anterior: spatial-prioritization (run_prioritization)", conditionMessage(e))
+  log_error("Failed in target_sensitivity: %s\nProbable cause: solver failure or targets outside range [0, 0.999].\nCheck: targets_base values and HiGHS installation.\nPrevious skill: spatial-prioritization (run_prioritization)", conditionMessage(e))
   stop(e)
 })
 
@@ -267,7 +267,7 @@ tryCatch({
     log_info("  Cost scenario: %s", name)
     res <- solve_scenario(cost_scenarios[[name]], targets_base, name = name)
     if (is.null(res)) {
-      log_warn("Cenario de custo '%s' nao produziu solucao.", name)
+      log_warn("Cost '%s' scenario produced no solution.", name)
       return(NULL)
     }
     data.frame(cost_scenario = name,
@@ -280,7 +280,7 @@ tryCatch({
             row.names = FALSE)
   log_info("Cost scenario sensitivity done. %d / %d scenarios solved.", nrow(cost_df), length(cost_scenarios))
 }, error = function(e) {
-  log_error("Falha em cost_scenario_sensitivity: %s\nCausa provavel: falha do solver ou raster de custo invalido.\nVerifique: valores do raster pu e instalacao do HiGHS.\nSkill anterior: spatial-prioritization (run_prioritization)", conditionMessage(e))
+  log_error("Failed in cost_scenario_sensitivity: %s\nProbable cause: solver failure or invalid cost raster.\nCheck: pu raster values and HiGHS installation.\nPrevious skill: spatial-prioritization (run_prioritization)", conditionMessage(e))
   stop(e)
 })
 
@@ -293,7 +293,7 @@ tryCatch({
   all_solutions <- c(blm_solutions, target_solutions)
 
   if (length(all_solutions) < 2) {
-    log_warn("Solucoes insuficientes para analise de portfolio (%d). Sao necessarias pelo menos 2.", length(all_solutions))
+    log_warn("Insufficient solutions for portfolio analysis (%d). At least 2 are required.", length(all_solutions))
   } else {
     freq_raster <- Reduce("+", all_solutions) / length(all_solutions)
     names(freq_raster) <- "selection_frequency"
@@ -302,7 +302,7 @@ tryCatch({
     log_info("Portfolio frequency raster saved (%d scenarios).", length(all_solutions))
   }
 }, error = function(e) {
-  log_error("Falha em portfolio_irreplaceability: %s\nCausa provavel: solucoes incompativeis (extensoes diferentes) ou falha na soma de rasters.\nVerifique: consistencia espacial das solucoes individuais.\nSkill anterior: spatial-prioritization (run_prioritization)", conditionMessage(e))
+  log_error("Failed in portfolio_irreplaceability: %s\nProbable cause: incompatible solutions (different extents) or raster sum failure.\nCheck: spatial consistency of individual solutions.\nPrevious skill: spatial-prioritization (run_prioritization)", conditionMessage(e))
   stop(e)
 })
 

@@ -62,7 +62,7 @@ try:
     import pandas as pd
 except ImportError as e:
     logger.error(
-        "Dependencia ausente: %s\n  Instale com: pip install requests pandas\n  Skill anterior: ecological-data-foundation",
+        "Dependencia missing: %s\n  Instale com: pip install requests pandas\n  Previous skill: ecological-data-foundation",
         e,
     )
     sys.exit(1)
@@ -83,7 +83,7 @@ def iucn_get(endpoint: str, api_key: str) -> dict:
         return resp.json()
     except requests.RequestException as e:
         logger.error(
-            "Falha na requisicao IUCN API '%s': %s\n  Causa provavel: chave invalida ou API indisponivel.\n  Verifique: https://apiv3.iucnredlist.org/\n  Skill anterior: ecological-data-foundation",
+            "IUCN API request failed '%s': %s\n  Probable cause: invalid key or API unavailable.\n  Check: https://apiv3.iucnredlist.org/\n  Previous skill: ecological-data-foundation",
             endpoint, e,
         )
         raise
@@ -102,7 +102,7 @@ def fetch_country_occurrences(species_name: str, api_key: str) -> list[dict]:
         data = iucn_get(f"species/countries/name/{sp_encoded}", api_key)
         return data.get("result", [])
     except Exception as e:
-        logger.warning("Falha ao buscar paises de ocorrencia para '%s': %s", species_name, e)
+        logger.warning("Failed to fetch occurrence countries for '%s': %s", species_name, e)
         return []
 
 
@@ -113,7 +113,7 @@ def fetch_habitats(species_name: str, api_key: str) -> list[dict]:
         data = iucn_get(f"habitats/species/name/{sp_encoded}", api_key)
         return data.get("result", [])
     except Exception as e:
-        logger.warning("Falha ao buscar habitats para '%s': %s", species_name, e)
+        logger.warning("Failed to fetch habitats for '%s': %s", species_name, e)
         return []
 
 
@@ -194,10 +194,10 @@ def save_metadata(output_dir: Path, species_name: str, taxon_id,
     meta_path = output_dir / f"download_metadata_IUCN_{safe_name}.txt"
     try:
         meta_path.write_text("\n".join(lines), encoding="utf-8")
-        logger.info("Metadados gravados: %s", meta_path)
+        logger.info("Metadata saved: %s", meta_path)
     except OSError as e:
         logger.error(
-            "Falha ao gravar metadados: %s\n  Skill anterior: ecological-data-foundation", e,
+            "Failed to gravar metadados: %s\n  Previous skill: ecological-data-foundation", e,
         )
         raise
 
@@ -208,12 +208,12 @@ def download_species(species_name: str, output_dir: Path, api_key: str) -> None:
     logger.info("--- Iniciando download IUCN: %s ---", species_name)
     safe_name = species_name.replace(" ", "_")
 
-    log_step(1, f"Buscar avaliacao IUCN para '{species_name}'")
+    log_step(1, f"Fetch IUCN assessment for '{species_name}'")
     assessment = fetch_assessment(species_name, api_key)
 
     results = assessment.get("result", [])
     if not results:
-        logger.warning("Nenhum resultado IUCN para '%s'. Especie pode nao estar avaliada.", species_name)
+        logger.warning("No IUCN results for '%s'. Species may not have been assessed.", species_name)
         return
 
     res         = results[0]
@@ -224,35 +224,35 @@ def download_species(species_name: str, output_dir: Path, api_key: str) -> None:
     assess_date = res.get("assessment_date", "")
     assess_year = assess_date[:4] if assess_date else ""
 
-    logger.info("Categoria IUCN: %s | Criterios: %s | Tendencia: %s | Ano: %s",
+    logger.info("IUCN Category: %s | Criteria: %s | Trend: %s | Year: %s",
                 category, criteria, pop_trend, assess_year)
 
     if category in ("CR", "EN"):
         logger.warning(
-            "Especie '%s' e %s — dados de distribuicao podem ser restritos por razoes de seguranca.",
+            "Species '%s' is %s — distribution data may be restricted for security reasons.",
             species_name, category,
         )
 
-    log_step(2, f"Buscar ocorrencias por pais para '{species_name}'")
+    log_step(2, f"Fetch country occurrences for '{species_name}'")
     countries = fetch_country_occurrences(species_name, api_key)
-    logger.info("Paises de ocorrencia: %d", len(countries))
+    logger.info("Occurrence countries: %d", len(countries))
 
-    log_step(3, f"Buscar habitats adequados para '{species_name}'")
+    log_step(3, f"Fetch suitable habitats for '{species_name}'")
     habitats = fetch_habitats(species_name, api_key)
     logger.info("Habitats identificados: %d", len(habitats))
 
-    log_step(4, "Padronizar registros para schema de saida")
+    log_step(4, "Standardise records to output schema")
     df = standardise_records(assessment, countries, species_name)
-    logger.info("Registros no schema padrao: %d", len(df))
+    logger.info("Records in standard schema: %d", len(df))
 
-    log_step(5, "Gravar CSV de status IUCN")
+    log_step(5, "Write IUCN status CSV")
     csv_path = output_dir / f"iucn_status_{safe_name}.csv"
     try:
         df.to_csv(csv_path, index=False)
-        logger.info("Gravado: %s", csv_path)
+        logger.info("Written: %s", csv_path)
     except OSError as e:
         logger.error(
-            "Falha ao gravar CSV IUCN: %s\n  Skill anterior: ecological-data-foundation", e,
+            "Failed to gravar CSV IUCN: %s\n  Previous skill: ecological-data-foundation", e,
         )
         raise
 
@@ -262,11 +262,11 @@ def download_species(species_name: str, output_dir: Path, api_key: str) -> None:
         hab_path     = output_dir / f"iucn_habitats_{safe_name}.csv"
         try:
             hab_df.to_csv(hab_path, index=False)
-            logger.info("Habitats gravados: %s", hab_path)
+            logger.info("Habitats saved: %s", hab_path)
         except OSError as e:
-            logger.warning("Falha ao gravar habitats: %s", e)
+            logger.warning("Failed to gravar habitats: %s", e)
 
-    log_step(6, "Gravar metadados")
+    log_step(6, "Save metadata")
     save_metadata(output_dir, species_name, taxon_id, category, assess_year)
 
 
@@ -279,18 +279,18 @@ def main():
     api_key = os.environ.get("IUCN_REDLIST_KEY", "")
     if not api_key:
         logger.error(
-            "Variavel IUCN_REDLIST_KEY nao definida.\n  Causa provavel: chave nao configurada no ambiente.\n  Verifique: export IUCN_REDLIST_KEY=your_key (Linux/Mac) ou setx IUCN_REDLIST_KEY your_key (Windows)\n  Skill anterior: ecological-data-foundation",
+            "Variavel IUCN_REDLIST_KEY nao definida.\n  Probable cause: chave nao configurada no ambiente.\n  Check: export IUCN_REDLIST_KEY=your_key (Linux/Mac) ou setx IUCN_REDLIST_KEY your_key (Windows)\n  Previous skill: ecological-data-foundation",
         )
         sys.exit(1)
     logger.info("Chave IUCN detectada (primeiros 4 chars): %s...", api_key[:4])
-    log_decision("api_key", "***", "lida de IUCN_REDLIST_KEY; nunca exibida em logs")
+    log_decision("api_key", "***", "read from IUCN_REDLIST_KEY; never shown in logs")
 
     argv = sys.argv[1:]
 
     if len(argv) < 2:
         species_input = "Panthera onca"
         output_dir    = Path("output/iucn")
-        logger.warning("Menos de 2 argumentos fornecidos. Usando valores padrao para teste.")
+        logger.warning("Fewer than 2 arguments provided. Using default values for testing.")
     else:
         species_input = argv[0]
         output_dir    = Path(argv[1])
@@ -301,43 +301,43 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Build species list
-    log_step(0, "Construir lista de especies")
+    log_step(0, "Build species list")
     if species_input.endswith(".csv") and Path(species_input).exists():
         try:
             df_sp = pd.read_csv(species_input)
             if "scientificName" not in df_sp.columns:
                 logger.error(
-                    "Coluna 'scientificName' nao encontrada em: %s\n  Skill anterior: ecological-data-foundation",
+                    "Coluna 'scientificName' nao encontrada em: %s\n  Previous skill: ecological-data-foundation",
                     species_input,
                 )
                 sys.exit(1)
             species_list = df_sp["scientificName"].dropna().unique().tolist()
             logger.info("Modo batch: %d especies carregadas", len(species_list))
-            log_decision("mode", "batch", "CSV valido com coluna scientificName")
+            log_decision("mode", "batch", "valid CSV with scientificName column")
         except Exception as e:
             logger.error(
-                "Falha ao ler lista de especies: %s\n  Skill anterior: ecological-data-foundation", e,
+                "Failed to read lista de especies: %s\n  Previous skill: ecological-data-foundation", e,
             )
             sys.exit(1)
     else:
         species_list = [species_input.strip()]
         logger.info("Modo especie unica: %s", species_list[0])
-        log_decision("mode", "single_species", "argumento nao e arquivo CSV")
+        log_decision("mode", "single_species", "argument is not a CSV file")
 
     for sp in species_list:
         try:
             download_species(sp, output_dir, api_key)
         except FileNotFoundError as e:
             logger.error(
-                "Arquivo de entrada nao encontrado: %s\n  Skill anterior: ecological-data-foundation", e,
+                "Input file not found: %s\n  Previous skill: ecological-data-foundation", e,
             )
         except Exception as e:
             logger.error(
-                "Falha ao baixar '%s' do IUCN: %s\n  Causa provavel: chave invalida, especie nao avaliada ou API indisponivel.\n  Skill anterior: ecological-data-foundation",
+                "Failed to download '%s' from IUCN: %s\n  Probable cause: invalid key, species not assessed, or API unavailable.\n  Previous skill: ecological-data-foundation",
                 sp, e,
             )
 
-    logger.info("Todos os downloads IUCN concluidos. Verifique: %s", output_dir)
+    logger.info("All IUCN downloads completed. Check: %s", output_dir)
 
 
 if __name__ == "__main__":

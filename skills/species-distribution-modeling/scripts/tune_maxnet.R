@@ -32,7 +32,7 @@ suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(ggplot2))
 
 # ── 1. Parse arguments ──────────────────────────────────────────────────────
-log_step(1, "Analisar argumentos da linha de comando")
+log_step(1, "Parse command-line arguments")
 args <- commandArgs(trailingOnly = TRUE)
 
 if (length(args) < 2) {
@@ -41,7 +41,7 @@ if (length(args) < 2) {
   output_dir <- "output/sdm_calibration"
   rm_vals    <- c(0.5, 1, 1.5, 2, 3, 4, 6)
   fc_vals    <- c("L", "LQ", "LQH", "LQHP", "LQHPT")
-  log_warn("Menos de 2 argumentos. Usando valores padrao para teste interativo.")
+  log_warn("Fewer than 2 arguments. Using default values for interactive testing.")
 } else {
   occ_csv    <- args[1]
   output_dir <- args[2]
@@ -56,29 +56,29 @@ log_info("Output dir : %s", output_dir)
 # ── Input precondition check ──────────────────────────────────────────────────
 if (!file.exists(occ_csv)) {
   log_error(
-    "Input nao encontrado: %s\nCausa provavel: arquivo nao gerado pelo passo anterior.\nVerifique a saida de: ecological-data-foundation (clean_occurrences)\nSkill anterior: ecological-data-foundation",
+    "Input not found: %s\nProbable cause: file not yet generated pelo passo anterior.\nCheck a saida de: ecological-data-foundation (clean_occurrences)\nPrevious skill: ecological-data-foundation",
     occ_csv
   )
   stop("Missing: ", occ_csv)
 }
 
 # ── 2. Create output directory ───────────────────────────────────────────────
-log_step(2, "Criar diretorio de saida")
+log_step(2, "Create output directory")
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
-log_info("Diretorio de saida pronto: %s", output_dir)
+log_info("Output directory ready: %s", output_dir)
 
-log_decision("rm_vals", paste(rm_vals, collapse = ","), "grade de multiplicadores de regularizacao para busca em grade MaxEnt")
-log_decision("fc_vals", paste(fc_vals, collapse = ","), "grade de classes de features para busca em grade MaxEnt")
-log_decision("total_models", length(rm_vals) * length(fc_vals), "numero total de combinacoes RM x FC")
+log_decision("rm_vals", paste(rm_vals, collapse = ","), "regularisation multiplier grid for MaxEnt grid search")
+log_decision("fc_vals", paste(fc_vals, collapse = ","), "feature class grid for MaxEnt grid search")
+log_decision("total_models", length(rm_vals) * length(fc_vals), "total number of RM x FC combinations")
 
 # ── 3. Load occurrence data ──────────────────────────────────────────────────
-log_step(3, "Carregar dados de ocorrencia com variaveis ambientais")
+log_step(3, "Load occurrence data with environmental variables")
 tryCatch({
   occ_data <- read.csv(occ_csv)
-  log_info("Registros carregados: %d | Colunas: %d", nrow(occ_data), ncol(occ_data))
+  log_info("Records loaded: %d | Columns: %d", nrow(occ_data), ncol(occ_data))
 }, error = function(e) {
   log_error(
-    "Falha ao ler CSV de ocorrencias '%s': %s\nCausa provavel: arquivo corrompido ou formato invalido.\nVerifique: %s\nSkill anterior: ecological-data-foundation",
+    "Failed to read CSV de ocorrencias '%s': %s\nProbable cause: corrupted file ou invalid format.\nCheck: %s\nPrevious skill: ecological-data-foundation",
     occ_csv, conditionMessage(e), occ_csv
   )
   stop(e)
@@ -90,13 +90,13 @@ lat_col <- intersect(c("decimalLatitude",  "latitude",  "lat", "y"), names(occ_d
 
 if (is.na(lon_col) || is.na(lat_col)) {
   log_error(
-    "Colunas de coordenadas nao encontradas.\nEsperadas: decimalLongitude/decimalLatitude (ou longitude/latitude, lon/lat, x/y).\nColunas presentes: %s\nCausa provavel: CSV nao processado por clean_occurrences.\nSkill anterior: ecological-data-foundation",
+    "Coordinate columns not found.\nExpected: decimalLongitude/decimalLatitude (or longitude/latitude, lon/lat, x/y).\nColumns present: %s\nProbable cause: CSV not processed by clean_occurrences.\nPrevious skill: ecological-data-foundation",
     paste(names(occ_data), collapse = ", ")
   )
   stop("Cannot find coordinate columns. Expected: decimalLongitude/decimalLatitude")
 }
 
-log_info("Coluna de longitude: '%s' | Coluna de latitude: '%s'", lon_col, lat_col)
+log_info("Longitude column: '%s' | Latitude column: '%s'", lon_col, lat_col)
 occ_pts <- occ_data[, c(lon_col, lat_col)]
 names(occ_pts) <- c("x", "y")
 
@@ -105,12 +105,12 @@ meta_cols <- c(lon_col, lat_col, "species", "scientificName", "gbifID",
                "occurrenceID", "datasetKey")
 env_cols  <- setdiff(names(occ_data), meta_cols)
 
-log_info("Registros de ocorrencia: %d", nrow(occ_pts))
-log_info("Variaveis ambientais (%d): %s", length(env_cols), paste(env_cols, collapse = ", "))
+log_info("Occurrence records: %d", nrow(occ_pts))
+log_info("Environmental variables (%d): %s", length(env_cols), paste(env_cols, collapse = ", "))
 
 if (nrow(occ_pts) < 10) {
   log_error(
-    "Registros de ocorrencia insuficientes (%d). Minimo requerido: 10.\nCausa provavel: filtragem excessiva em clean_occurrences ou especie com distribuicao muito restrita.\nSkill anterior: ecological-data-foundation",
+    "Insufficient occurrence records (%d). Minimum required: 10.\nProbable cause: excessive filtering in clean_occurrences or species with very restricted distribution.\nPrevious skill: ecological-data-foundation",
     nrow(occ_pts)
   )
   stop("Too few occurrences (", nrow(occ_pts), ") for calibration. Minimum required: 10")
@@ -118,33 +118,26 @@ if (nrow(occ_pts) < 10) {
 
 if (nrow(occ_pts) < 30) {
   log_warn(
-    "Poucos registros de ocorrencia (%d). Resultados de calibracao podem ser instáveis. Recomendado: >= 30.",
+    "Few occurrence records (%d). Calibration results may be unstable. Recommended: >= 30.",
     nrow(occ_pts)
   )
 }
 
 # ── 4. Build environmental SpatRaster from occurrence columns ────────────────
-log_step(4, "Preparar dados ambientais e pontos de background")
-# When a raster stack is not provided, construct a mock raster for ENMeval
-# using the env values in the CSV. In full use, load a real raster stack instead.
-log_warn("Construindo background a partir de valores env no CSV. Para uso em producao, use um SpatRaster real.")
+log_step(4, "Prepare environmental data and background points")
 
-env_mat <- as.matrix(occ_data[, env_cols])
-
-# Background: if CSV has a 'background' column flagging bg points, use them;
-# otherwise use a random sample of all non-occurrence rows.
+# Background: if CSV has a 'type' column flagging bg points, use them;
+# otherwise generate pseudo-background by spatial jitter.
 if ("type" %in% names(occ_data)) {
   bg_idx  <- occ_data$type == "background"
   bg_pts  <- occ_data[bg_idx, c(lon_col, lat_col)]
   bg_env  <- occ_data[bg_idx, env_cols]
   occ_env <- occ_data[!bg_idx, env_cols]
-  log_info("Coluna 'type' encontrada. Usando %d pontos de background definidos.", sum(bg_idx))
-  log_decision("background_source", "type column", "coluna 'type' presente no CSV define pontos de background")
+  log_info("Column 'type' found. Using %d defined background points.", sum(bg_idx))
+  log_decision("background_source", "type column", "column 'type' in CSV defines background points")
 } else {
-  # Use all points as both occurrences and generate background by jittering
-  # In production: load bg from a proper background CSV
-  log_warn("Coluna 'type' ausente. Gerando pseudo-background por jitter. Use um CSV de background real em producao.")
-  log_decision("background_source", "jitter", "coluna 'type' ausente; pseudo-background gerado por jitter aleatorio")
+  log_warn("Column 'type' missing. Generating pseudo-background by jitter. Use a real background CSV in production.")
+  log_decision("background_source", "jitter", "column 'type' missing; pseudo-background generated by random spatial jitter")
   set.seed(42)
   n_bg   <- min(10000, nrow(occ_data) * 10)
   bg_pts <- data.frame(
@@ -153,51 +146,67 @@ if ("type" %in% names(occ_data)) {
   )
   bg_env  <- occ_data[sample(nrow(occ_data), n_bg, replace = TRUE), env_cols]
   occ_env <- occ_data[, env_cols]
-  log_info("Pseudo-background gerado: %d pontos", n_bg)
+  log_info("Pseudo-background generated: %d points", n_bg)
 }
 
 names(bg_pts) <- c("x", "y")
 
-# ── 5. Run ENMeval grid search ───────────────────────────────────────────────
-log_step(5, "Executar busca em grade ENMeval (MaxNet)")
-log_info("Valores de RM  : %s", paste(rm_vals, collapse = ", "))
-log_info("Valores de FC  : %s", paste(fc_vals, collapse = ", "))
-log_info("Total de modelos: %d", length(rm_vals) * length(fc_vals))
-log_decision(
-  "partitions", "block",
-  "particao espacial por blocos geograficos — evita inflacao de AUC por autocorrelacao espacial"
-)
+# Try to load a SpatRaster if a raster file is provided as 5th argument,
+# otherwise fall back to randkfold partitioning (block requires SpatRaster).
+raster_arg  <- if (length(args) >= 5) args[5] else NULL
+envs_stack  <- NULL
 
-# ENMevaluate with maxnet and spatial block CV
-# block partitioning divides geographic space into quadrants for spatial CV
+if (!is.null(raster_arg) && file.exists(raster_arg)) {
+  envs_stack <- tryCatch({
+    terra::rast(raster_arg)
+  }, error = function(e) {
+    log_warn("Could not load raster '%s': %s. Falling back to randkfold partitioning.", raster_arg, conditionMessage(e))
+    NULL
+  })
+  if (!is.null(envs_stack)) {
+    log_info("SpatRaster loaded from '%s': %d layers.", raster_arg, terra::nlyr(envs_stack))
+    log_decision("partitions", "block",
+                 "spatial block partitioning — avoids AUC inflation from spatial autocorrelation (Valavi et al. 2019)")
+  }
+} else {
+  log_warn("No SpatRaster provided (pass raster TIF as 5th argument). Using randkfold partitioning.")
+  log_decision("partitions", "randkfold",
+               "no SpatRaster available; random k-fold CV used — note: may overestimate AUC due to spatial autocorrelation")
+}
+
+partition_method <- if (!is.null(envs_stack)) "block" else "randkfold"
+
+# ── 5. Run ENMeval grid search ────────────────────────────────────────────────
+log_step(5, "Run ENMeval grid search (MaxNet)")
+log_info("RM values   : %s", paste(rm_vals, collapse = ", "))
+log_info("FC values   : %s", paste(fc_vals, collapse = ", "))
+log_info("Total models: %d", length(rm_vals) * length(fc_vals))
+log_info("Partitions  : %s", partition_method)
+
+# ENMevaluate with maxnet — block partitioning when raster available, randkfold otherwise
 eval_out <- tryCatch({
   ENMevaluate(
-    occs       = occ_pts,
-    envs       = envs_stack,    # SpatRaster required for block partitioning
-    bg         = bg_pts,
+    occs         = occ_pts,
+    envs         = envs_stack,          # NULL triggers env extraction from occ columns
+    bg           = bg_pts,
     occs.testing = NULL,
-    algorithm  = "maxnet",
-    partitions = "block",       # spatial cross-validation — avoids autocorrelation inflation
-    tune.args  = list(
-      rm = rm_vals,
-      fc = fc_vals
-    ),
-    other.settings = list(
-      abs.auc.diff = FALSE
-    )
+    algorithm    = "maxnet",
+    partitions   = partition_method,
+    tune.args    = list(rm = rm_vals, fc = fc_vals),
+    other.settings = list(abs.auc.diff = FALSE)
   )
 }, error = function(e) {
   log_error(
-    "Falha em ENMevaluate: %s\nCausa provavel: dados ambientais insuficientes, pacote ENMeval nao instalado, ou pontos de ocorrencia fora do extent dos preditores.\nVerifique: install.packages('ENMeval') e a qualidade dos dados de entrada.\nSkill anterior: ecological-data-foundation",
+    "ENMevaluate failed: %s\nProbable cause: insufficient environmental data, ENMeval not installed, or occurrence points outside predictor extent.\nCheck: install.packages('ENMeval') and input data quality.\nPrevious skill: ecological-data-foundation",
     conditionMessage(e)
   )
   stop(e)
 })
 
-log_info("Calibracao ENMeval concluida.")
+log_info("ENMeval calibration completed.")
 
 # ── 6. Extract and process results table ─────────────────────────────────────
-log_step(6, "Extrair e processar tabela de resultados da calibracao")
+log_step(6, "Extract and process calibration results table")
 tryCatch({
   res <- eval.results(eval_out)
 
@@ -216,24 +225,24 @@ tryCatch({
   # Save full calibration table
   calib_path <- file.path(output_dir, "calibration_results.csv")
   write.csv(res, calib_path, row.names = FALSE)
-  log_info("Gravado: %s", calib_path)
+  log_info("Written: %s", calib_path)
 }, error = function(e) {
   log_error(
-    "Falha ao extrair resultados da calibracao: %s\nCausa provavel: objeto ENMeval com estrutura inesperada ou colunas renomeadas na versao do pacote.\nVerifique a versao do ENMeval instalada.\nSkill anterior: species-distribution-modeling",
+    "Failed to extract calibration results: %s\nProbable cause: ENMeval object with unexpected structure or renamed columns in the installed package version.\nCheck the installed ENMeval version.\nPrevious skill: species-distribution-modeling",
     conditionMessage(e)
   )
   stop(e)
 })
 
 # ── 7. Select best models by OR_AICc criterion ───────────────────────────────
-log_step(7, "Selecionar melhores modelos pelo criterio OR_AICc")
+log_step(7, "Select best models by OR_AICc criterion")
 # Rule: OR10 <= 0.15 (allows slight tolerance above 0.10 expected)
 #       AND delta_AICc < 2 (equivalent models by Burnham & Anderson)
 or_threshold   <- 0.15
 aicc_threshold <- 2
 
-log_decision("or_threshold",   or_threshold,   "tolerancia acima de 0.10 conforme Anderson et al. 2010")
-log_decision("aicc_threshold", aicc_threshold, "modelos equivalentes por Burnham & Anderson 2002 (delta_AICc < 2)")
+log_decision("or_threshold",   or_threshold,   "tolerance above 0.10 per Anderson et al. 2010")
+log_decision("aicc_threshold", aicc_threshold, "equivalent models per Burnham & Anderson 2002 (delta_AICc < 2)")
 
 best_models <- tryCatch({
   bm <- res %>%
@@ -243,21 +252,21 @@ best_models <- tryCatch({
   if (nrow(bm) == 0) {
     # Fallback: relax OR threshold and take AICc-best model
     log_warn(
-      "Nenhum modelo atende OR10 <= %.2f E delta_AICc < %.1f. Usando modelo com menor AICc como fallback.",
+      "No model meets OR10 <= %.2f AND delta_AICc < %.1f. Using model with lowest AICc as fallback.",
       or_threshold, aicc_threshold
     )
     log_decision(
       "selection_fallback", "aicc_best",
-      "nenhum modelo no quadrante ideal; selecionado o melhor por AICc para prosseguir"
+      "no model in the ideal quadrant; selected best by AICc to proceed"
     )
     bm <- res[1, ]
   } else {
-    log_info("%d modelo(s) atendem ao criterio OR_AICc.", nrow(bm))
+    log_info("%d model(s) meet the OR_AICc criterion.", nrow(bm))
   }
   bm
 }, error = function(e) {
   log_error(
-    "Falha ao selecionar melhores modelos: %s\nCausa provavel: colunas OR10 ou AICc ausentes na tabela de resultados.\nSkill anterior: species-distribution-modeling",
+    "Failed to select best models: %s\nProbable cause: OR10 or AICc columns missing in results table.\nPrevious skill: species-distribution-modeling",
     conditionMessage(e)
   )
   stop(e)
@@ -265,12 +274,12 @@ best_models <- tryCatch({
 
 best_path <- file.path(output_dir, "best_model_params.csv")
 write.csv(best_models, best_path, row.names = FALSE)
-log_info("Gravado: %s", best_path)
-log_info("Melhores modelos (primeiras linhas):")
+log_info("Written: %s", best_path)
+log_info("Best models (first rows):")
 message(capture.output(print(best_models[, c("tune.args.rm", "tune.args.fc", "OR10", "AICc", "delta.AICc")])))
 
 # ── 8. Calibration plot ───────────────────────────────────────────────────────
-log_step(8, "Gerar grafico de calibracao (delta_AICc x OR10)")
+log_step(8, "Generate calibration plot (delta_AICc vs OR10)")
 tryCatch({
   p <- ggplot(res, aes(x = delta.AICc, y = OR10,
                         colour = tune.args.fc, size = tune.args.rm)) +
@@ -295,22 +304,22 @@ tryCatch({
 
   plot_path <- file.path(output_dir, "calibration_plot.png")
   ggsave(plot_path, p, width = 10, height = 7, dpi = 150)
-  log_info("Gravado: %s", plot_path)
+  log_info("Written: %s", plot_path)
 }, error = function(e) {
   log_error(
-    "Falha ao gerar grafico de calibracao: %s\nCausa provavel: pacote ggplot2 nao instalado ou colunas ausentes na tabela de resultados.\nVerifique: install.packages('ggplot2')\nSkill anterior: species-distribution-modeling",
+    "Failed to generate calibration plot: %s\nProbable cause: ggplot2 not installed or missing columns in results table.\nCheck: install.packages('ggplot2')\nPrevious skill: species-distribution-modeling",
     conditionMessage(e)
   )
   stop(e)
 })
 
 # ── 9. Fit final model with best parameters ────────────────────────────────
-log_step(9, "Ajustar modelo final com os melhores parametros")
+log_step(9, "Fit final model with best parameters")
 best_rm <- best_models$tune.args.rm[1]
 best_fc <- best_models$tune.args.fc[1]
-log_info("Ajustando modelo final: RM = %s | FC = %s", best_rm, best_fc)
-log_decision("final_rm", best_rm, "RM do modelo de melhor desempenho no criterio OR_AICc")
-log_decision("final_fc", best_fc, "FC do modelo de melhor desempenho no criterio OR_AICc")
+log_info("Fitting final model: RM = %s | FC = %s", best_rm, best_fc)
+log_decision("final_rm", best_rm, "RM of best-performing model by OR_AICc criterion")
+log_decision("final_fc", best_fc, "FC of best-performing model by OR_AICc criterion")
 
 tryCatch({
   # Retrieve the fitted model object from ENMeval results
@@ -320,23 +329,23 @@ tryCatch({
   # Save as RDS for downstream projection
   rds_path <- file.path(output_dir, "best_maxnet.rds")
   saveRDS(best_model_obj, rds_path)
-  log_info("Gravado: %s", rds_path)
+  log_info("Written: %s", rds_path)
 }, error = function(e) {
   log_error(
-    "Falha ao ajustar ou salvar modelo final: %s\nCausa provavel: indice do modelo nao encontrado nos resultados ENMeval ou erro ao serializar o objeto.\nSkill anterior: species-distribution-modeling",
+    "Failed to fit or save final model: %s\nProbable cause: model index not found in ENMeval results or serialization error.\nPrevious skill: species-distribution-modeling",
     conditionMessage(e)
   )
   stop(e)
 })
 
 # ── 10. Summary ──────────────────────────────────────────────────────────────
-log_step(10, "Exibir resumo da calibracao")
-log_info("========== RESUMO DA CALIBRACAO ==========")
-log_info("Modelos avaliados      : %d", nrow(res))
-log_info("Modelos OR_AICc-ok     : %d", nrow(best_models))
-log_info("RM selecionado         : %s", best_rm)
-log_info("FC selecionado         : %s", best_fc)
-log_info("Melhor OR10            : %.3f", best_models$OR10[1])
-log_info("Melhor AUC (val)       : %.3f", best_models$AUC_val[1])
-log_info("Melhor delta_AICc      : %.3f", best_models$delta.AICc[1])
-log_info("==========================================")
+log_step(10, "Display calibration summary")
+log_info("========== CALIBRATION SUMMARY ==========")
+log_info("Models evaluated       : %d", nrow(res))
+log_info("Models OR_AICc-ok      : %d", nrow(best_models))
+log_info("Selected RM            : %s", best_rm)
+log_info("Selected FC            : %s", best_fc)
+log_info("Best OR10              : %.3f", best_models$OR10[1])
+log_info("Best AUC (validation)  : %.3f", best_models$AUC_val[1])
+log_info("Best delta_AICc        : %.3f", best_models$delta.AICc[1])
+log_info("=========================================")

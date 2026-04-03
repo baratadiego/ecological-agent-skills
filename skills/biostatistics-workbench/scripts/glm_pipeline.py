@@ -63,9 +63,9 @@ def fit_candidates(data: pd.DataFrame, response: str, candidates: dict, family) 
         except Exception as e:
             logger.error(
                 "Unexpected error in fit_candidates [%s]: %s\n"
-                "Causa provavel: formula invalida, colunas ausentes, ou familia incompativel\n"
-                "Verifique: nomes das colunas no CSV e formula definida\n"
-                "Skill anterior: data-cleaning",
+                "Probable cause: invalid formula, missing columns, or incompatible family\n"
+                "Check: column names in the CSV and defined formula\n"
+                "Previous skill: data-cleaning",
                 label, e
             )
     return results
@@ -104,9 +104,9 @@ def main():
     if not Path(data_file).exists():
         logger.error(
             "Input file not found: %s\n"
-            "Causa provavel: caminho incorreto ou arquivo nao gerado ainda\n"
-            "Verifique: o argumento data_csv e o diretorio de trabalho\n"
-            "Skill anterior: data-cleaning",
+            "Probable cause: incorrect path or file not yet generated\n"
+            "Check: the data_csv argument and working directory\n"
+            "Previous skill: data-cleaning",
             data_file
         )
         sys.exit(1)
@@ -118,9 +118,9 @@ def main():
     except Exception as e:
         logger.error(
             "Unexpected error in load data: %s\n"
-            "Causa provavel: arquivo CSV malformado ou permissoes insuficientes\n"
-            "Verifique: encoding e estrutura do arquivo CSV\n"
-            "Skill anterior: data-cleaning",
+            "Probable cause: malformed CSV file or insufficient permissions\n"
+            "Check: encoding and structure of the CSV file\n"
+            "Previous skill: data-cleaning",
             e
         )
         raise
@@ -130,9 +130,9 @@ def main():
     if response_var not in dat.columns:
         logger.error(
             "Response variable '%s' not found in columns: %s\n"
-            "Causa provavel: nome da variavel resposta incorreto\n"
-            "Verifique: cabecalho do CSV e o argumento response_var\n"
-            "Skill anterior: data-cleaning",
+            "Probable cause: incorrect response variable name\n"
+            "Check: CSV header and the response_var argument\n"
+            "Previous skill: data-cleaning",
             response_var, list(dat.columns)
         )
         sys.exit(1)
@@ -164,9 +164,9 @@ def main():
     if not results:
         logger.error(
             "No models converged successfully.\n"
-            "Causa provavel: dados insuficientes ou preditores com NA em todas as linhas\n"
-            "Verifique: completude dos dados e formulas dos candidatos\n"
-            "Skill anterior: data-cleaning"
+            "Probable cause: insufficient data or predictors with NA in all rows\n"
+            "Check: data completeness and candidate formulas\n"
+            "Previous skill: data-cleaning"
         )
         sys.exit(1)
 
@@ -178,9 +178,9 @@ def main():
     except Exception as e:
         logger.error(
             "Unexpected error in model selection table: %s\n"
-            "Causa provavel: nenhum modelo ajustado com sucesso\n"
-            "Verifique: etapa de fitting para mensagens de erro anteriores\n"
-            "Skill anterior: biostatistics-workbench (fitting)",
+            "Probable cause: no model fitted successfully\n"
+            "Check: fitting step for previous error messages\n"
+            "Previous skill: biostatistics-workbench (fitting)",
             e
         )
         raise
@@ -199,9 +199,9 @@ def main():
     except Exception as e:
         logger.error(
             "Unexpected error in best model summary/diagnostics: %s\n"
-            "Causa provavel: objeto de modelo invalido ou diretorio sem permissao de escrita\n"
-            "Verifique: output_dir e o modelo selecionado\n"
-            "Skill anterior: biostatistics-workbench (fitting)",
+            "Probable cause: invalid model object or directory without write permission\n"
+            "Check: output_dir and the selected model\n"
+            "Previous skill: biostatistics-workbench (fitting)",
             e
         )
         raise

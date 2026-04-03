@@ -120,7 +120,7 @@ def main():
     # ── Input precondition checks ────────────────────────────────────────────
     if not Path(record_csv).exists():
         logger.error(
-            "Input nao encontrado: %s\n  Causa provavel: process_camtrap_data.R nao foi executado ou falhou\n  Skill anterior: camera-trap-processing (process_camtrap_data.R)",
+            "Input not found: %s\n  Probable cause: process_camtrap_data.R nao foi executado ou falhou\n  Previous skill: camera-trap-processing (process_camtrap_data.R)",
             record_csv,
         )
         sys.exit(1)
@@ -130,32 +130,32 @@ def main():
 
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    log_step(1, "Carregando registros da tabela CSV")
+    log_step(1, "Loading records from CSV table")
     try:
         df = load_records(record_csv)
     except Exception as e:
         logger.error(
-            "Falha ao carregar record_table CSV: %s\n  Causa provavel: colunas obrigatorias ausentes ou arquivo corrompido\n  Skill anterior: camera-trap-processing",
+            "Failed to load record_table CSV: %s\n  Probable cause: required columns missing ou corrupted file\n  Previous skill: camera-trap-processing",
             e,
         )
         sys.exit(1)
 
-    logger.info("Total de registros: %d, Especies: %d", len(df), df["Species"].nunique())
+    logger.info("Total records: %d, Species: %d", len(df), df["Species"].nunique())
 
     if species_filter:
-        log_step(2, f"Filtrando para a especie '{species_filter}'")
+        log_step(2, f"Filtering to species '{species_filter}'")
         df = df[df["Species"] == species_filter]
-        logger.info("Filtrado para '%s': %d registros", species_filter, len(df))
+        logger.info("Filtered to '%s': %d records", species_filter, len(df))
         if len(df) == 0:
             logger.error(
-                "Nenhum registro encontrado para a especie '%s'\n  Causa provavel: nome de especie incorreto\n  Skill anterior: camera-trap-processing (process_camtrap_data.R)",
+                "No records found para a especie '%s'\n  Probable cause: incorrect species name\n  Previous skill: camera-trap-processing (process_camtrap_data.R)",
                 species_filter,
             )
             sys.exit(1)
     else:
-        log_step(2, "Processando todas as especies")
+        log_step(2, "Processing all species")
 
-    log_step(3, "Calculando resumo por especie e estacao")
+    log_step(3, "Computing summary by species and station")
     try:
         sp_sum = species_summary(df)
         st_sum = station_summary(df)
@@ -166,7 +166,7 @@ def main():
     sp_sum.to_csv(output_dir / "species_summary.csv", index=False)
     st_sum.to_csv(output_dir / "station_summary.csv", index=False)
     logger.info("species_summary.csv: %d especies", len(sp_sum))
-    logger.info("station_summary.csv: %d estacoes", len(st_sum))
+    logger.info("station_summary.csv: %d stations", len(st_sum))
 
     low_events = sp_sum[sp_sum["n_events"] < 10]["Species"].tolist()
     if low_events:
@@ -175,7 +175,7 @@ def main():
             low_events,
         )
 
-    log_step(4, "Gerando grafico de linha do tempo de deteccoes")
+    log_step(4, "Generating detection timeline plot")
     try:
         plot_detection_timeline(df, output_dir / "detection_timeline.png")
         logger.info("detection_timeline.png salvo")
@@ -183,9 +183,9 @@ def main():
         logger.error("Unexpected error in plot_detection_timeline: %s", e)
         raise
 
-    logger.info("Concluido. Saidas gravadas em: %s", output_dir)
+    logger.info("Completed. Outputs saved to: %s", output_dir)
     logger.info("  species_summary.csv: %d especies", len(sp_sum))
-    logger.info("  station_summary.csv: %d estacoes", len(st_sum))
+    logger.info("  station_summary.csv: %d stations", len(st_sum))
 
 
 if __name__ == "__main__":

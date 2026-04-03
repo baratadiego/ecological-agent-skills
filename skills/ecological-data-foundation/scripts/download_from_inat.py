@@ -58,7 +58,7 @@ try:
     from pyinaturalist import get_observations
 except ImportError as e:
     logger.error(
-        "Dependencia ausente: %s\n  Instale com: pip install pyinaturalist pandas\n  Skill anterior: ecological-data-foundation",
+        "Dependencia missing: %s\n  Instale com: pip install pyinaturalist pandas\n  Previous skill: ecological-data-foundation",
         e,
     )
     sys.exit(1)
@@ -92,7 +92,7 @@ def fetch_observations(taxon_name: str, year_from: int, year_to: int,
             )
         except Exception as e:
             logger.error(
-                "Falha em get_observations (pagina=%d, taxon='%s'): %s\n  Causa provavel: sem conexao com a internet ou API iNaturalist indisponivel.\n  Skill anterior: ecological-data-foundation",
+                "Failed in get_observations (page=%d, taxon='%s'): %s\n  Probable cause: no internet connection or iNaturalist API unavailable.\n  Previous skill: ecological-data-foundation",
                 page, taxon_name, e,
             )
             raise
@@ -171,10 +171,10 @@ def save_metadata(output_dir: Path, species_name: str, n_records: int,
     meta_path = output_dir / f"download_metadata_iNat_{safe_name}.txt"
     try:
         meta_path.write_text("\n".join(lines), encoding="utf-8")
-        logger.info("Metadados gravados: %s", meta_path)
+        logger.info("Metadata saved: %s", meta_path)
     except OSError as e:
         logger.error(
-            "Falha ao gravar metadados em '%s': %s\n  Causa provavel: sem permissao de escrita.\n  Skill anterior: ecological-data-foundation",
+            "Failed to gravar metadados em '%s': %s\n  Probable cause: sem permissao de escrita.\n  Previous skill: ecological-data-foundation",
             meta_path, e,
         )
         raise
@@ -188,38 +188,38 @@ def download_species(species_name: str, output_dir: Path,
     today_str = date.today().strftime("%Y%m%d")
     safe_name = species_name.replace(" ", "_")
 
-    log_step(1, f"Buscar observacoes iNaturalist para '{species_name}'")
+    log_step(1, f"Fetch iNaturalist observations for '{species_name}'")
     observations = fetch_observations(species_name, year_from, year_to, quality_grade)
-    logger.info("Total de observacoes recuperadas: %d", len(observations))
+    logger.info("Total observations retrieved: %d", len(observations))
 
     if not observations:
-        logger.warning("Nenhum registro encontrado para '%s'.", species_name)
+        logger.warning("No records found for '%s'.", species_name)
         return
 
-    log_step(2, "Padronizar registros para schema de saida")
+    log_step(2, "Standardise records to output schema")
     df = standardise_records(observations, species_name)
     n_final = len(df)
-    logger.info("Registros com coordenadas validas: %d", n_final)
+    logger.info("Records with valid coordinates: %d", n_final)
 
     if n_final < 30:
         logger.warning(
-            "Registros insuficientes para SDM confiavel (n = %d). Considere: (1) ampliar periodo, (2) usar quality='any', (3) combinar com GBIF.",
+            "Insufficient records for reliable SDM (n = %d). Consider: (1) extending date range, (2) using quality='any', (3) combining with GBIF.",
             n_final,
         )
 
-    log_step(3, "Gravar CSV de ocorrencias")
+    log_step(3, "Write occurrences CSV")
     csv_path = output_dir / f"occurrences_raw_iNat_{safe_name}_{today_str}.csv"
     try:
         df.to_csv(csv_path, index=False)
-        logger.info("Gravado: %s (%d registros)", csv_path, n_final)
+        logger.info("Written: %s (%d registros)", csv_path, n_final)
     except OSError as e:
         logger.error(
-            "Falha ao gravar CSV para '%s': %s\n  Causa provavel: sem permissao de escrita em '%s'.\n  Skill anterior: ecological-data-foundation",
+            "Failed to gravar CSV para '%s': %s\n  Probable cause: sem permissao de escrita em '%s'.\n  Previous skill: ecological-data-foundation",
             species_name, e, output_dir,
         )
         raise
 
-    log_step(4, "Gravar metadados do download")
+    log_step(4, "Save download metadata")
     save_metadata(output_dir, species_name, n_final, year_from, year_to, quality_grade)
 
 
@@ -236,7 +236,7 @@ def main():
         year_from     = 2000
         year_to       = date.today().year
         quality_grade = "research"
-        logger.warning("Menos de 2 argumentos fornecidos. Usando valores padrao para teste.")
+        logger.warning("Fewer than 2 arguments provided. Using default values for testing.")
     else:
         species_input = argv[0]
         output_dir    = Path(argv[1])
@@ -259,45 +259,45 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Build species list
-    log_step(0, "Construir lista de especies")
+    log_step(0, "Build species list")
     if species_input.endswith(".csv") and Path(species_input).exists():
         try:
             df_sp = pd.read_csv(species_input)
             if "scientificName" not in df_sp.columns:
                 logger.error(
-                    "Coluna 'scientificName' nao encontrada em: %s\n  Causa provavel: CSV mal formatado.\n  Skill anterior: ecological-data-foundation",
+                    "Coluna 'scientificName' nao encontrada em: %s\n  Probable cause: CSV mal formatado.\n  Previous skill: ecological-data-foundation",
                     species_input,
                 )
                 sys.exit(1)
             species_list = df_sp["scientificName"].dropna().unique().tolist()
             logger.info("Modo batch: %d especies carregadas", len(species_list))
-            log_decision("mode", "batch", "CSV valido com coluna scientificName")
+            log_decision("mode", "batch", "valid CSV with scientificName column")
         except Exception as e:
             logger.error(
-                "Falha ao ler lista de especies '%s': %s\n  Skill anterior: ecological-data-foundation",
+                "Failed to read lista de especies '%s': %s\n  Previous skill: ecological-data-foundation",
                 species_input, e,
             )
             sys.exit(1)
     else:
         species_list = [species_input.strip()]
         logger.info("Modo especie unica: %s", species_list[0])
-        log_decision("mode", "single_species", "argumento nao e arquivo CSV")
+        log_decision("mode", "single_species", "argument is not a CSV file")
 
     for sp in species_list:
         try:
             download_species(sp, output_dir, year_from, year_to, quality_grade)
         except FileNotFoundError as e:
             logger.error(
-                "Arquivo de entrada nao encontrado ao processar '%s': %s\n  Esperado como saida de: ecological-data-foundation\n  Skill anterior: ecological-data-foundation",
+                "Input file not found ao processar '%s': %s\n  Esperado como saida de: ecological-data-foundation\n  Previous skill: ecological-data-foundation",
                 sp, e,
             )
         except Exception as e:
             logger.error(
-                "Falha ao baixar '%s' do iNaturalist: %s\n  Causa provavel: problema de rede ou especie nao encontrada.\n  Skill anterior: ecological-data-foundation",
+                "Failed to download '%s' from iNaturalist: %s\n  Probable cause: network error or species not found.\n  Previous skill: ecological-data-foundation",
                 sp, e,
             )
 
-    logger.info("Todos os downloads iNaturalist concluidos. Verifique: %s", output_dir)
+    logger.info("All iNaturalist downloads completed. Check: %s", output_dir)
 
 
 if __name__ == "__main__":

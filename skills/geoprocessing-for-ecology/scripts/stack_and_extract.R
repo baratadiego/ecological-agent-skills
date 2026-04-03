@@ -34,7 +34,7 @@ log_info("Skill: %s | raster_dir=%s | points_file=%s | area_file=%s | output_dir
 # ── Input precondition checks ─────────────────────────────────────────────────
 if (!dir.exists(raster_dir)) {
   log_error(
-    "Diretorio de rasters nao encontrado: %s\nCausa provavel: caminho errado ou rasters ainda nao baixados/preparados.\nVerifique: se o diretorio existe e contem arquivos .tif.\nSkill anterior: download-predictors ou remote-sensing-analysis.",
+    "Raster directory not found: %s\nProbable cause: incorrect path or rasters not yet downloaded/prepared.\nCheck: whether the directory exists and contains .tif files.\nPrevious skill: download-predictors or remote-sensing-analysis.",
     raster_dir
   )
   stop("Missing raster directory: ", raster_dir)
@@ -42,7 +42,7 @@ if (!dir.exists(raster_dir)) {
 
 if (!file.exists(points_file)) {
   log_error(
-    "Input nao encontrado: %s\nCausa provavel: CSV de pontos nao gerado ou caminho incorreto.\nVerifique: execute primeiro o script de limpeza de ocorrencias.\nSkill anterior: species-distribution-modeling (data cleaning step).",
+    "Input not found: %s\nProbable cause: points CSV not generated or incorrect path.\nCheck: run the occurrence cleaning script first.\nPrevious skill: species-distribution-modeling (data cleaning step).",
     points_file
   )
   stop("Missing: ", points_file)
@@ -50,33 +50,33 @@ if (!file.exists(points_file)) {
 
 if (!file.exists(area_file)) {
   log_error(
-    "Input nao encontrado: %s\nCausa provavel: shapefile da area de estudo ausente ou caminho incorreto.\nVerifique: se o arquivo .shp existe e se os arquivos auxiliares (.dbf, .shx, .prj) estao no mesmo diretorio.\nSkill anterior: geoprocessing-for-ecology (study area definition step).",
+    "Input not found: %s\nProbable cause: shapefile da study area missing ou incorrect path.\nCheck: that therquivo .shp existe e se os arquivos auxiliares (.dbf, .shx, .prj) estao no mesmo directory.\nPrevious skill: geoprocessing-for-ecology (study area definition step).",
     area_file
   )
   stop("Missing: ", area_file)
 }
 
 # ── 1. Load study area ─────────────────────────────────────────────────────────
-log_step(1, "Carregar area de estudo (shapefile)")
+log_step(1, "Load study area (shapefile)")
 study_area <- tryCatch({
   vect(area_file)
 }, error = function(e) {
   log_error(
-    "Falha ao carregar shapefile da area de estudo: %s\nCausa provavel: arquivo corrompido, CRS ausente (.prj faltando) ou formato invalido.\nVerifique: se todos os arquivos do shapefile (.shp, .dbf, .shx, .prj) estao presentes.\nSkill anterior: geoprocessing-for-ecology (study area definition step).",
+    "Failed to load shapefile da study area: %s\nProbable cause: corrupted file, CRS missing (.prj faltando) ou invalid format.\nCheck: se todos os arquivos do shapefile (.shp, .dbf, .shx, .prj) estao presentes.\nPrevious skill: geoprocessing-for-ecology (study area definition step).",
     conditionMessage(e)
   )
   stop(e)
 })
-log_info("Area de estudo carregada: CRS=%s | Feicoes=%d", crs(study_area, describe=TRUE)$code, nrow(study_area))
+log_info("Study area loaded: CRS=%s | Features=%d", crs(study_area, describe=TRUE)$code, nrow(study_area))
 
 # ── 2. Load and stack rasters ──────────────────────────────────────────────────
-log_step(2, "Listar e empilhar rasters .tif do diretorio de entrada")
+log_step(2, "List and stack .tif rasters from input directory")
 tif_files <- list.files(raster_dir, pattern = "\\.tif$", full.names = TRUE)
 log_info("Rasters encontrados: %d", length(tif_files))
 
 if (length(tif_files) == 0) {
   log_error(
-    "Nenhum arquivo .tif encontrado em: %s\nCausa provavel: diretorio vazio, rasters em subpasta nao listada ou extensao diferente (.tiff).\nVerifique: o conteudo do diretorio e considere usar pattern='\\\\.tiff?$' se necessario.\nSkill anterior: download-predictors.",
+    "No .tif files found in: %s\nProbable cause: empty directory, rasters em subpasta nao listada ou extensao diferente (.tiff).\nCheck: o contents of directory e considere usar pattern='\\\\.tiff?$' se necessario.\nPrevious skill: download-predictors.",
     raster_dir
   )
   stop("No .tif files found in ", raster_dir)
@@ -89,19 +89,19 @@ stack_raw <- tryCatch({
   rast(tif_files)
 }, error = function(e) {
   log_error(
-    "Falha ao empilhar rasters: %s\nCausa provavel: rasters com resolucoes, extensoes ou CRSs incompativeis.\nVerifique: se todos os rasters tem a mesma resolucao e CRS antes de empilhar.\nSkill anterior: download-predictors.",
+    "Failed to stack rasters: %s\nProbable cause: rasters with incompatible resolutions, extents, or CRS.\nCheck: all rasters must share the same resolution and CRS before stacking.\nPrevious skill: download-predictors.",
     conditionMessage(e)
   )
   stop(e)
 })
 
-log_info("Stack criado: %d camadas | resolucao=%.4f x %.4f | CRS=%s",
+log_info("Stack created: %d layers | resolution=%.4f x %.4f | CRS=%s",
          nlyr(stack_raw), res(stack_raw)[1], res(stack_raw)[2],
          crs(stack_raw, describe=TRUE)$code)
 
 # ── 3. Reproject study area to raster CRS, then crop and mask ─────────────────
-log_step(3, "Reprojetar area de estudo e recortar stack de rasters")
-log_decision("reproject_target", "CRS do stack de rasters",
+log_step(3, "Reproject study area and crop raster stack")
+log_decision("reproject_target", "CRS of raster stack",
              "reprojetar o vetor (leve) e nao o raster (pesado) minimiza tempo de processamento e artefatos de interpolacao")
 
 stack_crop <- tryCatch({
@@ -110,7 +110,7 @@ stack_crop <- tryCatch({
   mask(crop_result, study_proj)
 }, error = function(e) {
   log_error(
-    "Falha ao recortar/mascarar rasters com a area de estudo: %s\nCausa provavel: area de estudo fora da extensao dos rasters ou CRS incompativel.\nVerifique: se a area de estudo e os rasters se sobrepoem geograficamente.\nSkill anterior: download-predictors.",
+    "Failed to clip and mask rasters with study area: %s\nProbable cause: study area outside the raster extent or incompatible CRS.\nCheck: verify that the study area and rasters overlap geographically.\nPrevious skill: download-predictors.",
     conditionMessage(e)
   )
   stop(e)
@@ -121,30 +121,30 @@ log_info("Stack recortado: extensao=%.4f,%.4f,%.4f,%.4f (xmin,xmax,ymin,ymax)",
 
 n_valid_cells <- sum(!is.na(values(stack_crop[[1]])))
 if (n_valid_cells == 0) {
-  log_warn("Stack mascarado nao contem celulas validas — a area de estudo pode nao sobrepor os rasters.")
+  log_warn("Masked stack contains no valid cells — the study area may not overlap the rasters.")
 }
 
 # ── 4. Write stack ─────────────────────────────────────────────────────────────
-log_step(4, "Salvar stack de rasters processado")
+log_step(4, "Save processed raster stack")
 stack_out <- file.path(output_dir, "predictors_stack.tif")
 tryCatch({
   writeRaster(stack_crop, stack_out, overwrite = TRUE)
   log_info("Stack salvo: %s", stack_out)
 }, error = function(e) {
   log_error(
-    "Falha ao salvar stack de rasters: %s\nCausa provavel: disco cheio, permissao negada ou caminho invalido.\nVerifique: espaco em disco e permissoes do diretorio de saida.\nSkill anterior: nenhuma.",
+    "Failed to salvar stack de rasters: %s\nProbable cause: disco cheio, permissao negada ou caminho invalido.\nCheck: espaco em disco e permissoes do output directory.\nPrevious skill: [none].",
     conditionMessage(e)
   )
   stop(e)
 })
 
 # ── 5. Load points and extract ─────────────────────────────────────────────────
-log_step(5, "Carregar pontos de ocorrencia e extrair valores ambientais")
+log_step(5, "Load occurrence points and extract environmental values")
 pts_df <- tryCatch({
   read.csv(points_file)
 }, error = function(e) {
   log_error(
-    "Falha ao ler CSV de pontos: %s\nCausa provavel: arquivo corrompido ou separador incorreto.\nVerifique: formato do CSV de ocorrencias.\nSkill anterior: species-distribution-modeling (data cleaning step).",
+    "Failed to read CSV de pontos: %s\nProbable cause: corrupted file ou separador incorreto.\nCheck: formato do CSV de ocorrencias.\nPrevious skill: species-distribution-modeling (data cleaning step).",
     conditionMessage(e)
   )
   stop(e)
@@ -152,7 +152,7 @@ pts_df <- tryCatch({
 
 if (!all(c("decimalLongitude", "decimalLatitude") %in% names(pts_df))) {
   log_error(
-    "Colunas de coordenadas ausentes no CSV de pontos (colunas presentes: %s).\nCausa provavel: CSV exportado com nomes de colunas diferentes (ex.: 'lon'/'lat' ou 'x'/'y').\nVerifique: renomeie as colunas para 'decimalLongitude' e 'decimalLatitude'.\nSkill anterior: species-distribution-modeling (data cleaning step).",
+    "Colunas de coordenadas missing no CSV de pontos (colunas presentes: %s).\nProbable cause: CSV exportado com nomes de colunas diferentes (ex.: 'lon'/'lat' ou 'x'/'y').\nCheck: renomeie as colunas para 'decimalLongitude' e 'decimalLatitude'.\nPrevious skill: species-distribution-modeling (data cleaning step).",
     paste(names(pts_df), collapse = ", ")
   )
   stop("Points CSV must have columns: decimalLongitude, decimalLatitude")
@@ -164,14 +164,14 @@ log_decision("points_crs", "EPSG:4326",
 
 n_na_coords <- sum(is.na(pts_df$decimalLongitude) | is.na(pts_df$decimalLatitude))
 if (n_na_coords > 0) {
-  log_warn("%d ponto(s) com coordenadas NA — serao excluidos durante a vetorizacao.", n_na_coords)
+  log_warn("%d point(s) with NA coordinates — will be excluded during vectorisation.", n_na_coords)
 }
 
 pts_vect <- tryCatch({
   vect(pts_df, geom = c("decimalLongitude", "decimalLatitude"), crs = "EPSG:4326")
 }, error = function(e) {
   log_error(
-    "Falha ao criar SpatVector de pontos: %s\nCausa provavel: coordenadas fora do intervalo valido ou valores NA nao removidos.\nVerifique: se longitude esta entre -180 e 180 e latitude entre -90 e 90.\nSkill anterior: species-distribution-modeling (data cleaning step).",
+    "Failed to criar SpatVector de pontos: %s\nProbable cause: coordenadas fora do intervalo valido ou valores NA nao removidos.\nCheck: se longitude esta entre -180 e 180 e latitude entre -90 e 90.\nPrevious skill: species-distribution-modeling (data cleaning step).",
     conditionMessage(e)
   )
   stop(e)
@@ -181,7 +181,7 @@ pts_proj <- tryCatch({
   project(pts_vect, crs(stack_crop))
 }, error = function(e) {
   log_error(
-    "Falha ao reprojetar pontos para CRS do stack: %s\nCausa provavel: CRS do stack invalido ou nao suportado pela transformacao.\nVerifique: CRS do stack de rasters.\nSkill anterior: nenhuma.",
+    "Failed to reproject points to stack CRS: %s\nProbable cause: invalid stack CRS or transformation not supported.\nCheck: raster stack CRS.\nPrevious skill: [none].",
     conditionMessage(e)
   )
   stop(e)
@@ -191,7 +191,7 @@ extracted <- tryCatch({
   terra::extract(stack_crop, pts_proj, ID = FALSE)
 }, error = function(e) {
   log_error(
-    "Falha ao extrair valores do raster nos pontos: %s\nCausa provavel: stack ou pontos invalidos, ou nenhum ponto dentro da extensao do raster.\nVerifique: se os pontos estao dentro da area de estudo.\nSkill anterior: nenhuma.",
+    "Failed to extrair valores do raster nos pontos: %s\nProbable cause: stack ou pontos invalidos, ou nenhum ponto dentro da extensao do raster.\nCheck: se os pontos estao dentro da study area.\nPrevious skill: [none].",
     conditionMessage(e)
   )
   stop(e)
@@ -202,9 +202,9 @@ n_total    <- nrow(extracted)
 pct_complete <- round(100 * n_complete / n_total, 1)
 
 if (pct_complete < 80) {
-  log_warn("Apenas %.1f%% dos pontos (%d/%d) possuem dados ambientais completos — muitos pontos fora da area mascarada.", pct_complete, n_complete, n_total)
+  log_warn("Only %.1f%% of points (%d/%d) have complete environmental data — many points outside masked area.", pct_complete, n_complete, n_total)
 } else {
-  log_info("Pontos com dados ambientais completos: %d/%d (%.1f%%)", n_complete, n_total, pct_complete)
+  log_info("Points with complete environmental data: %d/%d (%.1f%%)", n_complete, n_total, pct_complete)
 }
 
 pts_env <- cbind(pts_df, extracted)
@@ -215,10 +215,10 @@ tryCatch({
   log_info("Valores extraidos salvos: %s", env_out)
 }, error = function(e) {
   log_error(
-    "Falha ao salvar points_with_env.csv: %s\nCausa provavel: permissao negada ou disco cheio.\nVerifique: permissoes do diretorio de saida.\nSkill anterior: nenhuma.",
+    "Failed to salvar points_with_env.csv: %s\nProbable cause: permissao negada ou disco cheio.\nCheck: permissoes do output directory.\nPrevious skill: [none].",
     conditionMessage(e)
   )
   stop(e)
 })
 
-log_info("Geoprocessamento concluido. Saidas em: %s", output_dir)
+log_info("Geoprocessamento completed. Outputs in: %s", output_dir)

@@ -34,22 +34,22 @@ log_decision("scenario_label", scenario_label, "Label embedded in output filenam
 
 # ── Precondition checks ───────────────────────────────────────────────────────
 if (!file.exists(model_rds)) {
-  log_error("Model RDS nao encontrado: %s\nCausa provavel: run_ensemble_sdm.R nao foi executado.\nVerifique: a saida de skills/species-distribution-modeling.\nSkill anterior: species-distribution-modeling", model_rds)
+  log_error("Model RDS not found: %s\nProbable cause: run_ensemble_sdm.R was not executed.\nCheck: the output of skills/species-distribution-modeling.\nPrevious skill: species-distribution-modeling", model_rds)
   stop("Missing model file: ", model_rds)
 }
 if (!file.exists(predictor_tif)) {
-  log_error("Predictor stack nao encontrado: %s\nCausa provavel: stack nao foi preparado.\nVerifique: geoprocessing-for-ecology / prepare_future_layers.R.\nSkill anterior: geoprocessing-for-ecology", predictor_tif)
+  log_error("Predictor stack not found: %s\nProbable cause: stack was not prepared.\nCheck: geoprocessing-for-ecology / prepare_future_layers.R.\nPrevious skill: geoprocessing-for-ecology", predictor_tif)
   stop("Missing predictor stack: ", predictor_tif)
 }
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
 log_step(1, "Loading model and predictor stack")
 model_obj  <- tryCatch(readRDS(model_rds), error = function(e) {
-  log_error("Falha ao ler model RDS: %s\nCausa provavel: arquivo corrompido ou formato incompativel.\nVerifique: Rscript que gerou o modelo usou saveRDS().", conditionMessage(e))
+  log_error("Failed to read model RDS: %s\nProbable cause: corrupted file ou formato incompativel.\nCheck: Rscript que gerou o modelo usou saveRDS().", conditionMessage(e))
   stop(e)
 })
 predictors <- tryCatch(rast(predictor_tif), error = function(e) {
-  log_error("Falha ao ler raster stack: %s\nCausa provavel: arquivo GeoTIFF invalido ou caminho errado.\nVerifique: predictor_tif existe e tem multiplas camadas.", conditionMessage(e))
+  log_error("Failed to read raster stack: %s\nProbable cause: invalid GeoTIFF or incorrect path.\nCheck: predictor_tif exists and has multiple layers.", conditionMessage(e))
   stop(e)
 })
 log_info("Model loaded: class = %s", class(model_obj)[1])
@@ -97,7 +97,7 @@ predict_single <- function(mod, preds) {
     tryCatch(
       predict(mod, predictors),
       error = function(e) {
-        log_error("Falha na predicao generica: %s\nCausa provavel: model class nao suportada.\nVerifique: model_obj e um dos tipos suportados (maxnet, gbm, randomForest).", conditionMessage(e))
+        log_error("Failed in generic prediction: %s\nProbable cause: model class not supported.\nCheck: model_obj is one of the supported typesuportados (maxnet, gbm, randomForest).", conditionMessage(e))
         stop(e)
       }
     )
@@ -110,7 +110,7 @@ if (is_ensemble) {
     preds_list <- lapply(model_obj$models, predict_single, preds = predictors)
     rast(preds_list)
   }, error = function(e) {
-    log_error("Falha na predicao ensemble: %s\nCausa provavel: modelos incompativeis.\nVerifique: todos os modelos foram treinados com os mesmos preditores.", conditionMessage(e))
+    log_error("Failed ensemble prediction: %s\nProbable cause: incompatible models.\nCheck: all models were trained with the same predictors.", conditionMessage(e))
     stop(e)
   })
 

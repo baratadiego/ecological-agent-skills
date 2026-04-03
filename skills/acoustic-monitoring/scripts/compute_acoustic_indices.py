@@ -186,7 +186,7 @@ def process_file(fpath: Path, freq_min: float, freq_max: float) -> dict | None:
     try:
         y, sr = librosa.load(str(fpath), sr=None, mono=True)
     except Exception as e:
-        logger.warning("Nao foi possivel carregar %s: %s", fpath.name, e)
+        logger.warning("Could not load %s: %s", fpath.name, e)
         return None
 
     freq_max_use = min(freq_max, sr / 2)
@@ -257,12 +257,12 @@ def write_heatmap(rows: list[dict], output_dir: Path) -> None:
         matplotlib.use("Agg")
         import matplotlib.pyplot as plt
     except ImportError:
-        logger.warning("matplotlib nao disponivel; pulando heatmap")
+        logger.warning("matplotlib not available; skipping heatmap")
         return
 
     dated = [r for r in rows if r["date"] and r["hour"] >= 0]
     if not dated:
-        logger.warning("Sem timestamps validos; heatmap nao gerado")
+        logger.warning("No valid timestamps; heatmap not generated")
         return
 
     dates = sorted(set(r["date"] for r in dated))
@@ -306,7 +306,7 @@ def main():
     # ── Input precondition checks ────────────────────────────────────────────
     if not audio_dir.is_dir():
         logger.error(
-            "Input nao encontrado: %s\n  Causa provavel: caminho incorreto ou diretorio nao montado\n  Skill anterior: [nenhuma — etapa inicial]",
+            "Input not found: %s\n  Probable cause: incorrect path or directory not mounted\n  Previous skill: [none — initial step]",
             audio_dir,
         )
         sys.exit(1)
@@ -318,20 +318,20 @@ def main():
     log_decision("freq_max", args.freq_max,
                  "frequencia maxima de analise em Hz; limitado pela taxa de amostragem")
 
-    log_step(1, "Descobrindo arquivos de audio")
+    log_step(1, "Discovering audio files")
     files = sorted(
         p for ext in ("*.wav", "*.WAV", "*.flac", "*.FLAC")
         for p in audio_dir.rglob(ext)
     )
     if not files:
         logger.error(
-            "Nenhum arquivo de audio encontrado em %s\n  Causa provavel: diretorio vazio ou extensoes nao reconhecidas\n  Skill anterior: [nenhuma]",
+            "No audio files found em %s\n  Probable cause: empty directory ou unrecognised extensions\n  Previous skill: [none]",
             audio_dir,
         )
         sys.exit(1)
-    logger.info("Encontrados %d arquivos de audio", len(files))
+    logger.info("Found %d audio files", len(files))
 
-    log_step(2, "Computando indices acusticos por arquivo")
+    log_step(2, "Computing acoustic indices per file")
     rows = []
     for i, fpath in enumerate(files, 1):
         logger.info("  [%d/%d] %s", i, len(files), fpath.name)
@@ -345,12 +345,12 @@ def main():
 
     if not rows:
         logger.error(
-            "Nenhum arquivo processado com sucesso\n  Causa provavel: formato de audio incompativel ou intervalo de frequencia invalido\n  Skill anterior: [nenhuma]"
+            "No files processed successfully\n  Probable cause: incompatible audio format or invalid frequency range\n  Previous skill: [none]"
         )
         sys.exit(1)
-    logger.info("%d de %d arquivos processados com sucesso", len(rows), len(files))
+    logger.info("%d of %d files processed successfully", len(rows), len(files))
 
-    log_step(3, "Escrevendo CSV de serie temporal")
+    log_step(3, "Writing time series CSV")
     # Write timeseries
     ts_path = output_dir / "acoustic_indices_timeseries.csv"
     fieldnames = ["file", "datetime", "date", "hour",
@@ -361,13 +361,13 @@ def main():
         writer.writerows(rows)
     logger.info("Serie temporal escrita: %s (%d linhas)", ts_path, len(rows))
 
-    log_step(4, "Escrevendo resumo por hora do dia")
+    log_step(4, "Writing summary by hour of day")
     write_summary(rows, output_dir)
 
-    log_step(5, "Gerando heatmap de paisagem sonora")
+    log_step(5, "Generating soundscape heatmap")
     write_heatmap(rows, output_dir)
 
-    logger.info("Computacao de indices acusticos concluida")
+    logger.info("Acoustic index computation completed")
 
 
 if __name__ == "__main__":

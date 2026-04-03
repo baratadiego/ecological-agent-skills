@@ -29,11 +29,11 @@ suppressPackageStartupMessages(library(terra))
 suppressPackageStartupMessages(library(sf))
 
 # ── 1. Parse arguments ──────────────────────────────────────────────────────
-log_step(1, "Analisar argumentos da linha de comando")
+log_step(1, "Parse command-line arguments")
 args <- commandArgs(trailingOnly = TRUE)
 
 if (length(args) < 4) {
-  log_warn("Menos de 4 argumentos. Usando caminhos padrao para teste.")
+  log_warn("Fewer than 4 arguments. Using default paths for testing.")
   current_tif      <- "data/predictors/env_train.tif"
   future_dir       <- "data/chelsa_future/ssp245_2050/"
   study_area_path  <- "data/study_area/g_area.shp"
@@ -50,20 +50,20 @@ if (length(args) < 4) {
 }
 
 log_info("Script: prepare_future_layers.R | Skill: %s", SKILL_NAME)
-log_info("Stack de calibracao : %s", current_tif)
-log_info("Diretorio futuro    : %s", future_dir)
-log_info("Area de estudo      : %s", study_area_path)
+log_info("Calibration stack  : %s", current_tif)
+log_info("Future directory    : %s", future_dir)
+log_info("Study area         : %s", study_area_path)
 log_info("Output dir          : %s", output_dir)
 log_info("SSP label           : %s", ssp_label)
 log_info("Year label          : %s", year_label)
 
-log_decision("ssp_label",  ssp_label,  "cenario SSP para rotular o arquivo de saida")
-log_decision("year_label", year_label, "horizonte temporal para rotular o arquivo de saida")
+log_decision("ssp_label",  ssp_label,  "SSP scenario label for output file naming")
+log_decision("year_label", year_label, "temporal horizon label for output file naming")
 
 # ── Input precondition checks ─────────────────────────────────────────────────
 if (!file.exists(current_tif)) {
   log_error(
-    "Input nao encontrado: %s\nCausa provavel: arquivo nao gerado pelo passo anterior.\nVerifique a saida de: species-distribution-modeling (prepare_predictors ou similar)\nSkill anterior: species-distribution-modeling",
+    "Input not found: %s\nProbable cause: file not yet generated pelo passo anterior.\nCheck a saida de: species-distribution-modeling (prepare_predictors ou similar)\nPrevious skill: species-distribution-modeling",
     current_tif
   )
   stop("Calibration stack not found: ", current_tif)
@@ -71,7 +71,7 @@ if (!file.exists(current_tif)) {
 
 if (!file.exists(study_area_path)) {
   log_error(
-    "Input nao encontrado: %s\nCausa provavel: shapefile de area de estudo ausente.\nVerifique a saida de: ecological-data-foundation ou etapa de definicao da G area.\nSkill anterior: species-distribution-modeling",
+    "Input not found: %s\nProbable cause: shapefile de study area missing.\nCheck a saida de: ecological-data-foundation ou etapa de definicao da G area.\nPrevious skill: species-distribution-modeling",
     study_area_path
   )
   stop("Study area file not found: ", study_area_path)
@@ -79,24 +79,24 @@ if (!file.exists(study_area_path)) {
 
 if (!dir.exists(future_dir)) {
   log_error(
-    "Diretorio de camadas futuras nao encontrado: %s\nCausa provavel: camadas CHELSA/WorldClim futuras nao baixadas.\nBaixe os GeoTIFFs futuros e coloque em: %s\nSkill anterior: species-distribution-modeling",
+    "Future layers directory not found: %s\nProbable cause: CHELSA/WorldClim future layers not yet downloaded.\nDownload the future GeoTIFFs and place them in: %s\nPrevious skill: species-distribution-modeling",
     future_dir, future_dir
   )
   stop("Future layers directory not found: ", future_dir)
 }
 
 # ── 2. Create output directory ───────────────────────────────────────────────
-log_step(2, "Criar diretorio de saida")
+log_step(2, "Create output directory")
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
-log_info("Diretorio de saida pronto: %s", output_dir)
+log_info("Output directory ready: %s", output_dir)
 
 # ── 3. Load reference calibration stack ─────────────────────────────────────
-log_step(3, "Carregar stack de calibracao de referencia")
+log_step(3, "Load reference calibration stack")
 ref_stack <- tryCatch({
   rast(current_tif)
 }, error = function(e) {
   log_error(
-    "Falha ao carregar stack de calibracao '%s': %s\nCausa provavel: arquivo GeoTIFF corrompido ou formato nao suportado pelo terra.\nSkill anterior: species-distribution-modeling",
+    "Failed to load calibration stack '%s': %s\nProbable cause: corrupted GeoTIFF file or format not supported by terra.\nPrevious skill: species-distribution-modeling",
     current_tif, conditionMessage(e)
   )
   stop(e)
@@ -108,12 +108,12 @@ log_info("Res    : %s", paste(res(ref_stack), collapse = " x "))
 log_info("Layers : %s", paste(names(ref_stack), collapse = ", "))
 
 # ── 4. Load study area (G area) ──────────────────────────────────────────────
-log_step(4, "Carregar area de estudo (G area)")
+log_step(4, "Load study area (G area)")
 study_area <- tryCatch({
   vect(study_area_path)
 }, error = function(e) {
   log_error(
-    "Falha ao carregar area de estudo '%s': %s\nCausa provavel: shapefile corrompido, projecao invalida ou formato nao suportado.\nVerifique: ogrinfo '%s'\nSkill anterior: species-distribution-modeling",
+    "Failed to load study area '%s': %s\nProbable cause: corrupted shapefile, invalid projection or unsupported format.\nCheck: ogrinfo '%s'\nPrevious skill: species-distribution-modeling",
     study_area_path, conditionMessage(e), study_area_path
   )
   stop(e)
@@ -121,50 +121,50 @@ study_area <- tryCatch({
 
 # Reproject study area to match calibration CRS if needed
 if (!identical(crs(study_area), crs(ref_stack))) {
-  log_info("Reprojetando area de estudo para o CRS de calibracao...")
+  log_info("Reprojecting study area to calibration CRS...")
   study_area <- tryCatch(
     project(study_area, crs(ref_stack)),
     error = function(e) {
       log_error(
-        "Falha ao reprojetar area de estudo: %s\nCausa provavel: CRS invalido ou incompativel.\nSkill anterior: species-distribution-modeling",
+        "Failed to reprojetar study area: %s\nProbable cause: CRS invalido ou incompativel.\nPrevious skill: species-distribution-modeling",
         conditionMessage(e)
       )
       stop(e)
     }
   )
-  log_info("Reprojecao concluida.")
+  log_info("Reprojection completed.")
 } else {
-  log_info("CRS da area de estudo ja coincide com o de calibracao. Sem reprojecao necessaria.")
+  log_info("Study area CRS already matches calibration. No reprojection needed.")
 }
 
 # ── 5. Load future climate layers ────────────────────────────────────────────
-log_step(5, "Carregar camadas climaticas futuras")
+log_step(5, "Load future climate layers")
 future_files <- list.files(future_dir, pattern = "\\.tif$", full.names = TRUE,
                             recursive = FALSE)
 if (length(future_files) == 0) {
   log_error(
-    "Nenhum arquivo .tif encontrado em: %s\nCausa provavel: camadas futuras nao baixadas ou extensao diferente de .tif.\nVerifique o conteudo do diretorio.\nSkill anterior: species-distribution-modeling",
+    "No .tif files found in: %s\nProbable cause: future layers not downloaded or files use a different extension.\nCheck the contents of the directory.\nPrevious skill: species-distribution-modeling",
     future_dir
   )
   stop("No .tif files found in: ", future_dir)
 }
 
-log_info("Arquivos de camada futura encontrados: %d", length(future_files))
+log_info("Future layer files found: %d", length(future_files))
 
 # Stack all future layers
 future_raw <- tryCatch({
   rast(future_files)
 }, error = function(e) {
   log_error(
-    "Falha ao empilhar camadas futuras: %s\nCausa provavel: GeoTIFFs corrompidos ou com extents incompativeis.\nVerifique: gdalinfo nos arquivos em %s\nSkill anterior: species-distribution-modeling",
+    "Failed to stack future layers: %s\nProbable cause: corrupted GeoTIFFs or incompatible extents.\nCheck: run gdalinfo on files in %s\nPrevious skill: species-distribution-modeling",
     conditionMessage(e), future_dir
   )
   stop(e)
 })
-log_info("Nomes das camadas futuras (brutos): %s", paste(names(future_raw), collapse = ", "))
+log_info("Raw future layer names: %s", paste(names(future_raw), collapse = ", "))
 
 # ── 6. Rename future layers to match calibration ─────────────────────────────
-log_step(6, "Renomear camadas futuras para coincidir com a calibracao")
+log_step(6, "Rename future layers to match calibration")
 # Strategy: if layer names differ but count matches, rename by position.
 # If counts differ, attempt name matching. Fail clearly if neither works.
 
@@ -174,24 +174,24 @@ future_names <- names(future_raw)
 if (setequal(ref_names, future_names)) {
   # Names match already — reorder to calibration order
   future_raw <- future_raw[[ref_names]]
-  log_info("Nomes das camadas coincidentes. Reordenados conforme calibracao.")
-  log_decision("rename_strategy", "reorder", "nomes identicos, apenas reordenados")
+  log_info("Layer names match. Reordered to match calibration.")
+  log_decision("rename_strategy", "reorder", "identical names, reordered only")
 
 } else if (length(future_names) == length(ref_names) &&
            !setequal(ref_names, future_names)) {
   # Same count but different names — rename by position (common with CHELSA long names)
   log_warn(
-    "Nomes das camadas diferem da calibracao. Renomeando por posicao (%d camadas).",
+    "Layer names differ from calibration stack. Renaming by position (%d layers).",
     length(ref_names)
   )
-  log_info("Nomes antigos: %s", paste(future_names, collapse = ", "))
-  log_info("Novos nomes  : %s", paste(ref_names,    collapse = ", "))
-  log_decision("rename_strategy", "by_position", "mesmo numero de camadas mas nomes diferentes (comum com CHELSA)")
+  log_info("Old names  : %s", paste(future_names, collapse = ", "))
+  log_info("New names  : %s", paste(ref_names,    collapse = ", "))
+  log_decision("rename_strategy", "by_position", "same number of layers but different names (common with CHELSA)")
   names(future_raw) <- ref_names
 
 } else {
   # Different count — try to find matching layers by partial name
-  log_warn("Numero de camadas difere. Tentando correspondencia por nome parcial...")
+  log_warn("Layer count differs. Attempting partial name matching...")
   matched <- sapply(ref_names, function(rn) {
     idx <- which(grepl(rn, future_names, fixed = TRUE))
     if (length(idx) == 1) idx else NA_integer_
@@ -200,7 +200,7 @@ if (setequal(ref_names, future_names)) {
   if (any(is.na(matched))) {
     missing_layers <- ref_names[is.na(matched)]
     log_error(
-      "Nao e possivel associar camadas futuras as de calibracao.\nCalibracao espera: %s\nCamadas futuras: %s\nSem correspondencia para: %s\nAcao: renomeie os .tif futuros para coincidir exatamente com os nomes de calibracao.\nSkill anterior: species-distribution-modeling",
+      "Cannot match future layers to calibration layers.\nCalibration expects: %s\nFuture layers: %s\nNo match for: %s\nAction: rename the future .tif files to exactly match the calibration layer names.\nPrevious skill: species-distribution-modeling",
       paste(ref_names,    collapse = ", "),
       paste(future_names, collapse = ", "),
       paste(missing_layers, collapse = ", ")
@@ -216,52 +216,52 @@ if (setequal(ref_names, future_names)) {
 
   future_raw <- future_raw[[matched]]
   names(future_raw) <- ref_names
-  log_info("Camadas associadas por nome parcial. Reordenadas conforme calibracao.")
-  log_decision("rename_strategy", "partial_name_match", "contagem diferente; correspondencia por substring")
+  log_info("Layers matched by partial name. Reordered to match calibration.")
+  log_decision("rename_strategy", "partial_name_match", "different count; matched by substring")
 }
 
 # ── 7. Reproject to calibration CRS ──────────────────────────────────────────
-log_step(7, "Reprojetar stack futuro para o CRS de calibracao")
+log_step(7, "Reproject future stack to calibration CRS")
 if (!identical(crs(future_raw), crs(ref_stack))) {
-  log_info("Reprojetando stack futuro para CRS de calibracao...")
-  log_decision("resample_method_reproj", "bilinear", "interpolacao bilinear para dados continuos de clima")
+  log_info("Reprojecting future stack to calibration CRS...")
+  log_decision("resample_method_reproj", "bilinear", "bilinear interpolation for continuous climate data")
   future_raw <- tryCatch(
     project(future_raw, crs(ref_stack), method = "bilinear"),
     error = function(e) {
       log_error(
-        "Falha ao reprojetar stack futuro: %s\nCausa provavel: CRS invalido ou falta de memoria para o raster.\nSkill anterior: species-distribution-modeling",
+        "Failed to reprojetar stack futuro: %s\nProbable cause: CRS invalido ou falta de memoria para o raster.\nPrevious skill: species-distribution-modeling",
         conditionMessage(e)
       )
       stop(e)
     }
   )
-  log_info("Reprojecao concluida.")
+  log_info("Reprojection completed.")
 } else {
-  log_info("CRS ja coincide com calibracao. Sem reprojecao necessaria.")
+  log_info("CRS already matches calibration. No reprojection needed.")
 }
 
 # ── 8. Crop and mask to study area (G area) ───────────────────────────────────
-log_step(8, "Recortar e mascarar para a area de estudo")
+log_step(8, "Crop and mask to study area")
 tryCatch({
   future_cropped <- crop(future_raw,    study_area)
   future_masked  <- mask(future_cropped, study_area)
-  log_info("Recorte e mascara aplicados. Celulas validas apos mascara: nao calculado (use global(future_masked, 'notNA')).")
+  log_info("Clip and mask applied. Valid cells after mask: not calculated (use global(future_masked, 'notNA')).")
 }, error = function(e) {
   log_error(
-    "Falha ao recortar/mascarar o stack futuro: %s\nCausa provavel: extent da area de estudo fora do extent do raster futuro.\nVerifique a projecao e o extent dos arquivos.\nSkill anterior: species-distribution-modeling",
+    "Failed to clip and mask future stack: %s\nProbable cause: study area extent outside the future raster extent.\nCheck the projection and extent of all files.\nPrevious skill: species-distribution-modeling",
     conditionMessage(e)
   )
   stop(e)
 })
 
 # ── 9. Resample to exactly match calibration grid ────────────────────────────
-log_step(9, "Reamostrar para coincidir exatamente com o grid de calibracao")
-log_decision("resample_method", "bilinear", "interpolacao bilinear para dados continuos de clima")
+log_step(9, "Resample to match calibration grid exactly")
+log_decision("resample_method", "bilinear", "bilinear interpolation for continuous climate data")
 future_resampled <- tryCatch(
   resample(future_masked, ref_stack, method = "bilinear"),
   error = function(e) {
     log_error(
-      "Falha na reamostragem do stack futuro: %s\nCausa provavel: incompatibilidade de CRS ou extent entre stack futuro e de calibracao.\nVerifique os passos 7 e 8.\nSkill anterior: species-distribution-modeling",
+      "Failed to resample future stack: %s\nProbable cause: CRS or extent incompatibility between future stack and calibration stack.\nCheck steps 7 and 8.\nPrevious skill: species-distribution-modeling",
       conditionMessage(e)
     )
     stop(e)
@@ -269,19 +269,19 @@ future_resampled <- tryCatch(
 )
 
 # ── 10. Geometry verification ────────────────────────────────────────────────
-log_step(10, "Verificar geometria do stack futuro contra o de calibracao")
+log_step(10, "Check future stack geometry against calibration")
 geom_ok <- tryCatch(
   compareGeom(ref_stack, future_resampled, stopOnError = FALSE,
               res = TRUE, orig = TRUE, crs = TRUE),
   error = function(e) {
-    log_warn("compareGeom retornou erro: %s. Prosseguindo com cautela.", conditionMessage(e))
+    log_warn("compareGeom returned error: %s. Proceeding with caution.", conditionMessage(e))
     FALSE
   }
 )
 
 if (!geom_ok) {
   log_error(
-    "Verificacao de geometria FALHOU apos reamostragem.\nCalibracao: ext=%s res=%s crs=%s\nFuturo     : ext=%s res=%s crs=%s\nVerifique incompatibilidades de extent ou datum e re-execute.\nSkill anterior: species-distribution-modeling",
+    "Geometry check FAILED after resampling.\nCalibration: ext=%s res=%s crs=%s\nFuture     : ext=%s res=%s crs=%s\nCheck for extent or datum incompatibilities and re-run.\nPrevious skill: species-distribution-modeling",
     as.character(ext(ref_stack)),
     paste(res(ref_stack), collapse = "x"),
     crs(ref_stack, describe = TRUE)$name,
@@ -300,14 +300,14 @@ if (!geom_ok) {
     "  Check for extent or datum mismatches and re-run."
   )
 }
-log_info("Verificacao de geometria PASSOU.")
+log_info("Geometry check PASSED.")
 
 # ── 11. Final layer name verification ────────────────────────────────────────
-log_step(11, "Verificar nomes finais das camadas")
+log_step(11, "Check final layer names")
 if (!identical(names(future_resampled), names(ref_stack))) {
   name_diff <- setdiff(names(future_resampled), names(ref_stack))
   log_error(
-    "Discrepancia de nomes de camadas no stack final.\nEsperado: %s\nObtido  : %s\nDivergentes: %s\nSkill anterior: species-distribution-modeling",
+    "Layer name mismatch in final stack.\nExpected: %s\nObtained: %s\nDivergent: %s\nPrevious skill: species-distribution-modeling",
     paste(names(ref_stack),       collapse = ", "),
     paste(names(future_resampled), collapse = ", "),
     paste(name_diff, collapse = ", ")
@@ -319,33 +319,33 @@ if (!identical(names(future_resampled), names(ref_stack))) {
     "  Differing layers: ", paste(name_diff, collapse = ", ")
   )
 }
-log_info("Nomes das camadas verificados. Camadas: %s", paste(names(future_resampled), collapse = ", "))
+log_info("Layer names verified. Layers: %s", paste(names(future_resampled), collapse = ", "))
 
 # ── 12. Save output ───────────────────────────────────────────────────────────
-log_step(12, "Gravar stack futuro preparado")
+log_step(12, "Write prepared future stack")
 out_filename <- paste0("future_stack_", ssp_label, "_", year_label, ".tif")
 out_path     <- file.path(output_dir, out_filename)
 
 tryCatch({
   writeRaster(future_resampled, out_path, overwrite = TRUE)
-  log_info("Gravado: %s", out_path)
+  log_info("Written: %s", out_path)
 }, error = function(e) {
   log_error(
-    "Falha ao gravar raster de saida '%s': %s\nCausa provavel: sem permissao de escrita ou espaco em disco insuficiente.\nSkill anterior: species-distribution-modeling",
+    "Failed to write output raster '%s': %s\nProbable cause: no write permission or insufficient disk space.\nPrevious skill: species-distribution-modeling",
     out_path, conditionMessage(e)
   )
   stop(e)
 })
 
 # ── 13. Summary ───────────────────────────────────────────────────────────────
-log_step(13, "Exibir resumo das camadas futuras preparadas")
-log_info("========== RESUMO DAS CAMADAS FUTURAS ==========")
+log_step(13, "Display prepared future layers summary")
+log_info("========== PREPARED FUTURE LAYERS SUMMARY ==========")
 log_info("SSP                : %s", ssp_label)
-log_info("Horizonte temporal : %s", year_label)
-log_info("Camadas preparadas : %d", nlyr(future_resampled))
-log_info("Nomes das camadas  : %s", paste(names(future_resampled), collapse = ", "))
-log_info("CRS de saida       : %s", crs(future_resampled, describe = TRUE)$name)
-log_info("Resolucao de saida : %s unidades", paste(res(future_resampled), collapse = " x "))
-log_info("Arquivo de saida   : %s", out_path)
-log_info("=================================================")
-log_info("Pronto para: maxnet::predict(), biomod2::BIOMOD_Projection() ou sdm_pipeline.py")
+log_info("Temporal horizon   : %s", year_label)
+log_info("Prepared layers    : %d", nlyr(future_resampled))
+log_info("Layer names        : %s", paste(names(future_resampled), collapse = ", "))
+log_info("Output CRS         : %s", crs(future_resampled, describe = TRUE)$name)
+log_info("Output resolution  : %s units", paste(res(future_resampled), collapse = " x "))
+log_info("Output file        : %s", out_path)
+log_info("=========================================================")
+log_info("Ready for: maxnet::predict(), biomod2::BIOMOD_Projection() or sdm_pipeline.py")

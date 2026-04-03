@@ -45,7 +45,7 @@ quasi_ext  <- if (length(args) >= 6) as.numeric(args[6]) else 50
 
 # ── Input precondition checks ─────────────────────────────────────────────────
 if (!file.exists(vr_path)) {
-  log_error("Input nao encontrado: %s\nCausa provavel: passo anterior nao concluiu.\nVerifique: outputs do skill anterior.\nSkill anterior: population-viability-analysis (matrix_pva)", vr_path)
+  log_error("Input not found: %s\nProbable cause: previous step did not complete.\nCheck: outputs of the previous skill.\nPrevious skill: population-viability-analysis (matrix_pva)", vr_path)
   stop("Missing input: ", vr_path)
 }
 
@@ -64,12 +64,12 @@ tryCatch({
 
   mat_cols <- grep("^a_[0-9]+_[0-9]+$", names(vr), value = TRUE)
   if (length(mat_cols) == 0) {
-    log_error("Nenhuma coluna de elemento de matriz (a_i_j) encontrada no CSV.\nCausa provavel: formato errado do arquivo de taxas vitais.\nVerifique: nomes das colunas do CSV.\nSkill anterior: population-viability-analysis (matrix_pva)")
+    log_error("No matrix element columns (a_i_j) found in CSV.\nProbable cause: incorrect vital rates file format.\nCheck: CSV column names.\nPrevious skill: population-viability-analysis (matrix_pva)")
     stop("No matrix element columns (a_i_j) found in vital_rates_csv.")
   }
 
   if (nrow(vr) < 5) {
-    log_warn("Serie temporal curta (%d anos). Estimativas de variancia podem ser imprecisas; n_sim alto recomendado.", nrow(vr))
+    log_warn("Short time series (%d anos). Variance estimates may be imprecise; high n_sim recommended.", nrow(vr))
   }
 
   indices <- regmatches(mat_cols, gregexpr("[0-9]+", mat_cols))
@@ -77,7 +77,7 @@ tryCatch({
   log_info("Matrix dimension detected: %d x %d", k, k)
   log_decision("k", k, "Matrix dimension inferred from max index in vital rate column names")
 }, error = function(e) {
-  log_error("Falha em load_vital_rates: %s\nCausa provavel: arquivo CSV malformado ou ausente.\nVerifique: caminho e formato do CSV de taxas vitais.\nSkill anterior: population-viability-analysis (matrix_pva)", conditionMessage(e))
+  log_error("Failed in load_vital_rates: %s\nProbable cause: malformed CSV file or missing.\nCheck: path and format of vital rates CSV.\nPrevious skill: population-viability-analysis (matrix_pva)", conditionMessage(e))
   stop(e)
 })
 
@@ -93,7 +93,7 @@ tryCatch({
   names(vr_stats) <- mat_cols
   log_info("Vital rate statistics computed for %d matrix elements.", length(vr_stats))
 }, error = function(e) {
-  log_error("Falha em compute_vr_stats: %s\nCausa provavel: colunas com todos os valores NA.\nVerifique: completude dos dados de taxas vitais.\nSkill anterior: population-viability-analysis (matrix_pva)", conditionMessage(e))
+  log_error("Failed in compute_vr_stats: %s\nProbable cause: columns with all NA values.\nCheck: completeness of vital rates data.\nPrevious skill: population-viability-analysis (matrix_pva)", conditionMessage(e))
   stop(e)
 })
 
@@ -153,10 +153,10 @@ tryCatch({
   log_decision("n0", n0, "Initial N; from CLI arg or last year in vital_rates_csv or default 1000")
 
   if (n0 <= quasi_ext) {
-    log_warn("n0 (%d) <= quasi_ext (%g). A populacao comeca abaixo do limiar de quasi-extincao.", n0, quasi_ext)
+    log_warn("n0 (%d) <= quasi_ext (%g). Population starts below quasi-extinction threshold.", n0, quasi_ext)
   }
 }, error = function(e) {
-  log_error("Falha em compute_initial_vector: %s\nCausa provavel: matriz singular ou eigenvalores complexos na A_mean.\nVerifique: estrutura da matriz de transicao.\nSkill anterior: population-viability-analysis (matrix_pva)", conditionMessage(e))
+  log_error("Failed in compute_initial_vector: %s\nProbable cause: singular matrix or complex eigenvalues in A_mean.\nCheck: structure of transition matrix.\nPrevious skill: population-viability-analysis (matrix_pva)", conditionMessage(e))
   stop(e)
 })
 
@@ -194,7 +194,7 @@ tryCatch({
   log_info("Simulations complete. Extinctions observed: %d / %d (%.1f%%)",
            sum(!is.na(ext_times)), n_sim, 100 * mean(!is.na(ext_times)))
 }, error = function(e) {
-  log_error("Falha em monte_carlo_simulation: %s\nCausa provavel: erro na amostragem de parametros ou overflow numerico.\nVerifique: parametros de distribuicao (mu, sig2) para cada elemento de matriz.\nSkill anterior: population-viability-analysis (matrix_pva)", conditionMessage(e))
+  log_error("Failed in monte_carlo_simulation: %s\nProbable cause: parameter sampling error or numerical overflow.\nCheck: distribution parameters (mu, sig2) for each matrix element.\nPrevious skill: population-viability-analysis (matrix_pva)", conditionMessage(e))
   stop(e)
 })
 
@@ -210,7 +210,7 @@ tryCatch({
   write.csv(ext_df, file.path(output_dir, "extinction_curve.csv"), row.names = FALSE)
   log_info("Extinction curve written. P(ext at t=%d) = %.4f", t_max, ext_curve[t_max])
 }, error = function(e) {
-  log_error("Falha em extinction_curve: %s\nCausa provavel: vetor ext_times malformado ou diretorio de saida inacessivel.\nVerifique: output_dir e resultados da simulacao.\nSkill anterior: population-viability-analysis (matrix_pva)", conditionMessage(e))
+  log_error("Failed in extinction_curve: %s\nProbable cause: malformed ext_times vector or inaccessible output directory.\nCheck: output_dir and simulation results.\nPrevious skill: population-viability-analysis (matrix_pva)", conditionMessage(e))
   stop(e)
 })
 
@@ -244,10 +244,10 @@ tryCatch({
   log_info("IUCN Criterion E category: %s", risk_cat)
 
   if (risk_cat %in% c("CR", "EN")) {
-    log_warn("Categoria IUCN %s detectada. Considerar medidas urgentes de conservacao.", risk_cat)
+    log_warn("IUCN category %s detected. Consider urgent conservation measures.", risk_cat)
   }
 }, error = function(e) {
-  log_error("Falha em iucn_classification: %s\nCausa provavel: curva de extincao vazia ou horizontes temporais invalidos.\nVerifique: resultados da simulacao e parametro t_max.\nSkill anterior: population-viability-analysis (matrix_pva)", conditionMessage(e))
+  log_error("Failed in iucn_classification: %s\nProbable cause: empty extinction curve or invalid temporal horizons.\nCheck: simulation results and t_max parameter.\nPrevious skill: population-viability-analysis (matrix_pva)", conditionMessage(e))
   stop(e)
 })
 
@@ -261,7 +261,7 @@ tryCatch({
                  quantile(valid_ext, c(0.025, 0.975)) else c(NA, NA)
 
   if (length(valid_ext) < 10) {
-    log_warn("Menos de 10 extincoes observadas (%d). Intervalo de confianca do MTE nao calculado.", length(valid_ext))
+    log_warn("Fewer than 10 extinctions observed (%d). MTE confidence interval not calculated.", length(valid_ext))
   }
 
   # Stochastic growth rate (log lambda_s) — SURVIVOR-CONDITIONED
@@ -292,7 +292,7 @@ tryCatch({
   log_info("Results written.")
   log_info("Summary:\n%s", paste(capture.output(print(results_df)), collapse = "\n"))
 }, error = function(e) {
-  log_error("Falha em results_summary: %s\nCausa provavel: erro no calculo do MTE ou lambda_s.\nVerifique: resultados da simulacao all_N e ext_times.\nSkill anterior: population-viability-analysis (matrix_pva)", conditionMessage(e))
+  log_error("Failed in results_summary: %s\nProbable cause: error in MTE or lambda_s calculation.\nCheck: simulation results all_N and ext_times.\nPrevious skill: population-viability-analysis (matrix_pva)", conditionMessage(e))
   stop(e)
 })
 
@@ -329,7 +329,7 @@ tryCatch({
          width = 9, height = 5, dpi = 150)
   log_info("Trajectory plot saved.")
 }, error = function(e) {
-  log_error("Falha em trajectory_plot: %s\nCausa provavel: erro no ggplot2 ou dados de trajetoria invalidos.\nVerifique: instalacao do ggplot2 e matriz all_N.\nSkill anterior: population-viability-analysis (matrix_pva)", conditionMessage(e))
+  log_error("Failed in trajectory_plot: %s\nProbable cause: ggplot2 error or invalid trajectory data.\nCheck: ggplot2 installation and all_N matrix.\nPrevious skill: population-viability-analysis (matrix_pva)", conditionMessage(e))
   stop(e)
 })
 
@@ -352,7 +352,7 @@ tryCatch({
          width = 8, height = 5, dpi = 150)
   log_info("Extinction curve plot saved.")
 }, error = function(e) {
-  log_error("Falha em extinction_curve_plot: %s\nCausa provavel: erro no ggplot2 ou dados da curva de extincao invalidos.\nVerifique: instalacao do ggplot2 e ext_df.\nSkill anterior: population-viability-analysis (matrix_pva)", conditionMessage(e))
+  log_error("Failed in extinction_curve_plot: %s\nProbable cause: ggplot2 error or invalid extinction curve data.\nCheck: ggplot2 installation and ext_df.\nPrevious skill: population-viability-analysis (matrix_pva)", conditionMessage(e))
   stop(e)
 })
 

@@ -46,7 +46,7 @@ fit_and_check <- function(formula, data, family, label, output_dir = "outputs") 
     list(model = m, label = label, AIC = AIC(m))
   }, error = function(e) {
     log_error(
-      "Falha em fit_and_check [%s]: %s\nCausa provavel: convergencia ou dados insuficientes para a familia escolhida\nVerifique: formula, familia de distribuicao, e dados de entrada\nSkill anterior: data-cleaning",
+      "Failed in fit_and_check [%s]: %s\nProbable cause: convergence or insufficient data for the chosen family\nCheck: formula, distribution family, and input data\nPrevious skill: data-cleaning",
       label, conditionMessage(e)
     )
     stop(e)

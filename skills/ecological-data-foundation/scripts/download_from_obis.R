@@ -38,7 +38,7 @@ suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(readr))
 
 # ── 1. Parse arguments ───────────────────────────────────────────────────────
-log_step(1, "Analisar argumentos da linha de comando")
+log_step(1, "Parse command-line arguments")
 args <- commandArgs(trailingOnly = TRUE)
 
 if (length(args) < 2) {
@@ -47,7 +47,7 @@ if (length(args) < 2) {
   year_from     <- 1950
   year_to       <- as.integer(format(Sys.Date(), "%Y"))
   wkt_geometry  <- NULL
-  log_warn("Menos de 2 argumentos fornecidos. Usando valores padrao para teste.")
+  log_warn("Fewer than 2 arguments provided. Using default values for testing.")
 } else {
   species_input <- args[1]
   output_dir    <- args[2]
@@ -60,34 +60,34 @@ log_info("Script: download_from_obis.R | Skill: %s", SKILL_NAME)
 log_info("Species input  : %s", species_input)
 log_info("Output dir     : %s", output_dir)
 log_info("Year range     : %d - %d", year_from, year_to)
-log_info("WKT geometry   : %s", ifelse(is.null(wkt_geometry), "nenhum (global)", wkt_geometry))
+log_info("WKT geometry   : %s", ifelse(is.null(wkt_geometry), "none (global)", wkt_geometry))
 
 log_decision("absence", "FALSE",
              "apenas registros de presenca confirmada; OBIS inclui dados de ausencia em alguns datasets")
-log_decision("year_from", year_from, "filtro temporal; 1950 cobre era moderna de registros marinhos")
+log_decision("year_from", year_from, "temporal filter; 1950 covers the modern era of marine records")
 
 # ── 2. Create output directory ───────────────────────────────────────────────
-log_step(2, "Criar diretorio de saida")
+log_step(2, "Create output directory")
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
 # ── 3. Build species list ────────────────────────────────────────────────────
-log_step(3, "Construir lista de especies")
+log_step(3, "Build species list")
 if (grepl("\\.csv$", species_input, ignore.case = TRUE) && file.exists(species_input)) {
   tryCatch({
     species_df <- read_csv(species_input, show_col_types = FALSE)
     if (!"scientificName" %in% names(species_df)) {
       log_error(
-        "Coluna 'scientificName' nao encontrada em: %s\nCausa provavel: CSV mal formatado.\nSkill anterior: ecological-data-foundation",
+        "Coluna 'scientificName' nao encontrada em: %s\nProbable cause: CSV mal formatado.\nPrevious skill: ecological-data-foundation",
         species_input
       )
       stop("Missing column 'scientificName'")
     }
     species_list <- unique(trimws(species_df$scientificName))
     log_info("Modo batch: %d especies carregadas", length(species_list))
-    log_decision("mode", "batch", "CSV valido com coluna scientificName")
+    log_decision("mode", "batch", "valid CSV with scientificName column")
   }, error = function(e) {
     log_error(
-      "Falha ao ler lista de especies: %s\nSkill anterior: ecological-data-foundation",
+      "Failed to read lista de especies: %s\nPrevious skill: ecological-data-foundation",
       conditionMessage(e)
     )
     stop(e)
@@ -95,7 +95,7 @@ if (grepl("\\.csv$", species_input, ignore.case = TRUE) && file.exists(species_i
 } else {
   species_list <- trimws(species_input)
   log_info("Modo especie unica: %s", species_list)
-  log_decision("mode", "single_species", "argumento nao e arquivo CSV")
+  log_decision("mode", "single_species", "argument is not a CSV file")
 }
 
 # ── 4. Download function ─────────────────────────────────────────────────────
@@ -119,19 +119,19 @@ download_obis_species <- function(sp_name) {
     do.call(robis::occurrence, query_args)
   }, error = function(e) {
     log_error(
-      "Falha em robis::occurrence para '%s': %s\nCausa provavel: sem conexao com a internet ou API OBIS indisponivel.\nVerifique: https://api.obis.org/\nSkill anterior: ecological-data-foundation",
+      "Failed in robis::occurrence para '%s': %s\nProbable cause: no internet connection or OBIS API unavailable.\nCheck: https://api.obis.org/\nPrevious skill: ecological-data-foundation",
       sp_name, conditionMessage(e)
     )
     stop(e)
   })
 
   if (is.null(occ_raw) || nrow(occ_raw) == 0) {
-    log_warn("Nenhum registro OBIS encontrado para '%s'.", sp_name)
+    log_warn("No OBIS records found for '%s'.", sp_name)
     return(invisible(NULL))
   }
 
   n_raw <- nrow(occ_raw)
-  log_info("Registros brutos recuperados: %d", n_raw)
+  log_info("Raw records recuperados: %d", n_raw)
 
   # ── Apply OBIS quality flags ───────────────────────────────────────────────
   # Remove records flagged as having coordinate issues
@@ -140,7 +140,7 @@ download_obis_species <- function(sp_name) {
     bad_flags <- c("NO_COORD", "ZERO_COORD", "ON_LAND", "DEPTH_EXCEEDS_BATH")
     occ_raw <- occ_raw[!grepl(paste(bad_flags, collapse = "|"),
                                occ_raw$flags, ignore.case = TRUE), ]
-    log_info("Registros apos filtro de flags OBIS: %d", nrow(occ_raw))
+    log_info("Records after OBIS quality flags filter: %d", nrow(occ_raw))
   }
 
   # ── Standardise to output schema ──────────────────────────────────────────
@@ -177,15 +177,15 @@ download_obis_species <- function(sp_name) {
   std <- std[!is.na(std$decimalLatitude) & !is.na(std$decimalLongitude), ]
   n_removed <- n_before - nrow(std)
   if (n_removed > 0) {
-    log_warn("%d registros removidos por coordenadas ausentes.", n_removed)
+    log_warn("%d registros removidos por coordenadas missing.", n_removed)
   }
 
   n_final <- nrow(std)
-  log_info("Registros com coordenadas validas: %d", n_final)
+  log_info("Records with valid coordinates: %d", n_final)
 
   if (n_final < 30) {
     log_warn(
-      "Registros insuficientes para analise confiavel (n = %d). Considere relaxar filtros de datas ou area.",
+      "Insufficient records for reliable analysis (n = %d). Consider relaxing date or area filters.",
       n_final
     )
   }
@@ -194,10 +194,10 @@ download_obis_species <- function(sp_name) {
   csv_path <- file.path(output_dir, paste0("occurrences_raw_OBIS_", safe_name, "_", today_str, ".csv"))
   tryCatch({
     write_csv(std, csv_path)
-    log_info("Gravado: %s (%d registros)", csv_path, n_final)
+    log_info("Written: %s (%d registros)", csv_path, n_final)
   }, error = function(e) {
     log_error(
-      "Falha ao gravar CSV para '%s': %s\nSkill anterior: ecological-data-foundation",
+      "Failed to gravar CSV para '%s': %s\nPrevious skill: ecological-data-foundation",
       sp_name, conditionMessage(e)
     )
     stop(e)
@@ -220,10 +220,10 @@ download_obis_species <- function(sp_name) {
   meta_path <- file.path(output_dir, paste0("download_metadata_OBIS_", safe_name, ".txt"))
   tryCatch({
     writeLines(meta_lines, meta_path)
-    log_info("Gravado: %s", meta_path)
+    log_info("Written: %s", meta_path)
   }, error = function(e) {
     log_error(
-      "Falha ao gravar metadados para '%s': %s\nSkill anterior: ecological-data-foundation",
+      "Failed to save metadata for '%s': %s\nPrevious skill: ecological-data-foundation",
       sp_name, conditionMessage(e)
     )
   })
@@ -232,17 +232,17 @@ download_obis_species <- function(sp_name) {
 }
 
 # ── 5. Run for all species ───────────────────────────────────────────────────
-log_step(4, "Executar download OBIS para todas as especies")
+log_step(4, "Run OBIS download for all species")
 for (sp in species_list) {
   tryCatch(
     download_obis_species(sp),
     error = function(e) {
       log_error(
-        "Falha ao baixar '%s' do OBIS: %s\nCausa provavel: problema de rede ou especie nao encontrada.\nSkill anterior: ecological-data-foundation",
+        "Failed to download '%s' from OBIS: %s\nProbable cause: network error or species not found.\nPrevious skill: ecological-data-foundation",
         sp, conditionMessage(e)
       )
     }
   )
 }
 
-log_info("Todos os downloads OBIS concluidos. Verifique: %s", output_dir)
+log_info("All OBIS downloads completed. Check: %s", output_dir)

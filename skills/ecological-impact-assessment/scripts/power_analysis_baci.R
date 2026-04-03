@@ -185,7 +185,7 @@ tryCatch({
     dev.off()
     log_info("Base-graphics power curves saved.")
   }, error = function(e2) {
-    log_error("Falha ao gerar grafico de poder: %s\nCausa provavel: pwr ou ggplot2 nao instalados.\nVerifique: install.packages(c('pwr','ggplot2','patchwork'))", conditionMessage(e2))
+    log_error("Failed to generate power plot: %s\nProbable cause: pwr or ggplot2 not installed.\nCheck: install.packages(c('pwr','ggplot2','patchwork'))", conditionMessage(e2))
   })
 })
 

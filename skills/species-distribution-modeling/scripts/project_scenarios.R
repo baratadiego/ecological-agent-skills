@@ -32,11 +32,11 @@ log_decision("threshold_from_csv", ifelse(is.null(threshold_from_csv), "NULL", t
 
 # ── Precondition checks ───────────────────────────────────────────────────────
 if (!file.exists(model_rds)) {
-  log_error("Model RDS nao encontrado: %s\nCausa provavel: run_ensemble_sdm.R nao concluiu.\nVerifique: a saida de skills/species-distribution-modeling.\nSkill anterior: species-distribution-modeling", model_rds)
+  log_error("Model RDS not found: %s\nProbable cause: run_ensemble_sdm.R did not complete.\nCheck: the output of skills/species-distribution-modeling.\nPrevious skill: species-distribution-modeling", model_rds)
   stop("Missing model: ", model_rds)
 }
 if (!dir.exists(scenarios_dir)) {
-  log_error("Scenarios dir nao encontrado: %s\nCausa provavel: prepare_future_layers.R nao foi executado.\nVerifique: CMIP6 stacks foram baixados e preparados.\nSkill anterior: geoprocessing-for-ecology", scenarios_dir)
+  log_error("Scenarios dir not found: %s\nProbable cause: prepare_future_layers.R was not executed.\nCheck: CMIP6 stacks foram baixados e preparados.\nPrevious skill: geoprocessing-for-ecology", scenarios_dir)
   stop("Missing scenarios dir: ", scenarios_dir)
 }
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
@@ -44,7 +44,7 @@ dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 # ── Step 1: Load model ────────────────────────────────────────────────────────
 log_step(1, "Loading model")
 model_obj <- tryCatch(readRDS(model_rds), error = function(e) {
-  log_error("Falha ao ler model RDS: %s\nCausa provavel: arquivo corrompido.\nVerifique: Rscript gerou o modelo com saveRDS().", conditionMessage(e))
+  log_error("Failed to read model RDS: %s\nProbable cause: corrupted file.\nCheck: Rscript generated the model with saveRDS().", conditionMessage(e))
   stop(e)
 })
 is_ensemble <- is.list(model_obj) && !inherits(model_obj, "MaxEnt")
@@ -91,7 +91,7 @@ predict_stack <- function(mod, preds) {
 log_step(3, "Scanning scenario stacks")
 tif_files <- list.files(scenarios_dir, pattern = "\\.tif$", full.names = TRUE)
 if (length(tif_files) == 0) {
-  log_error("Nenhum .tif encontrado em: %s\nCausa provavel: prepare_future_layers.R nao gerou os stacks.\nVerifique: arquivos .tif existem em scenarios_dir.", scenarios_dir)
+  log_error("No .tif files found in: %s\nProbable cause: prepare_future_layers.R did not generate the stacks.\nCheck: .tif files exist in scenarios_dir.", scenarios_dir)
   stop("No .tif files in scenarios_dir")
 }
 log_info("Found %d scenario stack(s)", length(tif_files))
@@ -113,7 +113,7 @@ for (i in seq_along(tif_files)) {
   log_info("Projecting scenario %d/%d: %s", i, length(tif_files), lbl)
 
   preds <- tryCatch(rast(tif), error = function(e) {
-    log_error("Falha ao ler stack %s: %s\nCausa provavel: arquivo corrompido ou caminho errado.", lbl, conditionMessage(e))
+    log_error("Failed to read stack %s: %s\nProbable cause: corrupted file ou incorrect path.", lbl, conditionMessage(e))
     return(NULL)
   })
   if (is.null(preds)) { results[[i]] <- NULL; next }
@@ -129,7 +129,7 @@ for (i in seq_along(tif_files)) {
       predict_stack(model_obj, preds)
     }
   }, error = function(e) {
-    log_error("Falha na projecao do cenario %s: %s\nVerifique: stack tem os mesmos preditores do modelo.", lbl, conditionMessage(e))
+    log_error("Failed projecting scenario %s: %s\nCheck: stack has the same predictors as the model.", lbl, conditionMessage(e))
     NULL
   })
   if (is.null(suit)) { results[[i]] <- NULL; next }

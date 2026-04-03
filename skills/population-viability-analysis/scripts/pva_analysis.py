@@ -246,9 +246,9 @@ def main():
 
     if not Path(args.vital_rates_csv).exists():
         logger.error(
-            "Input nao encontrado: %s\n"
-            "  Causa provavel: passo anterior nao concluiu.\n"
-            "  Skill anterior que deveria ter produzido este input: reproducible-ecology-pipeline",
+            "Input not found: %s\n"
+            "  Probable cause: previous step did not complete.\n"
+            "  Previous skill que deveria ter produzido este input: reproducible-ecology-pipeline",
             args.vital_rates_csv
         )
         sys.exit(1)

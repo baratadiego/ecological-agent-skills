@@ -41,14 +41,14 @@ suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(readr))
 
 # ── 1. Parse arguments ───────────────────────────────────────────────────────
-log_step(1, "Analisar argumentos da linha de comando")
+log_step(1, "Parse command-line arguments")
 args <- commandArgs(trailingOnly = TRUE)
 
 if (length(args) < 2) {
   species_input    <- "Panthera onca"
   output_dir       <- "output/iucn"
   include_range_maps <- FALSE
-  log_warn("Menos de 2 argumentos fornecidos. Usando valores padrao para teste.")
+  log_warn("Fewer than 2 arguments provided. Using default values for testing.")
 } else {
   species_input    <- args[1]
   output_dir       <- args[2]
@@ -62,41 +62,41 @@ log_info("Species input      : %s", species_input)
 log_info("Output dir         : %s", output_dir)
 log_info("Include range maps : %s", include_range_maps)
 
-log_decision("api_version", "v3", "IUCN Red List API v3 — requer chave em IUCN_REDLIST_KEY")
+log_decision("api_version", "v3", "IUCN Red List API v3 — requires key in IUCN_REDLIST_KEY")
 
 # ── 2. Check API key ─────────────────────────────────────────────────────────
-log_step(2, "Verificar chave da API IUCN")
+log_step(2, "Check IUCN API key")
 iucn_key <- Sys.getenv("IUCN_REDLIST_KEY")
 if (is.null(iucn_key) || iucn_key == "") {
   log_error(
-    "Falha em verificar chave API IUCN: variavel IUCN_REDLIST_KEY nao definida.\nCausa provavel: chave nao configurada no ambiente.\nVerifique: adicione IUCN_REDLIST_KEY ao seu .Renviron via usethis::edit_r_environ()\nSkill anterior: ecological-data-foundation"
+    "Failed in verificar chave API IUCN: variavel IUCN_REDLIST_KEY nao definida.\nProbable cause: chave nao configurada no ambiente.\nCheck: adicione IUCN_REDLIST_KEY ao seu .Renviron via usethis::edit_r_environ()\nPrevious skill: ecological-data-foundation"
   )
   stop("IUCN_REDLIST_KEY environment variable not set.")
 }
 log_info("Chave IUCN detectada (primeiros 4 chars): %s...", substr(iucn_key, 1, 4))
 
 # ── 3. Create output directory ───────────────────────────────────────────────
-log_step(3, "Criar diretorio de saida")
+log_step(3, "Create output directory")
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
 # ── 4. Build species list ────────────────────────────────────────────────────
-log_step(4, "Construir lista de especies")
+log_step(4, "Build species list")
 if (grepl("\\.csv$", species_input, ignore.case = TRUE) && file.exists(species_input)) {
   tryCatch({
     species_df <- read_csv(species_input, show_col_types = FALSE)
     if (!"scientificName" %in% names(species_df)) {
       log_error(
-        "Coluna 'scientificName' nao encontrada em: %s\nCausa provavel: CSV mal formatado.\nSkill anterior: ecological-data-foundation",
+        "Coluna 'scientificName' nao encontrada em: %s\nProbable cause: CSV mal formatado.\nPrevious skill: ecological-data-foundation",
         species_input
       )
       stop("Missing column 'scientificName'")
     }
     species_list <- unique(trimws(species_df$scientificName))
     log_info("Modo batch: %d especies carregadas", length(species_list))
-    log_decision("mode", "batch", "CSV valido com coluna scientificName")
+    log_decision("mode", "batch", "valid CSV with scientificName column")
   }, error = function(e) {
     log_error(
-      "Falha ao ler lista de especies: %s\nSkill anterior: ecological-data-foundation",
+      "Failed to read lista de especies: %s\nPrevious skill: ecological-data-foundation",
       conditionMessage(e)
     )
     stop(e)
@@ -104,7 +104,7 @@ if (grepl("\\.csv$", species_input, ignore.case = TRUE) && file.exists(species_i
 } else {
   species_list <- trimws(species_input)
   log_info("Modo especie unica: %s", species_list)
-  log_decision("mode", "single_species", "argumento nao e arquivo CSV")
+  log_decision("mode", "single_species", "argument is not a CSV file")
 }
 
 # ── 5. Download function ─────────────────────────────────────────────────────
@@ -117,14 +117,14 @@ download_iucn_species <- function(sp_name) {
     rredlist::rl_search(sp_name, key = iucn_key)
   }, error = function(e) {
     log_error(
-      "Falha em rl_search para '%s': %s\nCausa provavel: chave IUCN invalida ou API indisponivel.\nVerifique: https://apiv3.iucnredlist.org/\nSkill anterior: ecological-data-foundation",
+      "Failed in rl_search for '%s': %s\nProbable cause: invalid IUCN key or API unavailable.\nCheck: https://apiv3.iucnredlist.org/\nPrevious skill: ecological-data-foundation",
       sp_name, conditionMessage(e)
     )
     stop(e)
   })
 
   if (is.null(assessment$result) || length(assessment$result) == 0) {
-    log_warn("Nenhum resultado IUCN para '%s'. Especie pode nao estar avaliada.", sp_name)
+    log_warn("No IUCN results for '%s'. Species may not have been assessed.", sp_name)
     return(invisible(NULL))
   }
 
@@ -135,11 +135,11 @@ download_iucn_species <- function(sp_name) {
   assess_yr<- res$assessment_year  %||% NA_integer_
   taxon_id <- res$taxonid %||% NA_integer_
 
-  log_info("Categoria IUCN para '%s': %s (criterios: %s, tendencia: %s, ano: %s)",
+  log_info("IUCN category for '%s': %s (criteria: %s, trend: %s, year: %s)",
            sp_name, category, criteria, pop_trend, assess_yr)
 
   if (category %in% c("CR", "EN")) {
-    log_warn("Especie '%s' e %s — dados de distribuicao podem ser restritos por razoes de seguranca.",
+    log_warn("Species '%s' is %s — distribution data may be restricted for security reasons.",
              sp_name, category)
   }
 
@@ -147,7 +147,7 @@ download_iucn_species <- function(sp_name) {
   country_occ <- tryCatch({
     rredlist::rl_occ_country(sp_name, key = iucn_key)
   }, error = function(e) {
-    log_warn("Falha ao buscar paises de ocorrencia para '%s': %s", sp_name, conditionMessage(e))
+    log_warn("Failed to fetch occurrence countries for '%s': %s", sp_name, conditionMessage(e))
     list(result = NULL)
   })
 
@@ -155,7 +155,7 @@ download_iucn_species <- function(sp_name) {
   habitats <- tryCatch({
     rredlist::rl_habitats(sp_name, key = iucn_key)
   }, error = function(e) {
-    log_warn("Falha ao buscar habitats para '%s': %s", sp_name, conditionMessage(e))
+    log_warn("Failed to fetch habitats for '%s': %s", sp_name, conditionMessage(e))
     list(result = NULL)
   })
 
@@ -181,7 +181,7 @@ download_iucn_species <- function(sp_name) {
       stringsAsFactors              = FALSE
     )
   } else {
-    log_warn("Sem dados de ocorrencia por pais para '%s'. Criando registro sumario.", sp_name)
+    log_warn("No country occurrence data for '%s'. Creating summary record.", sp_name)
     std <- data.frame(
       species                       = sp_name,
       decimalLatitude               = NA_real_,
@@ -206,10 +206,10 @@ download_iucn_species <- function(sp_name) {
   csv_path <- file.path(output_dir, paste0("iucn_status_", safe_name, ".csv"))
   tryCatch({
     write_csv(std, csv_path)
-    log_info("Gravado: %s (%d linhas)", csv_path, nrow(std))
+    log_info("Written: %s (%d linhas)", csv_path, nrow(std))
   }, error = function(e) {
     log_error(
-      "Falha ao gravar CSV para '%s': %s\nSkill anterior: ecological-data-foundation",
+      "Failed to gravar CSV para '%s': %s\nPrevious skill: ecological-data-foundation",
       sp_name, conditionMessage(e)
     )
     stop(e)
@@ -222,9 +222,9 @@ download_iucn_species <- function(sp_name) {
     hab_path <- file.path(output_dir, paste0("iucn_habitats_", safe_name, ".csv"))
     tryCatch({
       write_csv(hab_df, hab_path)
-      log_info("Habitats gravados: %s", hab_path)
+      log_info("Habitats saved: %s", hab_path)
     }, error = function(e) {
-      log_warn("Falha ao gravar habitats para '%s': %s", sp_name, conditionMessage(e))
+      log_warn("Failed to write habitats for '%s': %s", sp_name, conditionMessage(e))
     })
   }
 
@@ -245,9 +245,9 @@ download_iucn_species <- function(sp_name) {
   meta_path <- file.path(output_dir, paste0("download_metadata_IUCN_", safe_name, ".txt"))
   tryCatch({
     writeLines(meta_lines, meta_path)
-    log_info("Gravado: %s", meta_path)
+    log_info("Written: %s", meta_path)
   }, error = function(e) {
-    log_warn("Falha ao gravar metadados para '%s': %s", sp_name, conditionMessage(e))
+    log_warn("Failed to save metadata for '%s': %s", sp_name, conditionMessage(e))
   })
 
   return(invisible(csv_path))
@@ -257,17 +257,17 @@ download_iucn_species <- function(sp_name) {
 `%||%` <- function(a, b) if (!is.null(a) && !is.na(a) && length(a) > 0) a else b
 
 # ── 6. Run for all species ───────────────────────────────────────────────────
-log_step(5, "Executar download IUCN para todas as especies")
+log_step(5, "Run IUCN download for all species")
 for (sp in species_list) {
   tryCatch(
     download_iucn_species(sp),
     error = function(e) {
       log_error(
-        "Falha ao baixar '%s' do IUCN: %s\nCausa provavel: chave invalida, especie nao avaliada ou API indisponivel.\nSkill anterior: ecological-data-foundation",
+        "Failed to download '%s' from IUCN: %s\nProbable cause: invalid key, species not assessed, or API unavailable.\nPrevious skill: ecological-data-foundation",
         sp, conditionMessage(e)
       )
     }
   )
 }
 
-log_info("Todos os downloads IUCN concluidos. Verifique: %s", output_dir)
+log_info("All IUCN downloads completed. Check: %s", output_dir)

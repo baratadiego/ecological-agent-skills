@@ -30,14 +30,14 @@ output_dir <- ifelse(length(args) >= 3, args[3], "outputs/community")
 log_step(1, "Validate inputs")
 if (!file.exists(sp_file)) {
   log_error(
-    "Falha em validate inputs: arquivo de matriz de especies nao encontrado: %s\nCausa provavel: caminho incorreto ou arquivo nao gerado\nVerifique: o argumento species_matrix_csv e o diretorio de trabalho\nSkill anterior: data-cleaning",
+    "Failed in validate inputs: species matrix file not found: %s\nProbable cause: incorrect path or file not generated\nCheck: the species_matrix_csv argument and working directory\nPrevious skill: data-cleaning",
     sp_file
   )
   stop("Species matrix file not found.")
 }
 if (!file.exists(meta_file)) {
   log_error(
-    "Falha em validate inputs: arquivo de metadados nao encontrado: %s\nCausa provavel: caminho incorreto ou arquivo nao gerado\nVerifique: o argumento metadata_csv e o diretorio de trabalho\nSkill anterior: data-cleaning",
+    "Failed in validate inputs: metadata file not found: %s\nProbable cause: incorrect path or file not generated\nCheck: the metadata_csv argument and working directory\nPrevious skill: data-cleaning",
     meta_file
   )
   stop("Metadata file not found.")
@@ -53,7 +53,7 @@ tryCatch({
   meta <- read.csv(meta_file, row.names = 1)
 }, error = function(e) {
   log_error(
-    "Falha em load data: %s\nCausa provavel: CSV malformado ou sem coluna de rownames\nVerifique: estrutura dos arquivos (primeira coluna deve ser site ID)\nSkill anterior: data-cleaning",
+    "Failed in load data: %s\nProbable cause: malformed CSV or missing rownames column\nCheck: file structure (first column must be site ID)\nPrevious skill: data-cleaning",
     conditionMessage(e)
   )
   stop(e)
@@ -81,7 +81,7 @@ tryCatch({
            mean(div$richness), mean(div$shannon))
 }, error = function(e) {
   log_error(
-    "Falha em alpha diversity: %s\nCausa provavel: matriz de especies vazia ou nao numerica\nVerifique: estrutura do CSV de especies\nSkill anterior: data-cleaning",
+    "Failed in alpha diversity: %s\nProbable cause: empty or non-numeric species matrix\nCheck: structure of the species CSV\nPrevious skill: data-cleaning",
     conditionMessage(e)
   )
   stop(e)
@@ -110,7 +110,7 @@ tryCatch({
   log_info("Ordination plot saved.")
 }, error = function(e) {
   log_error(
-    "Falha em NMDS: %s\nCausa provavel: matriz com sites/especies insuficientes ou todos zeros\nVerifique: numero de sites (>= 3) e que a matriz nao seja toda zeros\nSkill anterior: data-cleaning",
+    "Failed in NMDS: %s\nProbable cause: matrix with insufficient sites/species or all zeros\nCheck: number of sites (>= 3) and that the matrix is not all zeros\nPrevious skill: data-cleaning",
     conditionMessage(e)
   )
   stop(e)
@@ -131,7 +131,7 @@ if ("group" %in% names(meta)) {
     log_info("PERMANOVA results saved.")
   }, error = function(e) {
     log_error(
-      "Falha em PERMANOVA/PERMDISP: %s\nCausa provavel: grupo com apenas um nivel ou sites insuficientes por grupo\nVerifique: coluna 'group' nos metadados e balanceamento\nSkill anterior: data-cleaning",
+      "Failed in PERMANOVA/PERMDISP: %s\nProbable cause: group with only one level or insufficient sites per group\nCheck: 'group' column in metadata and balance\nPrevious skill: data-cleaning",
       conditionMessage(e)
     )
     stop(e)

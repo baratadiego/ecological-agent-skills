@@ -58,7 +58,11 @@
         "action_if_overdispersion": "switch to negative binomial or quasi family",
         "action_if_residuals_fail": "transform response or use non-parametric alternative"
       },
-      "skill_md_path": "skills/biostatistics-workbench/SKILL.md"
+      "skill_md_path": "skills/biostatistics-workbench/SKILL.md",
+      "primary_script_r": "skills/biostatistics-workbench/scripts/glm_pipeline.R",
+      "primary_script_py": "skills/biostatistics-workbench/scripts/glm_pipeline.py",
+      "preferred_language": "Python",
+      "preferred_language_reason": "R script is a scaffold without full implementation; Python script is complete"
     },
     {
       "skill_id": "community-ecology-ordination",
@@ -114,7 +118,11 @@
         "action_if_stress_above_threshold": "increase NMDS dimensions to 3 or reduce species set",
         "action_if_permanova_r2_low": "report effect size and discuss ecological significance"
       },
-      "skill_md_path": "skills/community-ecology-ordination/SKILL.md"
+      "skill_md_path": "skills/community-ecology-ordination/SKILL.md",
+      "primary_script_r": "skills/community-ecology-ordination/scripts/community_analysis.R",
+      "primary_script_py": "skills/community-ecology-ordination/scripts/community_analysis.py",
+      "preferred_language": "Python",
+      "preferred_language_reason": "R script is a scaffold without full implementation; Python script is complete"
     },
     {
       "skill_id": "ecological-data-foundation",
@@ -188,7 +196,11 @@
         "action_if_duplicates_exceed_20pct": "investigate source bias before proceeding",
         "action_if_coordinates_fail_cleaning": "flag and exclude; document in qa_report.md"
       },
-      "skill_md_path": "skills/ecological-data-foundation/SKILL.md"
+      "skill_md_path": "skills/ecological-data-foundation/SKILL.md",
+      "primary_script_r": "skills/ecological-data-foundation/scripts/clean_occurrences.R",
+      "primary_script_py": "skills/ecological-data-foundation/scripts/clean_occurrences.py",
+      "preferred_language": "R",
+      "preferred_language_reason": "Both scripts fully implemented; R preferred for CoordinateCleaner integration and Darwin Core standardisation"
     },
     {
       "skill_id": "ecological-impact-assessment",
@@ -242,7 +254,11 @@
         "action_if_baci_ns": "compute post-hoc power; report effect size with CI",
         "action_if_permdisp_significant": "report PERMDISP alongside PERMANOVA; discuss heterogeneity"
       },
-      "skill_md_path": "skills/ecological-impact-assessment/SKILL.md"
+      "skill_md_path": "skills/ecological-impact-assessment/SKILL.md",
+      "primary_script_r": "skills/ecological-impact-assessment/scripts/baci_analysis.R",
+      "primary_script_py": "skills/ecological-impact-assessment/scripts/fragmentation_analysis.py",
+      "preferred_language": "R",
+      "preferred_language_reason": "R baci_analysis.R is fully implemented; Python script covers only fragmentation (complementary, not equivalent)"
     },
     {
       "skill_id": "ecosystem-services-assessment",
@@ -298,7 +314,11 @@
         "action_if_accuracy_below": "perform uncertainty analysis; include classification error in ES estimates",
         "action_if_invest_nodata_exceeds_30pct": "check CRS and extent alignment before rerunning"
       },
-      "skill_md_path": "skills/ecosystem-services-assessment/SKILL.md"
+      "skill_md_path": "skills/ecosystem-services-assessment/SKILL.md",
+      "primary_script_r": "skills/ecosystem-services-assessment/scripts/tradeoff_analysis.R",
+      "primary_script_py": "skills/ecosystem-services-assessment/scripts/compute_es.py",
+      "preferred_language": "Python",
+      "preferred_language_reason": "R script is a scaffold without full implementation; Python script is complete"
     },
     {
       "skill_id": "environmental-time-series",
@@ -357,7 +377,11 @@
         "action_if_autocorrelation_detected": "apply pre-whitening before Mann-Kendall test",
         "action_if_bfast_breakpoints_exceed_5": "increase h parameter; check for artefacts"
       },
-      "skill_md_path": "skills/environmental-time-series/SKILL.md"
+      "skill_md_path": "skills/environmental-time-series/SKILL.md",
+      "primary_script_r": "skills/environmental-time-series/scripts/trend_analysis.R",
+      "primary_script_py": "skills/environmental-time-series/scripts/trend_analysis.py",
+      "preferred_language": "R",
+      "preferred_language_reason": "Both scripts implemented; R preferred for forecast, changepoint, and strucchange packages — the ecological time-series standard"
     },
     {
       "skill_id": "geoprocessing-for-ecology",
@@ -390,7 +414,15 @@
         "GDAL",
         "study area mask",
         "crop raster",
-        "align rasters"
+        "align rasters",
+        "Google Earth Engine",
+        "GEE",
+        "MODIS",
+        "Landsat",
+        "NDVI time series",
+        "LST time series",
+        "earthengine",
+        "remote sensing time series"
       ],
       "min_inputs": {
         "occurrence_or_sample_points": "required",
@@ -407,7 +439,9 @@
         "worldclim/wc2.1_{res}m_bio_{1..19}.tif",
         "chelsa/CHELSA_bio{1..19}.tif",
         "era5/era5_land_temp_precip_monthly.nc",
-        "predictor_metadata.csv"
+        "predictor_metadata.csv",
+        "gee_time_series.csv",
+        "gee_metadata.json"
       ],
       "depends_on_skills": [
         "ecological-data-foundation"
@@ -424,7 +458,12 @@
         "action_if_resolution_mismatch": "resample to coarsest resolution; document choice in decision_log.md",
         "action_if_extent_mismatch": "clip all layers to study area extent"
       },
-      "skill_md_path": "skills/geoprocessing-for-ecology/SKILL.md"
+      "skill_md_path": "skills/geoprocessing-for-ecology/SKILL.md",
+      "primary_script_r": "skills/geoprocessing-for-ecology/scripts/download_predictors.R",
+      "primary_script_py": "skills/geoprocessing-for-ecology/scripts/download_predictors.py",
+      "gee_script_py": "skills/geoprocessing-for-ecology/scripts/gee_time_series.py",
+      "preferred_language": "R",
+      "preferred_language_reason": "Both scripts implemented; R preferred for terra (C++ vectorised raster ops) and geodata automatic mirror handling — faster than rasterio for large stacks. Use gee_script_py when cloud-based MODIS/Landsat time series is needed without local download."
     },
     {
       "skill_id": "model-validation-and-uncertainty",
@@ -493,7 +532,11 @@
         "action_if_auc_below": "revise predictors; expand calibration grid; report as unreliable",
         "action_if_mop_zero_exceeds_threshold": "restrict projection extent; add explicit caveats"
       },
-      "skill_md_path": "skills/model-validation-and-uncertainty/SKILL.md"
+      "skill_md_path": "skills/model-validation-and-uncertainty/SKILL.md",
+      "primary_script_r": "skills/model-validation-and-uncertainty/scripts/validate_sdm.R",
+      "primary_script_py": "skills/model-validation-and-uncertainty/scripts/validate_model.py",
+      "preferred_language": "R",
+      "preferred_language_reason": "R validate_sdm.R and extrapolation_risk.R are fully implemented with dismo::mess() and MESS/MOP metrics; Python script is partial"
     },
     {
       "skill_id": "occupancy-and-detection",
@@ -552,7 +595,11 @@
         "action_if_gof_fails": "add detection covariate or relax closure assumption",
         "action_if_c_hat_above_threshold": "use QAICc for model selection; report overdispersion"
       },
-      "skill_md_path": "skills/occupancy-and-detection/SKILL.md"
+      "skill_md_path": "skills/occupancy-and-detection/SKILL.md",
+      "primary_script_r": "skills/occupancy-and-detection/scripts/occupancy_analysis.R",
+      "primary_script_py": "skills/occupancy-and-detection/scripts/occupancy_analysis.py",
+      "preferred_language": "R",
+      "preferred_language_reason": "R unmarked package is the gold standard for occupancy modelling; Python implementation lacks AIC model selection and goodness-of-fit tests"
     },
     {
       "skill_id": "predictive-modeling-best-practices",
@@ -613,7 +660,11 @@
         "action_if_vif_above_threshold": "remove predictor with highest VIF iteratively until all below threshold",
         "action_if_spatial_autocorrelation": "use spatial block CV instead of random CV"
       },
-      "skill_md_path": "skills/predictive-modeling-best-practices/SKILL.md"
+      "skill_md_path": "skills/predictive-modeling-best-practices/SKILL.md",
+      "primary_script_r": "skills/predictive-modeling-best-practices/scripts/collinearity_check.R",
+      "primary_script_py": "skills/predictive-modeling-best-practices/scripts/spatial_cv.py",
+      "preferred_language": "R",
+      "preferred_language_reason": "R collinearity_check.R is the main entry point (VIF + Pearson filter); Python spatial_cv.py is complementary, not a full equivalent"
     },
     {
       "skill_id": "reproducible-ecology-pipeline",
@@ -679,7 +730,11 @@
         "action_if_not_reproducible_from_params": "complete parameter manifest before finalising any report",
         "action_if_seed_sensitive_results": "document random seed explicitly in parameter_manifest.yaml"
       },
-      "skill_md_path": "skills/reproducible-ecology-pipeline/SKILL.md"
+      "skill_md_path": "skills/reproducible-ecology-pipeline/SKILL.md",
+      "primary_script_r": null,
+      "primary_script_py": "skills/reproducible-ecology-pipeline/scripts/generate_file_manifest.py",
+      "preferred_language": "Python",
+      "preferred_language_reason": "No R script exists for this skill; Python is the only available implementation"
     },
     {
       "skill_id": "species-distribution-modeling",
@@ -742,7 +797,11 @@
         "action_if_n_below_min": "do not fit model; use literature-based range map with explicit caveat",
         "action_if_auc_below": "revise predictors and expand calibration grid"
       },
-      "skill_md_path": "skills/species-distribution-modeling/SKILL.md"
+      "skill_md_path": "skills/species-distribution-modeling/SKILL.md",
+      "primary_script_r": "skills/species-distribution-modeling/scripts/run_ensemble_sdm.R",
+      "primary_script_py": "skills/species-distribution-modeling/scripts/sdm_pipeline.py",
+      "preferred_language": "R",
+      "preferred_language_reason": "R run_ensemble_sdm.R is fully implemented with MaxEnt (maxnet), BRT, RF, blockCV spatial CV, TSS, response curves, and uncertainty map; Python sdm_pipeline.py lacks MaxEnt, blockCV, and TSS"
     },
     {
       "skill_id": "camera-trap-processing",
@@ -786,14 +845,20 @@
         "ecological-data-foundation",
         "occupancy-and-detection"
       ],
-      "called_by_workflows": [],
+      "called_by_workflows": [
+        "run-camera-trap-occupancy"
+      ],
       "decision_points": {
         "independence_threshold_default_min": 30,
         "min_events_for_activity": 75,
         "min_events_for_RAI": 10,
         "min_trap_nights_per_station": 100
       },
-      "skill_md_path": "skills/camera-trap-processing/SKILL.md"
+      "skill_md_path": "skills/camera-trap-processing/SKILL.md",
+      "primary_script_r": "skills/camera-trap-processing/scripts/process_camtrap_data.R",
+      "primary_script_py": "skills/camera-trap-processing/scripts/process_camtrap_data.py",
+      "preferred_language": "R",
+      "preferred_language_reason": "R camtrapR is the gold standard for camera trap data; provides record tables, detection histories, activity patterns, and RAI natively"
     },
     {
       "skill_id": "acoustic-monitoring",
@@ -837,14 +902,20 @@
         "ecological-data-foundation",
         "environmental-time-series"
       ],
-      "called_by_workflows": [],
+      "called_by_workflows": [
+        "run-acoustic-monitoring"
+      ],
       "decision_points": {
         "min_confidence_threshold": 0.7,
         "min_recording_hours_for_richness": 48,
         "ndsi_disturbance_threshold": -0.3,
         "snr_exclusion_threshold_db": 10
       },
-      "skill_md_path": "skills/acoustic-monitoring/SKILL.md"
+      "skill_md_path": "skills/acoustic-monitoring/SKILL.md",
+      "primary_script_r": "skills/acoustic-monitoring/scripts/compute_acoustic_indices.R",
+      "primary_script_py": "skills/acoustic-monitoring/scripts/batch_species_detection.py",
+      "preferred_language": "Python",
+      "preferred_language_reason": "Deep learning species detection (BirdNET, bat detectors) is Python-native; R script covers only acoustic indices (complementary step)"
     },
     {
       "skill_id": "landscape-connectivity",
@@ -888,7 +959,9 @@
         "geoprocessing-for-ecology",
         "ecological-impact-assessment"
       ],
-      "called_by_workflows": [],
+      "called_by_workflows": [
+        "assess-landscape-connectivity"
+      ],
       "decision_points": {
         "min_patches_for_graph": 3,
         "sensitivity_dmax_values": [
@@ -900,7 +973,11 @@
         "min_iic_pc_for_connectivity": 0.01,
         "pinchpoint_percentile": 95
       },
-      "skill_md_path": "skills/landscape-connectivity/SKILL.md"
+      "skill_md_path": "skills/landscape-connectivity/SKILL.md",
+      "primary_script_r": "skills/landscape-connectivity/scripts/resistance_surface.R",
+      "primary_script_py": "skills/landscape-connectivity/scripts/connectivity_analysis.py",
+      "preferred_language": "R",
+      "preferred_language_reason": "R gdistance and Circuitscape integration are the standard for resistance surface and current-flow connectivity; Python script is supplementary"
     },
     {
       "skill_id": "population-viability-analysis",
@@ -946,7 +1023,9 @@
         "biostatistics-workbench",
         "occupancy-and-detection"
       ],
-      "called_by_workflows": [],
+      "called_by_workflows": [
+        "run-population-viability"
+      ],
       "decision_points": {
         "min_years_vital_rates": 3,
         "cv_threshold_stochastic_required": 0.3,
@@ -954,7 +1033,11 @@
         "default_quasi_ext_threshold": 50,
         "default_t_max_years": 100
       },
-      "skill_md_path": "skills/population-viability-analysis/SKILL.md"
+      "skill_md_path": "skills/population-viability-analysis/SKILL.md",
+      "primary_script_r": "skills/population-viability-analysis/scripts/matrix_pva.R",
+      "primary_script_py": "skills/population-viability-analysis/scripts/pva_analysis.py",
+      "preferred_language": "R",
+      "preferred_language_reason": "R popbio and matrix models (lambda, stable stage distribution, sensitivity/elasticity) are the ecological standard for PVA; both scripts implemented"
     },
     {
       "skill_id": "spatial-prioritization",
@@ -1004,7 +1087,9 @@
         "ecosystem-services-assessment",
         "landscape-connectivity"
       ],
-      "called_by_workflows": [],
+      "called_by_workflows": [
+        "run-conservation-prioritization"
+      ],
       "decision_points": {
         "default_target": 0.3,
         "max_iterations_before_target_relax": 1000,
@@ -1020,7 +1105,11 @@
           1.0
         ]
       },
-      "skill_md_path": "skills/spatial-prioritization/SKILL.md"
+      "skill_md_path": "skills/spatial-prioritization/SKILL.md",
+      "primary_script_r": "skills/spatial-prioritization/scripts/run_prioritization.R",
+      "primary_script_py": null,
+      "preferred_language": "R",
+      "preferred_language_reason": "R prioritizr is the only implementation; no Python equivalent exists for this skill"
     }
   ],
   "_metadata": {

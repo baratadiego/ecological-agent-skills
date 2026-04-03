@@ -315,3 +315,12 @@ class TestPredictorHelpers:
     def test_worldclim_base_url_format(self):
         assert "worldclim" in pred_mod.WORLDCLIM_BASE.lower()
         assert pred_mod.WORLDCLIM_BASE.startswith("https://")
+        # Must point to the new UC Davis domain (biogeo.ucdavis.edu is defunct)
+        assert "geodata.ucdavis.edu" in pred_mod.WORLDCLIM_BASE
+
+    def test_worldclim_mirrors_list(self):
+        assert hasattr(pred_mod, "WORLDCLIM_MIRRORS")
+        assert len(pred_mod.WORLDCLIM_MIRRORS) >= 2
+        assert all(m.startswith("https://") for m in pred_mod.WORLDCLIM_MIRRORS)
+        # Primary mirror must be the new domain
+        assert "geodata.ucdavis.edu" in pred_mod.WORLDCLIM_MIRRORS[0]

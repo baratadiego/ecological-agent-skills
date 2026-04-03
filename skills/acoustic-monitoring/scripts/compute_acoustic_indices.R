@@ -31,7 +31,7 @@ suppressPackageStartupMessages(library(ggplot2))
 
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) < 2) {
-  log_error("Argumentos insuficientes. Uso: Rscript compute_acoustic_indices.R <audio_dir> <output_dir> [time_resolution_min] [freq_min_hz] [freq_max_hz]")
+  log_error("Insufficient arguments. Usage: Rscript compute_acoustic_indices.R <audio_dir> <output_dir> [time_resolution_min] [freq_min_hz] [freq_max_hz]")
   cat("Usage: Rscript compute_acoustic_indices.R <audio_dir> <output_dir>",
       "[time_resolution_min] [freq_min_hz] [freq_max_hz]\n")
   cat("Defaults: time_resolution_min=1  freq_min_hz=0  freq_max_hz=22050\n")
@@ -46,20 +46,20 @@ freq_max_hz      <- if (length(args) >= 5) as.numeric(args[5]) else 22050
 
 # ── Input precondition checks ────────────────────────────────────────────────
 if (!dir.exists(audio_dir)) {
-  log_error("Input nao encontrado: %s\nCausa provavel: caminho incorreto ou diretorio nao montado\nVerifique: se o diretorio de audio existe\nSkill anterior: [nenhuma — etapa inicial]", audio_dir)
+  log_error("Input not found: %s\nProbable cause: incorrect path or directory not mounted\nCheck: whether the audio directory exists\nPrevious skill: [none — initial step]", audio_dir)
   stop("Missing audio_dir: ", audio_dir)
 }
 
 log_decision("time_res_min", time_res_min,
-             "resolucao temporal de agregacao em minutos; 1 min = resolucao completa por arquivo")
+             "temporal aggregation resolution in minutes; 1 min = full resolution per file")
 log_decision("freq_min_hz", freq_min_hz,
-             "frequencia minima de analise em Hz; 0 = sem filtro inferior")
+             "minimum analysis frequency in Hz; 0 = no low-pass filter")
 log_decision("freq_max_hz", freq_max_hz,
-             "frequencia maxima de analise em Hz; limitado pela taxa de amostragem do arquivo")
+             "maximum analysis frequency in Hz; limited by the file sample rate")
 
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
-log_step(1, "Descobrindo arquivos de audio no diretorio")
+log_step(1, "Discovering audio files in directory")
 # ── Discover audio files ────────────────────────────────────────────────────
 wav_files  <- list.files(audio_dir, pattern = "\\.wav$",  full.names = TRUE,
                          recursive = TRUE, ignore.case = TRUE)
@@ -68,10 +68,10 @@ flac_files <- list.files(audio_dir, pattern = "\\.flac$", full.names = TRUE,
 audio_files <- c(wav_files, flac_files)
 
 if (length(audio_files) == 0) {
-  log_error("Nenhum arquivo .wav ou .flac encontrado em: %s\nCausa provavel: diretorio vazio ou extensoes em maiusculas nao reconhecidas\nVerifique: conteudo do diretorio de audio\nSkill anterior: [nenhuma]", audio_dir)
+  log_error("No .wav or .flac files found in: %s\nProbable cause: empty directory or unrecognized uppercase extensions\nCheck: audio directory contents\nPrevious skill: [none]", audio_dir)
   stop("No .wav or .flac files found in: ", audio_dir)
 }
-log_info("Encontrados %d arquivos de audio", length(audio_files))
+log_info("Found %d audio files", length(audio_files))
 
 # ── Helper: extract timestamp from filename ─────────────────────────────────
 # Supports common recorder filename patterns:
@@ -89,7 +89,7 @@ parse_timestamp <- function(fname) {
            error = function(e) NA_POSIXct_)
 }
 
-log_step(2, "Computando indices acusticos por arquivo")
+log_step(2, "Computing acoustic indices per file")
 # ── Compute indices per file ────────────────────────────────────────────────
 compute_file_indices <- function(fpath) {
   tryCatch({
@@ -149,22 +149,22 @@ compute_file_indices <- function(fpath) {
       stringsAsFactors = FALSE
     )
   }, error = function(e) {
-    log_warn("Pulando %s: %s", basename(fpath), conditionMessage(e))
+    log_warn("Skipping %s: %s", basename(fpath), conditionMessage(e))
     NULL
   })
 }
 
-log_info("Computando indices — pode levar varios minutos para grandes conjuntos de dados...")
+log_info("Computing indices — may take several minutes for large datasets...")
 results_list <- lapply(audio_files, compute_file_indices)
 results_list <- Filter(Negate(is.null), results_list)
 
 if (length(results_list) == 0) {
-  log_error("Nenhum arquivo processado com sucesso\nCausa provavel: formato de audio incompativel ou intervalo de frequencia invalido\nVerifique: formato WAV/FLAC e configuracoes de frequencia\nSkill anterior: [nenhuma]")
+  log_error("No files processed successfully\nProbable cause: incompatible audio format or invalid frequency range\nCheck: WAV/FLAC format and frequency settings\nPrevious skill: [none]")
   stop("No files could be processed. Check audio format and frequency range.")
 }
-log_info("%d de %d arquivos processados com sucesso", length(results_list), length(audio_files))
+log_info("%d of %d files processed successfully", length(results_list), length(audio_files))
 
-log_step(3, "Agregando indices por resolucao temporal")
+log_step(3, "Aggregating indices by temporal resolution")
 indices_df <- dplyr::bind_rows(results_list)
 
 # ── Aggregate by time resolution ────────────────────────────────────────────
@@ -181,16 +181,16 @@ if (!is.na(indices_df$datetime[1])) {
     mutate(time_block = seq_len(nrow(.)),
            hour_of_day = NA_integer_,
            date = NA)
-  log_warn("Nenhum timestamp extraido dos nomes de arquivo. Heatmap nao sera gerado.")
+  log_warn("No timestamps extracted from file names. Heatmap will not be generated.")
 }
 
-log_step(4, "Escrevendo CSV de serie temporal de indices")
+log_step(4, "Writing index time series CSV")
 # ── Write timeseries CSV ────────────────────────────────────────────────────
 ts_path <- file.path(output_dir, "acoustic_indices_timeseries.csv")
 write.csv(indices_df, ts_path, row.names = FALSE)
 log_info("Serie temporal escrita: %s (%d linhas)", ts_path, nrow(indices_df))
 
-log_step(5, "Calculando e escrevendo resumo por hora do dia")
+log_step(5, "Computing and writing summary by hour of day")
 # ── Write summary CSV ───────────────────────────────────────────────────────
 summary_df <- indices_df %>%
   group_by(hour_of_day) %>%
@@ -206,7 +206,7 @@ sum_path <- file.path(output_dir, "indices_summary.csv")
 write.csv(summary_df, sum_path, row.names = FALSE)
 log_info("Resumo escrito: %s", sum_path)
 
-log_step(6, "Gerando heatmap de paisagem sonora")
+log_step(6, "Generating soundscape heatmap")
 # ── Soundscape heatmap ──────────────────────────────────────────────────────
 if (!all(is.na(indices_df$datetime))) {
   plot_df <- indices_df %>%
@@ -229,7 +229,7 @@ if (!all(is.na(indices_df$datetime))) {
          dpi = 150)
   log_info("Heatmap salvo: %s", plot_path)
 } else {
-  log_warn("Pulando heatmap: nenhum timestamp disponivel nos arquivos de audio")
+  log_warn("Skipping heatmap: no timestamps available in audio files")
 }
 
-log_info("Computacao de indices acusticos concluida")
+log_info("Acoustic index computation completed")

@@ -85,18 +85,18 @@ def main():
     if not Path(sp_file).exists():
         logger.error(
             "Species matrix file not found: %s\n"
-            "Causa provavel: caminho incorreto ou arquivo nao gerado\n"
-            "Verifique: o argumento species_matrix_csv e o diretorio de trabalho\n"
-            "Skill anterior: data-cleaning",
+            "Probable cause: incorrect path or file not yet generated\n"
+            "Check: o argumento species_matrix_csv e o working directory\n"
+            "Previous skill: data-cleaning",
             sp_file
         )
         sys.exit(1)
     if not Path(meta_file).exists():
         logger.error(
             "Metadata file not found: %s\n"
-            "Causa provavel: caminho incorreto ou arquivo nao gerado\n"
-            "Verifique: o argumento metadata_csv e o diretorio de trabalho\n"
-            "Skill anterior: data-cleaning",
+            "Probable cause: incorrect path or file not yet generated\n"
+            "Check: o argumento metadata_csv e o working directory\n"
+            "Previous skill: data-cleaning",
             meta_file
         )
         sys.exit(1)
@@ -110,9 +110,9 @@ def main():
     except Exception as e:
         logger.error(
             "Unexpected error in load data: %s\n"
-            "Causa provavel: CSV malformado ou sem coluna de rownames\n"
-            "Verifique: estrutura dos arquivos (primeira coluna deve ser site ID)\n"
-            "Skill anterior: data-cleaning",
+            "Probable cause: CSV malformado ou sem coluna de rownames\n"
+            "Check: structra dos arquivos (primeira coluna deve ser site ID)\n"
+            "Previous skill: data-cleaning",
             e
         )
         raise
@@ -132,9 +132,9 @@ def main():
     except Exception as e:
         logger.error(
             "Unexpected error in alpha diversity: %s\n"
-            "Causa provavel: matriz de especies vazia ou nao numerica\n"
-            "Verifique: estrutura do CSV de especies\n"
-            "Skill anterior: data-cleaning",
+            "Probable cause: matriz de especies vazia ou nao numerica\n"
+            "Check: CSV structure de especies\n"
+            "Previous skill: data-cleaning",
             e
         )
         raise
@@ -148,9 +148,9 @@ def main():
     except Exception as e:
         logger.error(
             "Unexpected error in Bray-Curtis matrix: %s\n"
-            "Causa provavel: dados nao numericos na matriz de especies\n"
-            "Verifique: tipos de dados no CSV de especies\n"
-            "Skill anterior: data-cleaning",
+            "Probable cause: dados nao numericos na matriz de especies\n"
+            "Check: tipos de dados no CSV de especies\n"
+            "Previous skill: data-cleaning",
             e
         )
         raise
@@ -191,9 +191,9 @@ def main():
         except Exception as e:
             logger.error(
                 "Unexpected error in PCoA/PERMANOVA: %s\n"
-                "Causa provavel: grupo com apenas um nivel ou sites insuficientes\n"
-                "Verifique: coluna 'group' nos metadados e balanceamento\n"
-                "Skill anterior: data-cleaning",
+                "Probable cause: grupo com apenas um nivel ou sites insuficientes\n"
+                "Check: coluna 'group' nos metadados e balanceamento\n"
+                "Previous skill: data-cleaning",
                 e
             )
             raise
@@ -218,9 +218,9 @@ def main():
     except Exception as e:
         logger.error(
             "Unexpected error in hierarchical clustering: %s\n"
-            "Causa provavel: matriz de distancias com NaN ou apenas um site\n"
-            "Verifique: integridade da matriz Bray-Curtis\n"
-            "Skill anterior: community-ecology-ordination (distance matrix)",
+            "Probable cause: distance matrix contains NaN or only one site\n"
+            "Check: integridade da matriz Bray-Curtis\n"
+            "Previous skill: community-ecology-ordination (distance matrix)",
             e
         )
         raise

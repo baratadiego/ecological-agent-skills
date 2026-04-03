@@ -29,14 +29,14 @@ output_dir <- ifelse(length(args) >= 3, args[3], "outputs/occupancy")
 log_step(1, "Validate inputs")
 if (!file.exists(dh_file)) {
   log_error(
-    "Falha em validate inputs: arquivo de historico de deteccao nao encontrado: %s\nCausa provavel: caminho incorreto ou arquivo nao gerado\nVerifique: o argumento detection_history_csv e o diretorio de trabalho\nSkill anterior: data-cleaning",
+    "Failed in validate inputs: detection history file not found: %s\nProbable cause: incorrect path or file not yet generated\nCheck: the detection_history_csv argument and working directory\nPrevious skill: data-cleaning",
     dh_file
   )
   stop("Detection history file not found.")
 }
 if (!file.exists(sc_file)) {
   log_error(
-    "Falha em validate inputs: arquivo de covariadas de sitio nao encontrado: %s\nCausa provavel: caminho incorreto ou arquivo nao gerado\nVerifique: o argumento site_cov_csv e o diretorio de trabalho\nSkill anterior: data-cleaning",
+    "Failed in validate inputs: site covariates file not found: %s\nProbable cause: incorrect path or file not yet generated\nCheck: the site_cov_csv argument and working directory\nPrevious skill: data-cleaning",
     sc_file
   )
   stop("Site covariates file not found.")
@@ -50,7 +50,7 @@ tryCatch({
   sc <- read.csv(sc_file, row.names = 1)
 }, error = function(e) {
   log_error(
-    "Falha em load data: %s\nCausa provavel: CSV malformado ou sem coluna de rownames\nVerifique: estrutura dos arquivos (primeira coluna deve ser site ID)\nSkill anterior: data-cleaning",
+    "Failed in load data: %s\nProbable cause: CSV malformado ou sem coluna de rownames\nCheck: structra dos arquivos (primeira coluna deve ser site ID)\nPrevious skill: data-cleaning",
     conditionMessage(e)
   )
   stop(e)
@@ -84,7 +84,7 @@ tryCatch({
   log_info("Covariates standardised: %s", paste(names(sc_std), collapse = ", "))
 }, error = function(e) {
   log_error(
-    "Falha em standardise covariates: %s\nCausa provavel: covariadas nao numericas ou com NA\nVerifique: tipos de dados e completude do arquivo de covariadas\nSkill anterior: data-cleaning",
+    "Failed in standardise covariates: %s\nProbable cause: non-numeric covariates or NAs present\nCheck: data types and completeness of the covariates file\nPrevious skill: data-cleaning",
     conditionMessage(e)
   )
   stop(e)
@@ -96,7 +96,7 @@ tryCatch({
   log_info("unmarkedFrameOccu built successfully.")
 }, error = function(e) {
   log_error(
-    "Falha em unmarkedFrameOccu: %s\nCausa provavel: numero de sites diverge entre dh e sc, ou valores invalidos em dh\nVerifique: que dh e sc tem o mesmo numero de linhas e mesmos site IDs\nSkill anterior: data-cleaning",
+    "Failed in unmarkedFrameOccu: %s\nProbable cause: number oe sites diverge entre dh e sc, ou valores invalidos em dh\nCheck: que dh e sc tem o mesmo number oe linhas e mesmos site IDs\nPrevious skill: data-cleaning",
     conditionMessage(e)
   )
   stop(e)
@@ -112,7 +112,7 @@ tryCatch({
   # m2 <- occu(~effort ~forest_cover + dist_road, data = umf)
 }, error = function(e) {
   log_error(
-    "Falha em occu() fitting: %s\nCausa provavel: dados insuficientes, covariadas com NA, ou singularidade numerica\nVerifique: numero de sitios detectados vs nao detectados e completude de covariadas\nSkill anterior: occupancy-and-detection (data formatting)",
+    "Failed in occu() fitting: %s\nProbable cause: insufficient data, covariates with NA, or numerical singularity\nCheck: number of detected vs undetected sites and completeness of covariates\nPrevious skill: occupancy-and-detection (data formatting)",
     conditionMessage(e)
   )
   stop(e)
@@ -127,7 +127,7 @@ tryCatch({
   log_info("Model selection table saved.")
 }, error = function(e) {
   log_error(
-    "Falha em model selection: %s\nCausa provavel: nenhum modelo ajustado com sucesso\nVerifique: etapa de fitting para mensagens de erro anteriores\nSkill anterior: occupancy-and-detection (fitting)",
+    "Failed in model selection: %s\nProbable cause: nenhum modelo ajustado com sucesso\nCheck: fitting step for previous error messages\nPrevious skill: occupancy-and-detection (fitting)",
     conditionMessage(e)
   )
   stop(e)
@@ -153,7 +153,7 @@ tryCatch({
   log_info("Outputs written to: %s", output_dir)
 }, error = function(e) {
   log_error(
-    "Falha em predict/summary: %s\nCausa provavel: modelo nao convergiu ou objeto umf invalido\nVerifique: avisos de convergencia do unmarked durante o fitting\nSkill anterior: occupancy-and-detection (fitting)",
+    "Failed in predict/summary: %s\nProbable cause: modelo nao convergiu ou objeto umf invalido\nCheck: avisos de convergence do unmarked durante o fitting\nPrevious skill: occupancy-and-detection (fitting)",
     conditionMessage(e)
   )
   stop(e)

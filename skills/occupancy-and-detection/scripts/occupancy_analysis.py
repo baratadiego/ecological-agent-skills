@@ -68,9 +68,9 @@ def main():
     if not Path(dh_file).exists():
         logger.error(
             "Detection history file not found: %s\n"
-            "Causa provavel: caminho incorreto ou arquivo nao gerado\n"
-            "Verifique: o argumento detection_history_csv e o diretorio de trabalho\n"
-            "Skill anterior: data-cleaning",
+            "Probable cause: incorrect path or file not yet generated\n"
+            "Check: o argumento detection_history_csv e o working directory\n"
+            "Previous skill: data-cleaning",
             dh_file
         )
         sys.exit(1)
@@ -84,9 +84,9 @@ def main():
     except Exception as e:
         logger.error(
             "Unexpected error in load data: %s\n"
-            "Causa provavel: CSV malformado, valores nao numericos, ou ausencia de rownames\n"
-            "Verifique: estrutura do arquivo (primeira coluna = site ID, restantes = ocasioes)\n"
-            "Skill anterior: data-cleaning",
+            "Probable cause: CSV malformado, valores nao numericos, ou ausencia de rownames\n"
+            "Check: structra do arquivo (primeira coluna = site ID, restantes = ocasioes)\n"
+            "Previous skill: data-cleaning",
             e
         )
         raise
@@ -100,9 +100,9 @@ def main():
     except ValueError as e:
         logger.error(
             "Unexpected error in validate_detection_history: %s\n"
-            "Causa provavel: valores invalidos (nao 0/1/NA) ou sitios com historico todo NA\n"
-            "Verifique: codificacao dos dados (apenas 0, 1, ou NA sao permitidos)\n"
-            "Skill anterior: data-cleaning",
+            "Probable cause: valores invalidos (nao 0/1/NA) ou sitios com historico todo NA\n"
+            "Check: codificacao dos dados (apenas 0, 1, ou NA sao permitidos)\n"
+            "Previous skill: data-cleaning",
             e
         )
         raise
@@ -140,9 +140,9 @@ def main():
     except Exception as e:
         logger.error(
             "Unexpected error in detection summary: %s\n"
-            "Causa provavel: matriz com dimensoes invalidas ou valores inesperados\n"
-            "Verifique: estrutura do historico de deteccao\n"
-            "Skill anterior: occupancy-and-detection (data loading)",
+            "Probable cause: matriz com dimensoes invalidas ou valores inesperados\n"
+            "Check: structra do historico de deteccao\n"
+            "Previous skill: occupancy-and-detection (data loading)",
             e
         )
         raise

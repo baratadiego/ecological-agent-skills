@@ -42,7 +42,7 @@ suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(readr))
 
 # ── 1. Parse arguments ───────────────────────────────────────────────────────
-log_step(1, "Analisar argumentos da linha de comando")
+log_step(1, "Parse command-line arguments")
 args <- commandArgs(trailingOnly = TRUE)
 
 if (length(args) < 3) {
@@ -52,7 +52,7 @@ if (length(args) < 3) {
   year_from     <- 2000
   year_to       <- as.integer(format(Sys.Date(), "%Y"))
   country_code  <- NULL
-  log_warn("Menos de 3 argumentos fornecidos. Usando valores padrao para teste.")
+  log_warn("Fewer than 3 arguments provided. Using default values for testing.")
 } else {
   ebd_file      <- args[1]
   species_input <- args[2]
@@ -67,7 +67,7 @@ log_info("EBD file       : %s", ebd_file)
 log_info("Species input  : %s", species_input)
 log_info("Output dir     : %s", output_dir)
 log_info("Year range     : %d - %d", year_from, year_to)
-log_info("Country code   : %s", ifelse(is.null(country_code), "nenhum", country_code))
+log_info("Country code   : %s", ifelse(is.null(country_code), "none", country_code))
 
 log_decision("protocol", "STATIONARY,TRAVELING",
              "apenas protocolos quantificaveis para modelagem de avistamentos")
@@ -76,38 +76,38 @@ log_decision("approved", "TRUE",
 log_decision("year_from", year_from, "filtro temporal; 2000 equilibra tamanho e qualidade")
 
 # ── 2. Check EBD file exists ─────────────────────────────────────────────────
-log_step(2, "Verificar existencia do arquivo EBD")
+log_step(2, "Check EBD file existence")
 if (!file.exists(ebd_file)) {
   log_error(
-    "Input nao encontrado: %s\nCausa provavel: arquivo EBD nao baixado do eBird.\nVerifique: https://ebird.org/data/download — solicite acesso e baixe o EBD.\nSkill anterior: ecological-data-foundation",
+    "Input not found: %s\nProbable cause: EBD file not downloaded from eBird.\nCheck: https://ebird.org/data/download — request access and download the EBD.\nPrevious skill: ecological-data-foundation",
     ebd_file
   )
   stop("EBD file not found: ", ebd_file)
 }
-log_info("Arquivo EBD encontrado: %s", ebd_file)
+log_info("EBD file found: %s", ebd_file)
 
 # ── 3. Create output directory ───────────────────────────────────────────────
-log_step(3, "Criar diretorio de saida")
+log_step(3, "Create output directory")
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
 # ── 4. Build species list ────────────────────────────────────────────────────
-log_step(4, "Construir lista de especies")
+log_step(4, "Build species list")
 if (grepl("\\.csv$", species_input, ignore.case = TRUE) && file.exists(species_input)) {
   tryCatch({
     species_df <- read_csv(species_input, show_col_types = FALSE)
     if (!"scientificName" %in% names(species_df)) {
       log_error(
-        "Coluna 'scientificName' nao encontrada em: %s\nCausa provavel: CSV mal formatado.\nSkill anterior: ecological-data-foundation",
+        "Coluna 'scientificName' nao encontrada em: %s\nProbable cause: CSV mal formatado.\nPrevious skill: ecological-data-foundation",
         species_input
       )
       stop("Missing column 'scientificName'")
     }
     species_list <- unique(trimws(species_df$scientificName))
     log_info("Modo batch: %d especies carregadas", length(species_list))
-    log_decision("mode", "batch", "CSV valido com coluna scientificName")
+    log_decision("mode", "batch", "valid CSV with scientificName column")
   }, error = function(e) {
     log_error(
-      "Falha ao ler lista de especies: %s\nCausa provavel: CSV invalido.\nSkill anterior: ecological-data-foundation",
+      "Failed to read lista de especies: %s\nProbable cause: CSV invalido.\nPrevious skill: ecological-data-foundation",
       conditionMessage(e)
     )
     stop(e)
@@ -115,11 +115,11 @@ if (grepl("\\.csv$", species_input, ignore.case = TRUE) && file.exists(species_i
 } else {
   species_list <- trimws(species_input)
   log_info("Modo especie unica: %s", species_list)
-  log_decision("mode", "single_species", "argumento nao e arquivo CSV")
+  log_decision("mode", "single_species", "argument is not a CSV file")
 }
 
 # ── 5. Filter and parse EBD ──────────────────────────────────────────────────
-log_step(5, "Filtrar e carregar EBD com auk")
+log_step(5, "Filter and load EBD with auk")
 
 # Create a temporary filtered file for all species at once
 tmp_filtered <- tempfile(fileext = ".txt")
@@ -137,7 +137,7 @@ auk_filter_obj <- tryCatch({
   flt
 }, error = function(e) {
   log_error(
-    "Falha ao configurar filtros auk: %s\nCausa provavel: nome de especie nao encontrado no EBD ou parametros invalidos.\nVerifique nomes usando auk_species_codes().\nSkill anterior: ecological-data-foundation",
+    "Failed to configurar filtros auk: %s\nProbable cause: nome de especie not found no EBD ou parametros invalidos.\nCheck nomes usando auk_species_codes().\nPrevious skill: ecological-data-foundation",
     conditionMessage(e)
   )
   stop(e)
@@ -148,21 +148,21 @@ ebd_filtered <- tryCatch({
   read_ebd(tmp_filtered)
 }, error = function(e) {
   log_error(
-    "Falha ao filtrar ou ler EBD: %s\nCausa provavel: arquivo EBD corrompido ou formato incompativel com versao do auk.\nVerifique: auk::auk_version_requirements().\nSkill anterior: ecological-data-foundation",
+    "Failed to filter or read EBD: %s\nProbable cause: corrupted EBD file or format incompatible with installed auk version.\nCheck: auk::auk_version_requirements().\nPrevious skill: ecological-data-foundation",
     conditionMessage(e)
   )
   stop(e)
 })
 
 n_filtered <- nrow(ebd_filtered)
-log_info("Registros apos filtragem EBD: %d", n_filtered)
+log_info("Records after EBD filtering: %d", n_filtered)
 
 if (n_filtered == 0) {
-  log_warn("Nenhum registro encontrado apos filtragem. Verifique nomes das especies e periodo.")
+  log_warn("No records found after filtering. Check species names and date range.")
 }
 
 # ── 6. Standardise and save per-species ─────────────────────────────────────
-log_step(6, "Padronizar e gravar CSVs por especie")
+log_step(6, "Standardise and write CSVs per species")
 today_str <- format(Sys.Date(), "%Y%m%d")
 
 for (sp in species_list) {
@@ -172,13 +172,13 @@ for (sp in species_list) {
   log_info("Especie '%s': %d registros", sp, n_sp)
 
   if (n_sp == 0) {
-    log_warn("Nenhum registro para '%s'. Pulando.", sp)
+    log_warn("No records for '%s'. Skipping.", sp)
     next
   }
 
   if (n_sp < 30) {
     log_warn(
-      "Registros insuficientes para SDM confiavel para '%s' (n = %d). Considere ampliar periodo ou area geografica.",
+      "Insufficient records for reliable SDM for '%s' (n = %d). Consider expanding the time period or geographic area.",
       sp, n_sp
     )
   }
@@ -210,10 +210,10 @@ for (sp in species_list) {
                          paste0("occurrences_raw_eBird_", safe_name, "_", today_str, ".csv"))
   tryCatch({
     write_csv(std, csv_path)
-    log_info("Gravado: %s (%d registros)", csv_path, nrow(std))
+    log_info("Written: %s (%d registros)", csv_path, nrow(std))
   }, error = function(e) {
     log_error(
-      "Falha ao gravar CSV para '%s': %s\nCausa provavel: sem permissao de escrita.\nSkill anterior: ecological-data-foundation",
+      "Failed to gravar CSV para '%s': %s\nProbable cause: sem permissao de escrita.\nPrevious skill: ecological-data-foundation",
       sp, conditionMessage(e)
     )
     stop(e)
@@ -236,10 +236,10 @@ for (sp in species_list) {
   meta_path <- file.path(output_dir, paste0("download_metadata_eBird_", safe_name, ".txt"))
   tryCatch({
     writeLines(meta_lines, meta_path)
-    log_info("Metadados gravados: %s", meta_path)
+    log_info("Metadata saved: %s", meta_path)
   }, error = function(e) {
     log_error(
-      "Falha ao gravar metadados para '%s': %s\nSkill anterior: ecological-data-foundation",
+      "Failed to save metadata for '%s': %s\nPrevious skill: ecological-data-foundation",
       sp, conditionMessage(e)
     )
   })
@@ -248,4 +248,4 @@ for (sp in species_list) {
 # Clean up temp file
 if (file.exists(tmp_filtered)) file.remove(tmp_filtered)
 
-log_info("Todos os downloads eBird concluidos. Verifique: %s", output_dir)
+log_info("All eBird downloads completed. Check: %s", output_dir)

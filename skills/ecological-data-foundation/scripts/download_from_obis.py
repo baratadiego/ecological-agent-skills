@@ -59,7 +59,7 @@ try:
     import pandas as pd
 except ImportError as e:
     logger.error(
-        "Dependencia ausente: %s\n  Instale com: pip install requests pandas\n  Skill anterior: ecological-data-foundation",
+        "Dependencia missing: %s\n  Instale com: pip install requests pandas\n  Previous skill: ecological-data-foundation",
         e,
     )
     sys.exit(1)
@@ -98,7 +98,7 @@ def fetch_obis(scientificname: str, year_from: int, year_to: int,
             data = resp.json()
         except requests.RequestException as e:
             logger.error(
-                "Falha na requisicao OBIS (offset=%d, especie='%s'): %s\n  Causa provavel: sem conexao com a internet ou API OBIS indisponivel.\n  Verifique: https://api.obis.org/\n  Skill anterior: ecological-data-foundation",
+                "OBIS request failed (offset=%d, especie='%s'): %s\n  Probable cause: no internet connection or OBIS API unavailable.\n  Check: https://api.obis.org/\n  Previous skill: ecological-data-foundation",
                 offset, scientificname, e,
             )
             raise
@@ -133,7 +133,7 @@ def apply_quality_flags(records: list[dict]) -> list[dict]:
             continue
         filtered.append(rec)
     if n_flagged > 0:
-        logger.warning("%d registros removidos por flags OBIS de qualidade.", n_flagged)
+        logger.warning("%d records removed by OBIS quality flags.", n_flagged)
     return filtered
 
 
@@ -187,10 +187,10 @@ def save_metadata(output_dir: Path, species_name: str, n_records: int,
     meta_path = output_dir / f"download_metadata_OBIS_{safe_name}.txt"
     try:
         meta_path.write_text("\n".join(lines), encoding="utf-8")
-        logger.info("Metadados gravados: %s", meta_path)
+        logger.info("Metadata saved: %s", meta_path)
     except OSError as e:
         logger.error(
-            "Falha ao gravar metadados: %s\n  Skill anterior: ecological-data-foundation", e,
+            "Failed to gravar metadados: %s\n  Previous skill: ecological-data-foundation", e,
         )
         raise
 
@@ -204,41 +204,41 @@ def download_species(species_name: str, output_dir: Path,
     today_str = date.today().strftime("%Y%m%d")
     safe_name = species_name.replace(" ", "_")
 
-    log_step(1, f"Buscar registros OBIS para '{species_name}'")
+    log_step(1, f"Fetch OBIS records for '{species_name}'")
     records = fetch_obis(species_name, year_from, year_to, wkt_geometry)
-    logger.info("Registros brutos recuperados: %d", len(records))
+    logger.info("Raw records recuperados: %d", len(records))
 
     if not records:
-        logger.warning("Nenhum registro OBIS encontrado para '%s'.", species_name)
+        logger.warning("No OBIS records found for '%s'.", species_name)
         return
 
-    log_step(2, "Aplicar filtros de qualidade OBIS")
+    log_step(2, "Apply OBIS quality filters")
     records = apply_quality_flags(records)
-    logger.info("Registros apos filtros OBIS: %d", len(records))
+    logger.info("Records after OBIS filters: %d", len(records))
 
-    log_step(3, "Padronizar registros para schema de saida")
+    log_step(3, "Standardise records to output schema")
     df = standardise_records(records, species_name)
     n_final = len(df)
-    logger.info("Registros com coordenadas validas: %d", n_final)
+    logger.info("Records with valid coordinates: %d", n_final)
 
     if n_final < 30:
         logger.warning(
-            "Registros insuficientes para analise confiavel (n = %d). Considere relaxar filtros.",
+            "Insufficient records for reliable analysis (n = %d). Consider relaxing filters.",
             n_final,
         )
 
-    log_step(4, "Gravar CSV de ocorrencias")
+    log_step(4, "Write occurrences CSV")
     csv_path = output_dir / f"occurrences_raw_OBIS_{safe_name}_{today_str}.csv"
     try:
         df.to_csv(csv_path, index=False)
-        logger.info("Gravado: %s (%d registros)", csv_path, n_final)
+        logger.info("Written: %s (%d registros)", csv_path, n_final)
     except OSError as e:
         logger.error(
-            "Falha ao gravar CSV: %s\n  Skill anterior: ecological-data-foundation", e,
+            "Failed to gravar CSV: %s\n  Previous skill: ecological-data-foundation", e,
         )
         raise
 
-    log_step(5, "Gravar metadados do download")
+    log_step(5, "Save download metadata")
     save_metadata(output_dir, species_name, n_final, year_from, year_to, wkt_geometry)
 
 
@@ -255,7 +255,7 @@ def main():
         year_from     = 1950
         year_to       = date.today().year
         wkt_geometry  = None
-        logger.warning("Menos de 2 argumentos fornecidos. Usando valores padrao para teste.")
+        logger.warning("Fewer than 2 arguments provided. Using default values for testing.")
     else:
         species_input = argv[0]
         output_dir    = Path(argv[1])
@@ -266,7 +266,7 @@ def main():
     logger.info("Species input  : %s", species_input)
     logger.info("Output dir     : %s", output_dir)
     logger.info("Year range     : %d - %d", year_from, year_to)
-    logger.info("WKT geometry   : %s", wkt_geometry or "nenhum (global)")
+    logger.info("WKT geometry   : %s", wkt_geometry or "none (global)")
 
     log_decision("absence", "exclude",
                  "apenas registros de presenca confirmada")
@@ -276,13 +276,13 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Build species list
-    log_step(0, "Construir lista de especies")
+    log_step(0, "Build species list")
     if species_input.endswith(".csv") and Path(species_input).exists():
         try:
             df_sp = pd.read_csv(species_input)
             if "scientificName" not in df_sp.columns:
                 logger.error(
-                    "Coluna 'scientificName' nao encontrada em: %s\n  Skill anterior: ecological-data-foundation",
+                    "Coluna 'scientificName' nao encontrada em: %s\n  Previous skill: ecological-data-foundation",
                     species_input,
                 )
                 sys.exit(1)
@@ -290,7 +290,7 @@ def main():
             logger.info("Modo batch: %d especies carregadas", len(species_list))
         except Exception as e:
             logger.error(
-                "Falha ao ler lista de especies: %s\n  Skill anterior: ecological-data-foundation", e,
+                "Failed to read lista de especies: %s\n  Previous skill: ecological-data-foundation", e,
             )
             sys.exit(1)
     else:
@@ -302,16 +302,16 @@ def main():
             download_species(sp, output_dir, year_from, year_to, wkt_geometry)
         except FileNotFoundError as e:
             logger.error(
-                "Arquivo de entrada nao encontrado ao processar '%s': %s\n  Skill anterior: ecological-data-foundation",
+                "Input file not found ao processar '%s': %s\n  Previous skill: ecological-data-foundation",
                 sp, e,
             )
         except Exception as e:
             logger.error(
-                "Falha ao baixar '%s' do OBIS: %s\n  Causa provavel: problema de rede ou especie nao encontrada.\n  Skill anterior: ecological-data-foundation",
+                "Failed to download '%s' from OBIS: %s\n  Probable cause: network error or species not found.\n  Previous skill: ecological-data-foundation",
                 sp, e,
             )
 
-    logger.info("Todos os downloads OBIS concluidos. Verifique: %s", output_dir)
+    logger.info("All OBIS downloads completed. Check: %s", output_dir)
 
 
 if __name__ == "__main__":

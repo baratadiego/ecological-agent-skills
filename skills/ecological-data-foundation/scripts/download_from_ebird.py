@@ -63,7 +63,7 @@ try:
     import pandas as pd
 except ImportError as e:
     logger.error(
-        "Dependencia ausente: %s\n  Instale com: pip install pandas\n  Skill anterior: ecological-data-foundation",
+        "Dependencia missing: %s\n  Instale com: pip install pandas\n  Previous skill: ecological-data-foundation",
         e,
     )
     sys.exit(1)
@@ -113,7 +113,7 @@ def parse_ebd(ebd_path: Path, species_set: set, year_from: int, year_to: int,
         )
     except Exception as e:
         logger.error(
-            "Falha ao abrir arquivo EBD '%s': %s\n  Causa provavel: arquivo corrompido ou formato incorreto.\n  Skill anterior: ecological-data-foundation",
+            "Failed to open EBD file '%s': %s\n  Probable cause: corrupted file or incorrect format.\n  Previous skill: ecological-data-foundation",
             ebd_path, e,
         )
         raise
@@ -131,7 +131,7 @@ def parse_ebd(ebd_path: Path, species_set: set, year_from: int, year_to: int,
         country_col = next((c for c in chunk.columns if "COUNTRY CODE" in c), None)
 
         if sci_col is None:
-            logger.warning("Coluna de nome cientifico nao encontrada no chunk %d; pulando.", i)
+            logger.warning("Scientific name column not found in chunk %d; skipping.", i)
             continue
 
         # Filter species
@@ -159,7 +159,7 @@ def parse_ebd(ebd_path: Path, species_set: set, year_from: int, year_to: int,
             chunks.append(filtered)
             logger.info("Chunk %d: %d/%d registros selecionados", i, len(filtered), len(chunk))
 
-    logger.info("Total de linhas lidas no EBD: %d", n_total)
+    logger.info("Total rows read from EBD: %d", n_total)
     if not chunks:
         return pd.DataFrame()
     return pd.concat(chunks, ignore_index=True)
@@ -229,10 +229,10 @@ def save_metadata(output_dir: Path, species_name: str, n_records: int,
     meta_path = output_dir / f"download_metadata_eBird_{safe_name}.txt"
     try:
         meta_path.write_text("\n".join(lines), encoding="utf-8")
-        logger.info("Metadados gravados: %s", meta_path)
+        logger.info("Metadata saved: %s", meta_path)
     except OSError as e:
         logger.error(
-            "Falha ao gravar metadados em '%s': %s\n  Skill anterior: ecological-data-foundation",
+            "Failed to gravar metadados em '%s': %s\n  Previous skill: ecological-data-foundation",
             meta_path, e,
         )
         raise
@@ -252,7 +252,7 @@ def main():
         year_from     = 2000
         year_to       = date.today().year
         country_code  = None
-        logger.warning("Menos de 3 argumentos fornecidos. Usando valores padrao para teste.")
+        logger.warning("Fewer than 3 arguments provided. Using default values for testing.")
     else:
         ebd_file      = argv[0]
         species_input = argv[1]
@@ -267,7 +267,7 @@ def main():
     logger.info("Species input  : %s", species_input)
     logger.info("Output dir     : %s", output_dir)
     logger.info("Year range     : %d - %d", year_from, year_to)
-    logger.info("Country code   : %s", country_code or "nenhum")
+    logger.info("Country code   : %s", country_code or "none")
 
     log_decision("protocol", "Stationary,Traveling",
                  "apenas protocolos quantificaveis para modelagem")
@@ -275,10 +275,10 @@ def main():
                  "apenas listas aprovadas pelo eBird")
 
     # Check EBD file exists
-    log_step(1, "Verificar existencia do arquivo EBD")
+    log_step(1, "Check EBD file existence")
     if not ebd_path.exists():
         logger.error(
-            "Input nao encontrado: %s\n  Causa provavel: arquivo EBD nao baixado.\n  Verifique: https://ebird.org/data/download\n  Skill anterior: ecological-data-foundation",
+            "Input not found: %s\n  Probable cause: EBD file not downloaded.\n  Check: https://ebird.org/data/download\n  Previous skill: ecological-data-foundation",
             ebd_path,
         )
         sys.exit(1)
@@ -286,13 +286,13 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Build species list
-    log_step(2, "Construir lista de especies")
+    log_step(2, "Build species list")
     if species_input.endswith(".csv") and Path(species_input).exists():
         try:
             df_sp = pd.read_csv(species_input)
             if "scientificName" not in df_sp.columns:
                 logger.error(
-                    "Coluna 'scientificName' nao encontrada em: %s\n  Skill anterior: ecological-data-foundation",
+                    "Coluna 'scientificName' nao encontrada em: %s\n  Previous skill: ecological-data-foundation",
                     species_input,
                 )
                 sys.exit(1)
@@ -300,7 +300,7 @@ def main():
             logger.info("Modo batch: %d especies carregadas", len(species_list))
         except Exception as e:
             logger.error(
-                "Falha ao ler lista de especies: %s\n  Skill anterior: ecological-data-foundation", e,
+                "Failed to read lista de especies: %s\n  Previous skill: ecological-data-foundation", e,
             )
             sys.exit(1)
     else:
@@ -310,54 +310,54 @@ def main():
     species_set = set(species_list)
 
     # Parse EBD
-    log_step(3, "Analisar arquivo EBD em chunks")
+    log_step(3, "Parse EBD file in chunks")
     try:
         ebd_df = parse_ebd(ebd_path, species_set, year_from, year_to, country_code)
     except Exception as e:
         logger.error(
-            "Falha ao analisar EBD: %s\n  Causa provavel: arquivo corrompido ou incompativel.\n  Skill anterior: ecological-data-foundation",
+            "Failed to analisar EBD: %s\n  Probable cause: corrupted file ou incompativel.\n  Previous skill: ecological-data-foundation",
             e,
         )
         sys.exit(1)
 
-    logger.info("Total de registros filtrados do EBD: %d", len(ebd_df))
+    logger.info("Total records filtered from EBD: %d", len(ebd_df))
 
     if len(ebd_df) == 0:
-        logger.warning("Nenhum registro encontrado. Verifique nomes das especies e periodo.")
+        logger.warning("No records found. Check species names and date range.")
         return
 
     today_str = date.today().strftime("%Y%m%d")
 
     # Save per species
-    log_step(4, "Padronizar e gravar CSVs por especie")
+    log_step(4, "Standardise and write CSVs per species")
     for sp in species_list:
         try:
             std = standardise_ebd(ebd_df, sp)
             n_sp = len(std)
-            logger.info("Especie '%s': %d registros com coordenadas", sp, n_sp)
+            logger.info("Species '%s': %d records with coordinates", sp, n_sp)
 
             if n_sp == 0:
-                logger.warning("Nenhum registro para '%s'.", sp)
+                logger.warning("No records for '%s'.", sp)
                 continue
             if n_sp < 30:
                 logger.warning(
-                    "Registros insuficientes para SDM confiavel para '%s' (n = %d).", sp, n_sp,
+                    "Insufficient records for reliable SDM for '%s' (n = %d).", sp, n_sp,
                 )
 
             safe_name = sp.replace(" ", "_")
             csv_path  = output_dir / f"occurrences_raw_eBird_{safe_name}_{today_str}.csv"
             std.to_csv(csv_path, index=False)
-            logger.info("Gravado: %s", csv_path)
+            logger.info("Written: %s", csv_path)
 
             save_metadata(output_dir, sp, n_sp, year_from, year_to, country_code, ebd_path)
 
         except Exception as e:
             logger.error(
-                "Falha ao processar especie '%s': %s\n  Skill anterior: ecological-data-foundation",
+                "Failed to processar especie '%s': %s\n  Previous skill: ecological-data-foundation",
                 sp, e,
             )
 
-    logger.info("Todos os processamentos eBird concluidos. Verifique: %s", output_dir)
+    logger.info("All eBird processing completed. Check: %s", output_dir)
 
 
 if __name__ == "__main__":
