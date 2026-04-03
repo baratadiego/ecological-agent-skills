@@ -1,0 +1,59 @@
+# ecological-agent-skills — Python dependencies
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Install options (choose one):
+#   pip install -r requirements.txt                       # pip-only (~2 min; needs GDAL/GEOS/PROJ system libs)
+#   conda env create -f environment-python.yaml           # Python only, no R (~5 min)
+#   conda env create -f environment.yaml                  # Python + R, full (~15-25 min)
+#
+# Geospatial pip wheels may need system libs — see setup/check_system_deps.sh
+#
+# NOTE: Python 3.14 is NOT recommended — several geospatial packages (rasterio,
+# fiona, geopandas) may lack stable wheels.  Use Python 3.11 or 3.12.
+
+# ── Core scientific stack ─────────────────────────────────────────────────────
+numpy>=1.26,<2.0
+pandas>=2.2,<3.0
+scipy>=1.13,<2.0
+matplotlib>=3.9,<4.0
+seaborn>=0.13,<1.0
+
+# ── Geospatial ────────────────────────────────────────────────────────────────
+geopandas>=0.14,<1.0
+rasterio>=1.3,<2.0
+shapely>=2.0,<3.0
+pyproj>=3.6,<4.0
+fiona>=1.9,<2.0
+rasterstats>=0.19,<1.0
+
+# ── Statistics / ML ───────────────────────────────────────────────────────────
+scikit-learn>=1.5,<2.0
+statsmodels>=0.14,<1.0
+
+# ── Acoustic monitoring ───────────────────────────────────────────────────────
+librosa>=0.10,<1.0
+soundfile>=0.12,<1.0
+
+# ── Landscape connectivity ────────────────────────────────────────────────────
+networkx>=3.3,<4.0
+scikit-image>=0.23,<1.0
+
+# ── Workflow utilities ────────────────────────────────────────────────────────
+pyyaml>=6.0,<7.0
+requests>=2.32,<3.0
+
+# ── Ecology / occurrence data ─────────────────────────────────────────────────
+pymannkendall>=1.4,<2.0
+scikit-bio>=0.6,<1.0
+elapid>=1.1,<2.0
+
+# ── Occurrence data download ──────────────────────────────────────────────────
+pygbif>=0.6.3          # GBIF API — must be >= 0.6.3 to avoid name_backbone bug
+pyinaturalist>=0.19,<1.0
+cdsapi>=0.7,<1.0       # ERA5-Land via Copernicus CDS (requires ~/.cdsapirc)
+
+# ── Spatial predictor download (optional — Planetary Computer) ───────────────
+# Uncomment if using the planetary-computer source in download_predictors.py:
+# pystac-client>=0.8,<1.0
+# stackstac>=0.5,<1.0
+# planetary-computer>=1.0,<2.0

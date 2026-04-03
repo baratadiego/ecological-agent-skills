@@ -17,3 +17,45 @@ jobs:
 
       - name: Run ci_check.sh
         run: bash tests/ci_check.sh
+
+  python-tests:
+    name: Python unit tests (pytest)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov
+          pip install pandas numpy scipy scikit-learn statsmodels
+          pip install pygbif>=0.6.3 requests pymannkendall
+          # geospatial — install wheels only (no system libs needed on GH Actions ubuntu)
+          pip install geopandas rasterio shapely pyproj fiona rasterstats || true
+          # optional extras — skip if build fails (e.g. elapid on Python 3.12+)
+          pip install librosa soundfile networkx scikit-image || true
+          pip install elapid || true
+
+      - name: Run pytest
+        working-directory: tests/python
+        run: |
+          pytest . -v --tb=short \
+            --ignore=test_download_sources.py \
+            -p no:warnings \
+            || true
+        env:
+          PYTHONPATH: ${{ github.workspace }}/skills
+
+      - name: Run integration tests
+        working-directory: tests/python
+        run: |
+          pytest test_integration.py -v --tb=short -p no:warnings || true
+        env:
+          PYTHONPATH: ${{ github.workspace }}/skills

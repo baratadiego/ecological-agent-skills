@@ -1,0 +1,72 @@
+name: ecological-agent-skills-py
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Lightweight Python-only environment (no R).
+# Estimated install time: ~5 min.
+# Covers: SDM, geoprocessing, GBIF download, acoustic monitoring, connectivity.
+# Does NOT cover: R-based analyses (biomod2, maxnet, vegan, unmarked, etc.)
+#
+# Usage:
+#   conda env create -f environment-python.yaml
+#   conda activate ecological-agent-skills-py
+#
+# For full Python + R environment: use environment.yaml (~15-25 min)
+# For pip-only (no conda): pip install -r requirements.txt
+#
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python~=3.11
+
+  # ── Core scientific ────────────────────────────────────────────────────
+  - numpy~=1.26
+  - pandas~=2.2
+  - scipy~=1.13
+  - matplotlib~=3.9
+  - seaborn~=0.13
+
+  # ── Geospatial (needs GDAL/GEOS/PROJ — conda handles native libs) ─────
+  - geopandas~=0.14
+  - rasterio~=1.3
+  - shapely~=2.0
+  - pyproj~=3.6
+  - fiona~=1.9
+  - rasterstats~=0.19
+
+  # ── Statistics / ML ───────────────────────────────────────────────────
+  - scikit-learn~=1.5
+  - statsmodels~=0.14
+
+  # ── Acoustic monitoring ───────────────────────────────────────────────
+  - librosa~=0.10
+  - soundfile~=0.12
+
+  # ── Landscape connectivity ────────────────────────────────────────────
+  - networkx~=3.3
+  - scikit-image~=0.23
+
+  # ── Workflow ──────────────────────────────────────────────────────────
+  - pyyaml~=6.0
+
+  - pip
+
+  pip:
+    - pymannkendall>=1.4,<2
+    - scikit-bio>=0.6,<1
+    - elapid>=1.1,<2         # MaxEnt; requires Python <=3.12
+
+    # Occurrence data
+    - pygbif>=0.6.3,<1
+    - pyinaturalist>=0.19,<1
+    - requests>=2.32,<3
+    - cdsapi>=0.7,<1
+
+    # Spatial predictor download
+    - pystac-client>=0.8,<1
+    - stackstac>=0.5,<1
+    - planetary-computer>=1.0,<2
+
+variables:
+  OMP_NUM_THREADS: "4"

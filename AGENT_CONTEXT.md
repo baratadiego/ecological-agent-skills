@@ -153,7 +153,53 @@ Apply the appropriate routing based on project complexity:
 
 ---
 
-## 7. File Conventions of This Repository
+## 7. Environmental Data Sources
+
+### Default source: CHELSA v2.1
+
+The default environmental predictor source for all SDM and geoprocessing workflows is **CHELSA v2.1**
+(Climatologies at High resolution for the Earth's Land Surface Areas).
+
+- Resolution: ~1 km (30 arcsec)
+- Variables: BIO1-BIO19 (1981-2010 climatology)
+- Download URL pattern: `https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio{N}_1981-2010_V.2.1.tif`
+- No authentication required
+- License: CC BY 4.0
+
+**WorldClim v2.1** is the automatic fallback if CHELSA downloads fail.
+The `download_predictors.py` script handles this transparently — no user action required.
+
+Do not default to WorldClim unless the user explicitly requests it or CHELSA is unavailable.
+
+### Python version compatibility
+
+| Python | Status for this repository |
+|--------|---------------------------|
+| 3.11 | Recommended — all packages build correctly |
+| 3.12 | Supported — most packages available |
+| 3.13 | Untested |
+| 3.14 | Not recommended — `elapid` (MaxEnt) fails to build; `pygbif` has API bugs |
+
+If `elapid` is unavailable (Python 3.12+), `sdm_pipeline.py` automatically falls back to an
+RF + BRT ensemble without MaxEnt. This is logged as a DECISION entry.
+
+If `pygbif` raises a `TypeError` on `Session.request()` (Python 3.14), `download_from_gbif.py`
+automatically falls back to direct HTTP calls to the GBIF REST API.
+
+### Spatial thinning
+
+`clean_occurrences.py` accepts an optional third argument `thin_deg` (decimal degrees).
+When provided, one record is retained per `thin_deg × thin_deg` grid cell to reduce
+spatial autocorrelation before SDM fitting. Recommended values: 0.1 (~11 km) to 0.5 (~55 km).
+
+Example:
+```bash
+python clean_occurrences.py data/raw/occurrences.csv data/processed 0.1
+```
+
+---
+
+## 8. File Conventions of This Repository
 
 ### Where to put input data
 - Place raw input files in `data/raw/` (create if absent).

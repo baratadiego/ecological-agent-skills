@@ -7,6 +7,62 @@ Format: [version] — date — description
 
 ---
 
+## [3.2.0] — 2026-04-02 — Code quality, environment simplification, and documentation
+
+### Fixed
+
+- **`skills/species-distribution-modeling/scripts/sdm_pipeline.py`** — Translated ~28 Portuguese
+  log/error strings to English; fixed `log_step(7, ...)` called with 3 arguments (accepts only 2).
+- **`skills/geoprocessing-for-ecology/scripts/download_predictors.py`** — Translated 3 Portuguese
+  strings in the ERA5-Land error block to English.
+- **`skills/geoprocessing-for-ecology/scripts/stack_and_extract.py`** — Translated Portuguese
+  `"Previous skill que deveria ter produzido este input"` to English (3 occurrences).
+- **`skills/ecological-data-foundation/scripts/download_from_gbif.py`** — Translated
+  `"Registros recuperados"` and `"Failed to gravar CSV"` to English; enhanced low-record
+  warning with country-specific tip (suggests removing country filter when n < 30).
+
+### Changed
+
+- **`skills/geoprocessing-for-ecology/scripts/download_predictors.py`** — Changed default
+  environmental data source from WorldClim to **CHELSA v2.1**; added automatic WorldClim
+  fallback if CHELSA downloads return zero files.
+- **`environment.yaml`** — Replaced exact version pins (`=1.26.4`) with compatible-release
+  constraints (`~=1.26`) throughout; removed `pathlib2` (Python 2 backport, unused in 3.11+);
+  relaxed `r-base` to `~=4.4`; updated `pygbif` to `>=0.6.3,<1` with minimum-version comment;
+  added install-time estimate comment.
+- **`requirements.txt`** — Updated header to document all 3 install profiles with time estimates.
+
+### Added
+
+- **`skills/ecological-data-foundation/scripts/clean_occurrences.py`** — Added `spatial_thin()`
+  function and optional `thin_deg` argument (argv[3]); integrated as Step 6 in the main pipeline
+  (runs only when `thin_deg` is provided). Updated docstring with parameter documentation.
+- **`environment-python.yaml`** — New Python-only conda environment file (`ecological-agent-skills-py`);
+  installs all Python packages without R; estimated install time ~5 min.
+- **`INSTALL.md`** — New installation guide covering all 3 profiles (pip-only, Python+conda,
+  Full Python+R); includes decision guidance, R-only renv packages, GBIF credentials reference,
+  Python version compatibility table, and verification commands.
+- **`docs/GBIF_SETUP.md`** — New step-by-step guide for GBIF credentials setup; covers Linux/macOS
+  and Windows PowerShell (session and permanent); includes credential usage table and DOI citation format.
+- **`docs/taxonomy-diagram.md`** — Mermaid dependency diagram for all 17 skills showing
+  phase groupings, inter-skill dependencies, and workflow membership.
+- **`docs/DECISION_TREE.md`** — Data-type to skill selection decision guide; covers 6 data
+  branches (occurrence, spatial, tabular, time series, multimedia, model outputs) with disambiguation rules.
+- **`docs/glossary.md`** — Trilingual glossary (English / Portuguese / Spanish) with 90+ entries
+  across 11 thematic sections (occurrence data, SDM, predictors, validation, statistics,
+  occupancy, acoustics, landscape, population, conservation, reproducibility).
+- **`tests/python/test_integration.py`** — End-to-end integration tests covering:
+  clean_occurrences.py output artefacts and schema, spatial thinning, collinearity filter logic,
+  cross-validation splits, RF/BRT AUC on synthetic data, and full pipeline data flow validation.
+- **`AGENT_CONTEXT.md` — Section 7** — New section documenting: CHELSA as default predictor source
+  (URL pattern, license, fallback logic), Python version compatibility table, and spatial thinning
+  usage with `clean_occurrences.py`.
+- **`.github/workflows/ci.yml`** — Added `python-tests` job running pytest against
+  `tests/python/` on Python 3.11; skips `test_download_sources.py` (requires network);
+  runs integration tests as a separate step.
+
+---
+
 ## [3.1.0] — 2026-03-28 — License migration, citation metadata, and catalog update
 
 ### Changed

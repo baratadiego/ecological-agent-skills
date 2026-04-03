@@ -1,105 +1,109 @@
 name: ecological-agent-skills
 # SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Full environment (Python + R). Estimated install time: 15-25 min.
+# For Python-only (faster, ~5 min): use environment-python.yaml
+# For pip-only (no conda): use requirements.txt
+#
 channels:
   - conda-forge
   - defaults
 
 dependencies:
-  - python=3.11
-  - r-base=4.4.1
+  - python~=3.11
+  - r-base~=4.4
 
   # ── Core Python ────────────────────────────────────────────────────────
-  - numpy=1.26.4
-  - pandas=2.2.2
-  - scipy=1.13.1
-  - matplotlib=3.9.0
-  - seaborn=0.13.2
+  - numpy~=1.26
+  - pandas~=2.2
+  - scipy~=1.13
+  - matplotlib~=3.9
+  - seaborn~=0.13
 
   # ── Geospatial Python ─────────────────────────────────────────────────
-  - geopandas=0.14.4
-  - rasterio=1.3.10
-  - shapely=2.0.4
-  - pyproj=3.6.1
-  - fiona=1.9.6
-  - rasterstats=0.19.0
+  - geopandas~=0.14
+  - rasterio~=1.3
+  - shapely~=2.0
+  - pyproj~=3.6
+  - fiona~=1.9
+  - rasterstats~=0.19
 
   # ── Statistics / ML Python ────────────────────────────────────────────
-  - scikit-learn=1.5.0
-  - statsmodels=0.14.2
-
-  # ── Ecology Python ────────────────────────────────────────────────────
-  - pip
+  - scikit-learn~=1.5
+  - statsmodels~=0.14
 
   # ── Acoustic monitoring Python ────────────────────────────────────────
-  - librosa=0.10.2
-  - soundfile=0.12.1
+  - librosa~=0.10
+  - soundfile~=0.12
 
   # ── Landscape connectivity Python ─────────────────────────────────────
-  - networkx=3.3
-  - scikit-image=0.23.2
+  - networkx~=3.3
+  - scikit-image~=0.23
 
   # ── Workflow Python ───────────────────────────────────────────────────
-  - pyyaml=6.0.1
-  - pathlib2=2.3.7
+  - pyyaml~=6.0
+  # pathlib2 removed — pathlib is built-in since Python 3.4
 
   # ── R core packages (via conda-forge) ─────────────────────────────────
-  - r-terra=1.7_78
-  - r-sf=1.0_16
-  - r-dplyr=1.1.4
-  - r-ggplot2=3.5.1
-  - r-tidyr=1.3.1
-  - r-readr=2.1.5
-  - r-yaml=2.3.8
-  - r-janitor=2.2.0
-  - r-lubridate=1.9.3
-  - r-zoo=1.8_12
-  - r-broom=1.0.6
+  - r-terra~=1.7
+  - r-sf~=1.0
+  - r-dplyr~=1.1
+  - r-ggplot2~=3.5
+  - r-tidyr~=1.3
+  - r-readr~=2.1
+  - r-yaml~=2.3
+  - r-janitor~=2.2
+  - r-lubridate~=1.9
+  - r-zoo~=1.8
+  - r-broom~=1.0
 
   # ── R statistics ──────────────────────────────────────────────────────
-  - r-lme4=1.1_35.3
-  - r-emmeans=1.10.2
-  - r-mumin=1.47.5
-  - r-effectsize=0.8.9
-  - r-corrplot=0.92
+  - r-lme4~=1.1
+  - r-emmeans~=1.10
+  - r-mumin~=1.47
+  - r-effectsize~=0.8
+  - r-corrplot~=0.92
 
   # ── R ecology ─────────────────────────────────────────────────────────
-  - r-vegan=2.6_6.1
-  - r-unmarked=1.4.1
-  - r-gbm=2.2.2
-  - r-randomforest=4.7_1.1
-  - r-trend=1.1.6
+  - r-vegan~=2.6
+  - r-unmarked~=1.4
+  - r-gbm~=2.2
+  - r-randomforest~=4.7
+  - r-trend~=1.1
 
-  # ── R advanced skills (v2.0.0) ────────────────────────────────────────
-  - r-igraph=2.0.3
-  - r-ggrepel=0.9.5
+  # ── R advanced skills ─────────────────────────────────────────────────
+  - r-igraph~=2.0
+  - r-ggrepel~=0.9
 
-  # ── R occurrence data download (v2.2.0) ───────────────────────────────
-  - r-rgbif=3.7.9
-  - r-geodata=0.6_2
+  # ── R occurrence data download ────────────────────────────────────────
+  - r-rgbif~=3.7
+  - r-geodata~=0.6
+
+  - pip
 
   pip:
     # Python ecology (not on conda-forge)
-    - pymannkendall==1.4.3
-    - scikit-bio==0.6.2
-    - elapid==1.1.2
+    - pymannkendall>=1.4,<2
+    - scikit-bio>=0.6,<1
+    - elapid>=1.1,<2         # MaxEnt; requires Python <=3.12 (mesonpy build)
 
-    # ── Occurrence data download (v2.2.0) ─────────────────────────────────
-    - pygbif==0.6.3
-    - pyinaturalist==0.19.0
-    - requests==2.32.3
-    - cdsapi==0.7.2
+    # ── Occurrence data download ───────────────────────────────────────
+    - pygbif>=0.6.3,<1       # must be >=0.6.3 (earlier versions have API bug)
+    - pyinaturalist>=0.19,<1
+    - requests>=2.32,<3
+    - cdsapi>=0.7,<1
 
-    # ── Spatial predictor download (v2.2.0) ───────────────────────────────
-    - pystac-client==0.8.3
-    - stackstac==0.5.1
-    - planetary-computer==1.0.0
+    # ── Spatial predictor download ─────────────────────────────────────
+    - pystac-client>=0.8,<1
+    - stackstac>=0.5,<1
+    - planetary-computer>=1.0,<2
 
     # R packages not on conda-forge (install via renv after environment creation)
     # See renv.lock for: CoordinateCleaner, blockCV, maxnet, biomod2,
     #                    bfast, landscapemetrics, DHARMa, glmmTMB, betapart, SPEI,
     #                    camtrapR, overlap, circular, soundecology, tuneR,
     #                    popbio, prioritizr, highs,
-    #                    rinat, auk, robis, rredlist (v2.2.0)
+    #                    rinat, auk, robis, rredlist
 
 variables:
   R_LIBS_USER: "${CONDA_PREFIX}/lib/R/library"
