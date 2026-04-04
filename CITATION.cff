@@ -10,7 +10,7 @@ repository-code: "https://github.com/baratadiego/ecological-agent-skills"
 authors:
   - family-names: Barata
     given-names: Francisco Diego Barros
-    orcid: ""
+    orcid: "https://orcid.org/0000-0002-1640-5630"
 
 keywords:
   - ecology
