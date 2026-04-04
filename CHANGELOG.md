@@ -3,16 +3,39 @@
 All notable changes to this repository are documented here.
 Format: [version] — date — description
 
-## [Unreleased]
+## [3.2.1] — 2026-04-04 — DevContainer, SKILL.md linter, R/Python parity, scientific fixes
 
-### Fixed
+### Added — Infrastructure
+- **`.devcontainer/`** — Full DevContainer with R 4.4 + Python 3.11 + geospatial stack (rocker/geospatial base, all CRAN + pip dependencies pre-installed). Eliminates environment setup friction.
+- **`tests/lint_skill_md.sh`** — Validates 3 frontmatter fields and 9 required h2 sections across all SKILL.md files (204 checks). Integrated into `ci_check.sh`.
+- **`tests/generate_stats.sh`** — Auto-generates `docs/repository-statistics.md` with `--check` mode for CI drift detection.
+- **`tests/r/test-reproducible-ecology-pipeline.R`** — New R test file for reproducible-ecology-pipeline skill.
+
+### Added — R/Python Parity (6 new scripts)
+- **`ecosystem-services-assessment`** — `tradeoff_analysis.py` (Spearman correlation, heatmap, scatter plots)
+- **`ecological-impact-assessment`** — `baci_analysis.py` (mixed-effects BACI via statsmodels), `power_analysis_baci.py` (power curves via scipy)
+- **`model-validation-and-uncertainty`** — `extrapolation_risk.py` (MOP + MESS), `validate_sdm.py` (AUC, TSS, calibration)
+- **`predictive-modeling-best-practices`** — `collinearity_check.py` (VIF stepwise reduction)
+
+### Fixed — Scientific
+- **`run_ensemble_sdm.R`** — Replaced naive `rowMeans` with AUC-weighted averaging for ensemble SDM (both CV folds and final raster prediction). Fixes mathematical inconsistency when combining cloglog/logistic/vote outputs from Maxnet, BRT, and RF. Saves `auc_weights` in `ensemble_models.rds` for use by `predict_distribution.R`.
+- **`community_analysis.py`** — Fixed import typo `copshenetic` → `cophenet` (scipy.cluster.hierarchy).
+
+### Fixed — CI & Documentation
+- Renamed `## Key Decisions to Document` → `## Decision Points` in 5 SKILL.md files (biostatistics-workbench, ecological-impact-assessment, environmental-time-series, model-validation-and-uncertainty, occupancy-and-detection).
+- Added `suppressPackageStartupMessages` in `check_packages.R`.
+- Updated `tests/README.md` (12 → 17 skills, full test file tree).
+- Updated `docs/repository-statistics.md` (R: 34, Python: 32, CI: 677).
+- Updated `CITATION.cff` to v3.2.1 with ORCID and corrected counts (14 workflows, 66 scripts).
+- Removed internal `ANALYSIS_AND_ROADMAP.md` and `RELEASE_CHECKLIST.md` from repository.
+
+### Previous unreleased fixes (now included)
 - **`README.md`** — Added missing `run-acoustic-monitoring` workflow to workflow table and updated count from 13 to 14.
-- **`CATALOG.md`** — Added `run-acoustic-monitoring` row to Workflow × Skill Matrix; fixed `analyze-environmental-change` row (removed spurious ✓ for acoustic-monitoring, skill 14); fixed `produce-technical-report` row (added missing ✓ for biostatistics-workbench, skill 3).
-- **`skills/SKILL_INDEX.json`** — Synchronized `called_by_workflows` field for 8 workflows that were missing skill entries.
-- **`templates/SKILL_TEMPLATE.md`** — Added `name:` and `description:` to frontmatter; translated `[OBRIGATÓRIO]` markers to `[REQUIRED]`; added frontmatter fields to validation checklist.
-- **`.github/workflows/ci.yml`** — Removed `|| true` from pytest runs (CI now fails on test failures); added `r-tests` job for testthat; added `frontmatter-check` job.
-- **`tests/ci_check.sh`** — Added validation for `name:` and `description:` frontmatter fields; added `Decision Points` to `REQUIRED_SECTIONS`.
-- **7 SKILL.md files** — Added formal `## Decision Points` table to: `species-distribution-modeling`, `ecological-data-foundation`, `predictive-modeling-best-practices`, `community-ecology-ordination`, `geoprocessing-for-ecology`, `ecosystem-services-assessment`, `reproducible-ecology-pipeline`.
+- **`CATALOG.md`** — Added `run-acoustic-monitoring` row to Workflow × Skill Matrix; fixed `analyze-environmental-change` row; fixed `produce-technical-report` row.
+- **`skills/SKILL_INDEX.json`** — Synchronized `called_by_workflows` field for 8 workflows.
+- **`templates/SKILL_TEMPLATE.md`** — Added `name:` and `description:` to frontmatter; translated markers to English.
+- **`.github/workflows/ci.yml`** — Removed `|| true` from pytest runs; added `r-tests` and `frontmatter-check` jobs.
+- **7 SKILL.md files** — Added formal `## Decision Points` table to 7 skills.
 
 ---
 
