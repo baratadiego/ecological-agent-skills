@@ -1,0 +1,32 @@
+{
+  "name": "ecological-agent-skills",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+  "postCreateCommand": "bash -c 'echo \"DevContainer ready: R $(R --version | head -1 | grep -oP \"\\d+\\.\\d+\\.\\d+\") + Python $(python --version 2>&1 | grep -oP \"\\d+\\.\\d+\\.\\d+\")\" && Rscript -e \"cat(length(.packages(all.available=TRUE)), \\\"R packages installed\\\\n\\\")\" && python -c \"import pkg_resources; print(len(list(pkg_resources.working_set)), \\\"Python packages installed\\\")\"'",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "REditorSupport.r",
+        "ms-python.python",
+        "ms-toolsai.jupyter",
+        "ms-python.vscode-pylance"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/opt/venv/bin/python",
+        "r.rterm.linux": "/usr/local/bin/R",
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  },
+  "remoteEnv": {
+    "PYTHONPATH": "/workspace/skills",
+    "R_LIBS_USER": "/usr/local/lib/R/site-library"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {}
+  }
+}

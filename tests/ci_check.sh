@@ -507,6 +507,18 @@ TOTAL=$((PASS + FAIL))
 
 # Count script totals
 R_SCRIPT_TOTAL=$(find skills/*/scripts/ -name "*.R" -type f 2>/dev/null | wc -l)
+# ── SKILL.md lint ─────────────────────────────────────────────────────────────
+echo ""
+echo "=== SKILL.md Lint ==="
+if bash tests/lint_skill_md.sh > /dev/null 2>&1; then
+  LINT_CHECKS=$(bash tests/lint_skill_md.sh 2>/dev/null | grep -oP '\d+/\d+' | head -1)
+  pass "SKILL.md lint: ${LINT_CHECKS} checks passed"
+else
+  for line in $(bash tests/lint_skill_md.sh 2>/dev/null | grep "\\[FAIL\\]"); do
+    fail "SKILL.md lint: $line"
+  done
+fi
+
 PY_SCRIPT_TOTAL=$(find skills/*/scripts/ -name "*.py" -type f 2>/dev/null | wc -l)
 EXAMPLE_TOTAL=$(find examples/ -name "*_example.md" -type f 2>/dev/null | wc -l)
 RESOURCE_TOTAL=$(find skills/*/resources/ -name "*.md" -type f 2>/dev/null | wc -l)
