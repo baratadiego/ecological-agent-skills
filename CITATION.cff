@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 title: "ecological-agent-skills"
 type: software
-version: 3.2.0
+version: 3.2.1
 date-released: "2026-04-04"
 license: GPL-3.0-or-later
 repository-code: "https://github.com/baratadiego/ecological-agent-skills"
