@@ -1,12 +1,13 @@
 ---
+name: [REQUIRED — skill-id in kebab-case, must match directory name and SKILL_INDEX.json]
+description: "[REQUIRED — 40-80 words in English. Start with what this skill does. Include 'Use this skill when...' followed by trigger phrases and synonyms. Cover situations where the skill should activate even without explicit mention by the user.]"
 skill_version: 1.0.0
-<!-- [OBRIGATÓRIO] Increment this version (semver) whenever the skill content changes significantly. -->
 ---
 
-# Skill: [OBRIGATÓRIO — skill-id in kebab-case, must match directory name and SKILL_INDEX.json]
+# Skill: [REQUIRED — skill-id in kebab-case, must match directory name and SKILL_INDEX.json]
 
 <!-- INSTRUCTIONS FOR SKILL AUTHORS
-     Fill in every [OBRIGATÓRIO] field. Delete all HTML comments before submitting.
+     Fill in every [REQUIRED] field. Delete all HTML comments before submitting.
      Run the validation checklist at the bottom before opening a pull request.
      All content must be in English.
      No location-specific geographic references in global files.
@@ -16,20 +17,20 @@ skill_version: 1.0.0
 
 ## Purpose
 
-<!-- [OBRIGATÓRIO]
+<!-- [REQUIRED]
      Write 2–4 sentences describing exactly what this skill does.
      Start with "Guides the agent through..."
      Be specific: name the methods, models, or operations covered.
      Do NOT describe when to use it (that goes in "When to Invoke").
 -->
 
-[OBRIGATÓRIO — describe the skill's analytical scope]
+[REQUIRED — describe the skill's analytical scope]
 
 ---
 
 ## When to Invoke
 
-<!-- [OBRIGATÓRIO]
+<!-- [REQUIRED]
      List the situations that should trigger this skill as bullet points.
      Each bullet is a concrete scenario, not a keyword.
      These scenarios must be consistent with the trigger_keywords in SKILL_INDEX.json.
@@ -38,9 +39,9 @@ skill_version: 1.0.0
 
 Invoke this skill when:
 
-- [OBRIGATÓRIO — scenario 1]
-- [OBRIGATÓRIO — scenario 2]
-- [OBRIGATÓRIO — scenario 3]
+- [REQUIRED — scenario 1]
+- [REQUIRED — scenario 2]
+- [REQUIRED — scenario 3]
 - [add more as needed]
 
 **trigger_keywords** (must match `skills/SKILL_INDEX.json`):
@@ -52,7 +53,7 @@ Invoke this skill when:
 
 ## Inputs
 
-<!-- [OBRIGATÓRIO]
+<!-- [REQUIRED]
      List every input the skill needs.
      "Required" = skill cannot run without it.
      "Conditional" = required only under specific conditions (explain in Notes).
@@ -62,7 +63,7 @@ Invoke this skill when:
 
 | Input | Format | Required |
 |---|---|---|
-| [OBRIGATÓRIO — input name] | [format: CSV, GeoTIFF, SHP, GPKG, RData, etc.] | Required / Conditional / Recommended / Optional |
+| [REQUIRED — input name] | [format: CSV, GeoTIFF, SHP, GPKG, RData, etc.] | Required / Conditional / Recommended / Optional |
 | [input name] | [format] | Required |
 | [input name] | [format] | Optional |
 
@@ -70,7 +71,7 @@ Invoke this skill when:
 
 ## Outputs
 
-<!-- [OBRIGATÓRIO]
+<!-- [REQUIRED]
      List every file this skill produces.
      Use snake_case filenames with extensions.
      The primary outputs must match primary_outputs in SKILL_INDEX.json.
@@ -78,7 +79,7 @@ Invoke this skill when:
 
 | Output | Description |
 |---|---|
-| `[OBRIGATÓRIO — filename.ext]` | [what this file contains] |
+| `[REQUIRED — filename.ext]` | [what this file contains] |
 | `[filename.ext]` | [description] |
 | `[report_name.md]` | [full narrative report] |
 
@@ -86,7 +87,7 @@ Invoke this skill when:
 
 ## Steps
 
-<!-- [OBRIGATÓRIO]
+<!-- [REQUIRED]
      Numbered, sequential steps the agent must follow.
      Each step should be a complete, unambiguous instruction.
      Reference specific script names where applicable.
@@ -94,7 +95,7 @@ Invoke this skill when:
      Minimum 4 steps.
 -->
 
-1. **[OBRIGATÓRIO — step title]**
+1. **[REQUIRED — step title]**
    [Detailed instruction. Name the script, function, or tool to use. Specify parameters.]
 
 2. **[step title]**
@@ -116,7 +117,7 @@ Invoke this skill when:
 
 ## Decision Points
 
-<!-- [OBRIGATÓRIO]
+<!-- [REQUIRED]
      List every condition that requires a non-default decision.
      "Condition" = a measurable or observable state.
      "Diagnosis" = what the condition means.
@@ -127,7 +128,7 @@ Invoke this skill when:
 
 | Condition | Diagnosis | Recommended Action |
 |---|---|---|
-| [OBRIGATÓRIO — e.g., n < 10] | [e.g., insufficient data for reliable modelling] | [e.g., do not fit model; communicate limitation to user] |
+| [REQUIRED — e.g., n < 10] | [e.g., insufficient data for reliable modelling] | [e.g., do not fit model; communicate limitation to user] |
 | [condition] | [diagnosis] | [action] |
 | [condition] | [diagnosis] | [action] |
 
@@ -135,7 +136,7 @@ Invoke this skill when:
 
 ## Key Decisions to Document
 
-<!-- [OBRIGATÓRIO]
+<!-- [REQUIRED]
      List the decisions that MUST be recorded in decision_log.md.
      These are choices that affect reproducibility or interpretation.
      Phrase as questions the agent answered during analysis.
@@ -143,7 +144,7 @@ Invoke this skill when:
 
 Record the following in `decision_log.md` after running this skill:
 
-- [OBRIGATÓRIO — e.g., Which predictor variables were retained and why?]
+- [REQUIRED — e.g., Which predictor variables were retained and why?]
 - [e.g., Which model family was selected and what diagnostic justified it?]
 - [e.g., Were any records excluded? How many and for what reason?]
 - [add more as needed]
@@ -152,7 +153,7 @@ Record the following in `decision_log.md` after running this skill:
 
 ## Tools and Libraries
 
-<!-- [OBRIGATÓRIO — fill in at least one language block]
+<!-- [REQUIRED — fill in at least one language block]
      List packages, not functions.
      Separate R and Python. Add CLI tools if applicable.
      Keep version constraints only when a specific version is required.
@@ -160,14 +161,14 @@ Record the following in `decision_log.md` after running this skill:
 
 **R**
 ```r
-# [OBRIGATÓRIO — list R packages]
+# [REQUIRED — list R packages]
 library(package1)   # purpose
 library(package2)   # purpose
 ```
 
 **Python**
 ```python
-# [OBRIGATÓRIO — list Python packages]
+# [REQUIRED — list Python packages]
 import package1     # purpose
 import package2     # purpose
 ```
@@ -181,7 +182,7 @@ import package2     # purpose
 
 ## Resources
 
-<!-- [OBRIGATÓRIO]
+<!-- [REQUIRED]
      Link to every file in this skill's resources/ directory.
      Minimum 2 resources.
      Use relative paths from the repository root.
@@ -196,13 +197,13 @@ import package2     # purpose
 
 ## Notes
 
-<!-- [OBRIGATÓRIO]
+<!-- [REQUIRED]
      List caveats, common pitfalls, and edge cases.
      Be specific. Vague warnings are not useful.
      Minimum 3 bullet points.
 -->
 
-- **[OBRIGATÓRIO — pitfall or caveat]**: [specific explanation of the problem and how to avoid it]
+- **[REQUIRED — pitfall or caveat]**: [specific explanation of the problem and how to avoid it]
 - **[pitfall]**: [explanation]
 - **[pitfall]**: [explanation]
 
@@ -212,6 +213,8 @@ import package2     # purpose
 
 Before submitting this skill, verify:
 
+- [ ] `name:` field present in YAML frontmatter (kebab-case, matches directory name)
+- [ ] `description:` field present in YAML frontmatter (40-80 words, includes trigger phrases)
 - [ ] `trigger_keywords` added to `skills/SKILL_INDEX.json`
 - [ ] At least 2 files in `resources/`
 - [ ] At least 1 script in `scripts/` (R or Python)
@@ -220,6 +223,6 @@ Before submitting this skill, verify:
 - [ ] Skill added to `README.md`
 - [ ] `skill_version` field present in YAML header
 - [ ] `decision_points` in `SKILL_INDEX.json` match the Decision Points table above
-- [ ] All `[OBRIGATÓRIO]` placeholders replaced
+- [ ] All `[REQUIRED]` placeholders replaced
 - [ ] All HTML comments deleted
 - [ ] `bash tests/ci_check.sh` exits with code 0

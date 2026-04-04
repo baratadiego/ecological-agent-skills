@@ -1,7 +1,7 @@
 # Repository Statistics
 
-Generated: 2026-03-06
-Version: 3.0.0
+Generated: 2026-04-03
+Version: 3.2.0 (unreleased patch)
 
 ---
 
@@ -10,14 +10,14 @@ Version: 3.0.0
 | Category | Count |
 |----------|-------|
 | Skills | 17 |
-| Workflows | 9 |
-| R scripts | 33 |
-| Python scripts | 25 |
+| Workflows | 14 |
+| R scripts | 38 |
+| Python scripts | 20 |
 | Worked examples | 14 |
 | Resource documents | 53 |
-| Documentation files (docs/) | 4 |
+| Documentation files (docs/) | 8 |
 | Test datasets (CSV) | 11 |
-| Total files (excluding .git) | 323 |
+| Total files (excluding .git) | ~340 |
 
 ## Skill Breakdown
 
@@ -72,7 +72,7 @@ Version: 3.0.0
 |---------|--------|
 | Structure checks | 585/585 passed |
 | Skills verified | 17 |
-| Workflows verified | 9 |
+| Workflows verified | 14 |
 | Global coverage | 6/6 continents |
 | Empty files | 0 (in tracked content) |
 | JSON validation | SKILL_INDEX.json valid, smoke_test_cases.json valid |
@@ -99,3 +99,6 @@ Version: 3.0.0
 | 2.2.0 | 2026-03-05 | Global data download scripts (iNat, eBird, OBIS, IUCN), predictor sources |
 | 2.3.0 | 2026-03-06 | Scientific documentation, 7 global examples, comparison with alternatives |
 | 3.0.0 | 2026-03-06 | Quality infrastructure: regression tests, smoke tests, expanded CI, release process |
+| 3.1.0 | 2026-03-28 | License migration (MIT → GPL-3.0), CITATION.cff, CATALOG Phase 4 update |
+| 3.2.0 | 2026-04-02 | Code quality: English translation, CHELSA default, environment-python.yaml, INSTALL.md, glossary, taxonomy diagram, DECISION_TREE, integration tests |
+| 3.2.x | 2026-04-03 | Cross-reference fixes: SKILL_INDEX.json sync, run-acoustic-monitoring integration, Decision Points in 7 skills, CI hardening |

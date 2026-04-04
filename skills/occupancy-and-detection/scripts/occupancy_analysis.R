@@ -96,7 +96,7 @@ tryCatch({
   log_info("unmarkedFrameOccu built successfully.")
 }, error = function(e) {
   log_error(
-    "Failed in unmarkedFrameOccu: %s\nProbable cause: number oe sites diverge entre dh e sc, ou valores invalidos em dh\nCheck: que dh e sc tem o mesmo number oe linhas e mesmos site IDs\nPrevious skill: data-cleaning",
+    "Failed in unmarkedFrameOccu: %s\nProbable cause: number of sites differs between detection history and site covariates, or invalid values in detection history\nCheck: that detection history and site covariates have the same number of rows and matching site IDs\nPrevious skill: data-cleaning",
     conditionMessage(e)
   )
   stop(e)

@@ -104,6 +104,17 @@ Ensures that any predictive model in the project is built with sound ML practice
 
 ---
 
+## Decision Points
+
+| Condition | Diagnosis | Recommended Action |
+|-----------|-----------|-------------------|
+| VIF > 10 for any predictor | Severe collinearity — model coefficients are unstable | Remove predictor with highest VIF iteratively until all VIF < 10 |
+| Pearson \|r\| > 0.7 between predictors | High correlation — retaining both inflates false precision | Retain only one from each correlated pair based on ecological relevance |
+| CV AUC substantially > independent test AUC (> 0.1 gap) | Spatial autocorrelation causing overly optimistic CV | Switch to spatial block CV; document block size in `decision_log.md` |
+| n_folds > n_observations / 10 | Too many folds — test sets are too small for reliable metrics | Reduce to max(5, floor(n/10)) folds; use repeated CV if n < 50 |
+
+---
+
 ## Key Decisions to Document
 
 - CV strategy and block size (for spatial CV)

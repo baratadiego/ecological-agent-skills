@@ -92,6 +92,17 @@ Select relevant services for the context:
 
 ---
 
+## Decision Points
+
+| Condition | Diagnosis | Recommended Action |
+|-----------|-----------|-------------------|
+| Land cover map accuracy < 85% | Classification error propagates into ES estimates | Perform uncertainty analysis; include classification error as confidence range in ES outputs |
+| Land cover data > 5 years old | Land use change not captured — ES estimates may be outdated | Flag temporal gap; recommend updated land cover if available; note limitation in report |
+| InVEST NoData fraction > 30% in study area | CRS or extent mismatch, or missing input raster | Check CRS alignment and extent; rerun after fixing spatial inputs |
+| ES trade-off between two services is strongly negative (r < -0.7) | Managing for one service degrades the other | Report trade-off explicitly; do not recommend single-service optimisation without acknowledging cost |
+
+---
+
 ## Key Decisions to Document
 
 - ES portfolio selection rationale

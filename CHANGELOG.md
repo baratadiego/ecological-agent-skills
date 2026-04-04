@@ -5,6 +5,15 @@ Format: [version] — date — description
 
 ## [Unreleased]
 
+### Fixed
+- **`README.md`** — Added missing `run-acoustic-monitoring` workflow to workflow table and updated count from 13 to 14.
+- **`CATALOG.md`** — Added `run-acoustic-monitoring` row to Workflow × Skill Matrix; fixed `analyze-environmental-change` row (removed spurious ✓ for acoustic-monitoring, skill 14); fixed `produce-technical-report` row (added missing ✓ for biostatistics-workbench, skill 3).
+- **`skills/SKILL_INDEX.json`** — Synchronized `called_by_workflows` field for 8 workflows that were missing skill entries.
+- **`templates/SKILL_TEMPLATE.md`** — Added `name:` and `description:` to frontmatter; translated `[OBRIGATÓRIO]` markers to `[REQUIRED]`; added frontmatter fields to validation checklist.
+- **`.github/workflows/ci.yml`** — Removed `|| true` from pytest runs (CI now fails on test failures); added `r-tests` job for testthat; added `frontmatter-check` job.
+- **`tests/ci_check.sh`** — Added validation for `name:` and `description:` frontmatter fields; added `Decision Points` to `REQUIRED_SECTIONS`.
+- **7 SKILL.md files** — Added formal `## Decision Points` table to: `species-distribution-modeling`, `ecological-data-foundation`, `predictive-modeling-best-practices`, `community-ecology-ordination`, `geoprocessing-for-ecology`, `ecosystem-services-assessment`, `reproducible-ecology-pipeline`.
+
 ---
 
 ## [3.2.0] — 2026-04-02 — Code quality, environment simplification, and documentation

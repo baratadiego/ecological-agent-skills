@@ -47,9 +47,16 @@ Each workflow lives at `workflows/<workflow-id>/WORKFLOW.md`.
 | **Environmental time series** | ecological-data-foundation | environmental-time-series | biostatistics-workbench | reproducible-ecology-pipeline | — |
 | **Ecosystem services** | ecological-data-foundation | geoprocessing-for-ecology | ecosystem-services-assessment | model-validation-and-uncertainty | reproducible-ecology-pipeline |
 | **Multispecies screening** | ecological-data-foundation | geoprocessing-for-ecology | species-distribution-modeling (loop) | model-validation-and-uncertainty | reproducible-ecology-pipeline |
+| **Acoustic monitoring** | ecological-data-foundation | acoustic-monitoring | biostatistics-workbench | model-validation-and-uncertainty | reproducible-ecology-pipeline |
+| **Camera trap occupancy** | ecological-data-foundation | camera-trap-processing | occupancy-and-detection | model-validation-and-uncertainty | reproducible-ecology-pipeline |
+| **Landscape connectivity** | ecological-data-foundation | geoprocessing-for-ecology | landscape-connectivity | model-validation-and-uncertainty | reproducible-ecology-pipeline |
+| **Population viability** | ecological-data-foundation | biostatistics-workbench | population-viability-analysis | model-validation-and-uncertainty | reproducible-ecology-pipeline |
+| **Conservation prioritization** | ecological-data-foundation | geoprocessing-for-ecology | species-distribution-modeling | spatial-prioritization | reproducible-ecology-pipeline |
 
 For multispecies projects always read `workflows/run-multispecies-screening/WORKFLOW.md`
 before starting. It contains the priority classification logic.
+
+Available workflows (14): `run-sdm-study`, `run-multispecies-screening`, `run-occupancy-analysis`, `run-camera-trap-occupancy`, `run-acoustic-monitoring`, `run-population-viability`, `run-conservation-prioritization`, `assess-ecological-impact`, `assess-ecosystem-services`, `assess-landscape-connectivity`, `analyze-community-structure`, `analyze-environmental-change`, `build-fire-risk-map`, `produce-technical-report`.
 
 ---
 

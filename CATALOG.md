@@ -152,7 +152,7 @@ A quick-reference index for all 17 skills. Each row summarises the skill's domai
 **When to use:** When processing audio recordings from AudioMoth, SM4, or similar recorders to compute soundscape indices or detect species via BirdNET or similar classifiers.
 **Inputs:** Audio directory (WAV/FLAC), recording metadata, species list (optional), location coordinates
 **Outputs:** Acoustic indices time series (CSV), detection list with confidence scores, species accumulation curve, soundscape heatmap
-**Used by workflows:** (standalone; pairs with environmental-time-series)
+**Used by workflows:** run-acoustic-monitoring; pairs with environmental-time-series
 
 ---
 
@@ -192,14 +192,15 @@ A quick-reference index for all 17 skills. Each row summarises the skill's domai
 | analyze-community-structure | ✓ | | ✓ | | ✓ | | | ✓ | | | | ✓ | | | | | |
 | build-fire-risk-map | ✓ | ✓ | | ✓ | ✓ | | | | ✓ | ✓ | | | | | | | |
 | run-occupancy-analysis | ✓ | | ✓ | | ✓ | | ✓ | | | | | ✓ | | | | | |
-| analyze-environmental-change | ✓ | ✓ | | | | | | | ✓ | ✓ | | ✓ | | ✓ | | | |
+| analyze-environmental-change | ✓ | ✓ | | | | | | | ✓ | ✓ | | ✓ | | | | | |
 | assess-ecosystem-services | ✓ | ✓ | ✓ | | | | | | | | ✓ | ✓ | | | | | |
-| produce-technical-report | | | | | | | | | | | | ✓ | | | | | |
+| produce-technical-report | | | ✓ | | | | | | | | | ✓ | | | | | |
 | run-multispecies-screening | ✓ | ✓ | | ✓ | ✓ | ✓ | | | | | | | | | | | |
 | run-camera-trap-occupancy | ✓ | | | | ✓ | | ✓ | | | | | ✓ | ✓ | | | | |
 | assess-landscape-connectivity | ✓ | ✓ | | | ✓ | | | | | | | ✓ | | | ✓ | | |
 | run-population-viability | ✓ | | ✓ | | ✓ | | | | | | | ✓ | | | | ✓ | |
 | run-conservation-prioritization | ✓ | ✓ | | | | ✓ | | | | | | ✓ | | | | | ✓ |
+| run-acoustic-monitoring | ✓ | | ✓ | | ✓ | | | | | | | ✓ | | ✓ | | | |
 
 ---
 

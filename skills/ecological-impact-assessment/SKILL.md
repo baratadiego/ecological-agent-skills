@@ -61,7 +61,23 @@ Guides the agent through the design and analysis of ecological impact assessment
 - Verify: measurements Before AND After disturbance, at Control AND Impact sites
 - Compute the BACI interaction: (After−Before)_Impact − (After−Before)_Control
 - If multiple control or impact sites: use mixed model with site as random effect
-- Test for parallel trends in the pre-disturbance period (assumption check)
+
+### 2.5 Test Parallel Trends Assumption (mandatory before Step 3)
+The BACI estimator is only valid if Control and Impact groups had parallel trajectories before the disturbance. This assumption is testable and must be reported.
+
+**How to test:**
+- Subset data to **pre-disturbance period only**
+- Fit: `indicator ~ time * treatment + (1|site)` using only Before data
+- If the `time:treatment` interaction is **NOT significant** (p > 0.05): parallel trends assumption is supported — proceed
+- If the `time:treatment` interaction **IS significant** (p ≤ 0.05): baseline trends differed
+
+**If assumption is violated:**
+- Do NOT proceed with standard BACI as if causal
+- Report the pre-disturbance divergence explicitly in the report
+- Discuss whether the baseline difference confounds the impact estimate
+- Consider DiD (difference-in-differences) with covariate adjustment, or report as "observed difference" rather than causal impact
+
+**Document in `decision_log.md`:** the test result (F, df, p-value) and the action taken.
 
 ### 3. Statistical Analysis
 - Linear model: `indicator ~ period * treatment + (1|site)`

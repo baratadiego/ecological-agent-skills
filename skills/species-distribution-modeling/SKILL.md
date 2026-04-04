@@ -104,6 +104,18 @@ Guides the agent through the complete species distribution / ecological niche mo
 
 ---
 
+## Decision Points
+
+| Condition | Diagnosis | Recommended Action |
+|-----------|-----------|-------------------|
+| n_occurrences < 10 | Insufficient data for reliable model fitting | Do not fit model; use literature-based range map with explicit caveat |
+| 10 ≤ n_occurrences < 30 | Low sample size — model may be unreliable | Proceed with caution; apply high regularisation (RM ≥ 2); report uncertainty |
+| AUC_test < 0.7 | Potentially poor discriminative ability, OR species has a genuinely narrow niche | **First, diagnose the cause:** (1) Plot marginal response curves — if presences cluster in a narrow environmental range (< 10% of available gradient), low AUC may reflect ecological reality (narrow-niche species), NOT a poor model. Document as "narrow-niche species; AUC expected to be low". (2) If presences span the full gradient and AUC is still low, the model is genuinely poor — revise predictor set, expand calibration grid, check coordinate quality and spatial autocorrelation. See: Lobo et al. 2008 (Glob. Ecol. Biogeogr.), Warren & Seifert 2011 |
+| MESS/MOP extrapolation > 20% of projection area | Model projecting into novel environmental conditions | Mask novel-condition areas in final map; report extrapolation extent in report |
+| ΔAICc between top models < 2 | Top model is not clearly best | Use ensemble of top models; report Akaike weights alongside mean suitability map |
+
+---
+
 ## Key Decisions to Document
 
 - Spatial thinning distance

@@ -101,6 +101,18 @@ Guides the agent through multivariate analysis of ecological communities: ordina
 
 ---
 
+## Decision Points
+
+| Condition | Diagnosis | Recommended Action |
+|-----------|-----------|-------------------|
+| n_sites < 5 per group | Insufficient replication for PERMANOVA | Report descriptive statistics only; do not run hypothesis tests |
+| NMDS stress > 0.2 | Ordination distorting community distances | Increase NMDS dimensions to 3; or reduce species set by removing very rare species |
+| NMDS stress > 0.3 | Ordination is unreliable | Do not use NMDS; switch to PCoA or PCA on transformed data |
+| Species occurring in < 5% of sites | Rare species inflating beta diversity | Apply rarity filter or downweight with Hellinger/Wisconsin transformation |
+| PERMANOVA significant but PERMDISP also significant | Group dispersion differs (not only composition) | Report both results; interpret composition difference cautiously |
+
+---
+
 ## Key Decisions to Document
 
 - Dissimilarity metric and rationale

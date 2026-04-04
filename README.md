@@ -8,7 +8,7 @@ Teach your AI agent to do rigorous ecology.
 
 Works with Claude Code, Gemini CLI, Cursor, GitHub Copilot, and any agent that reads Markdown.
 
-**17 modular skills** | **13 multi-step workflows** | **58 R/Python scripts** | **14 worked examples across 6 continents**
+**17 modular skills** | **14 multi-step workflows** | **58 R/Python scripts** | **14 worked examples across 6 continents**
 
 ---
 
@@ -18,7 +18,7 @@ Works with Claude Code, Gemini CLI, Cursor, GitHub Copilot, and any agent that r
 - [Installation](#installation)
 - [Core Concepts](#core-concepts)
 - [Skills (17)](#skills-17)
-- [Workflows (13)](#workflows-13)
+- [Workflows (14)](#workflows-14)
 - [How to Use Skills](#how-to-use-skills)
 - [For AI Agents](#for-ai-agents)
 - [Examples (14)](#examples-14)
@@ -194,7 +194,7 @@ See [CATALOG.md](CATALOG.md) for full metadata, inputs, outputs, and workflow li
 
 ---
 
-## Workflows (13)
+## Workflows (14)
 
 | Workflow | Skills Used | Purpose |
 |----------|-------------|---------|
@@ -211,6 +211,7 @@ See [CATALOG.md](CATALOG.md) for full metadata, inputs, outputs, and workflow li
 | `assess-landscape-connectivity` | 1 → 2 → 15 → 5 → 12 | Corridor and patch importance |
 | `run-population-viability` | 1 → 3 → 16 → 5 → 12 | PVA and extinction risk |
 | `run-conservation-prioritization` | 1 → 2 → 6 → 17 → 12 | Reserve network design |
+| `run-acoustic-monitoring` | 1 → 14 → 3 → 5 → 12 | Soundscape indices and species detection |
 
 ---
 
@@ -309,7 +310,7 @@ ecological-agent-skills/
 │       ├── resources/            ← checklists, glossaries, templates
 │       ├── examples/             ← usage prompt examples
 │       └── scripts/              ← R/Python helpers
-├── workflows/                    ← 13 multi-step playbooks
+├── workflows/                    ← 14 multi-step playbooks
 │   └── <workflow-name>/
 │       └── WORKFLOW.md
 ├── templates/                    ← reusable prompts, reports, checklists

@@ -210,7 +210,7 @@ echo ""
 # ─────────────────────────────────────────────────────────────────────────────
 echo "--- Section 7: SKILL.md content quality ---"
 
-REQUIRED_SECTIONS=("Purpose" "When to Invoke" "Inputs" "Outputs" "Steps" "Notes")
+REQUIRED_SECTIONS=("Purpose" "When to Invoke" "Inputs" "Outputs" "Steps" "Decision Points" "Notes")
 
 for skill_dir in skills/*/; do
   [[ -d "$skill_dir" ]] || continue
@@ -230,6 +230,18 @@ for skill_dir in skills/*/; do
     pass "SKILL.md $skill_name: skill_version field present"
   else
     fail "SKILL.md $skill_name: skill_version field missing"
+  fi
+
+  if grep -q "^name:" "$skill_md" 2>/dev/null; then
+    pass "SKILL.md $skill_name: name field present"
+  else
+    fail "SKILL.md $skill_name: name field missing"
+  fi
+
+  if grep -q "^description:" "$skill_md" 2>/dev/null; then
+    pass "SKILL.md $skill_name: description field present"
+  else
+    fail "SKILL.md $skill_name: description field missing"
   fi
 done
 

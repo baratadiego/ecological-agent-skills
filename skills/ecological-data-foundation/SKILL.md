@@ -95,6 +95,17 @@ This skill guides the agent through the first mandatory step of any quantitative
 
 ---
 
+## Decision Points
+
+| Condition | Diagnosis | Recommended Action |
+|-----------|-----------|-------------------|
+| n_records_clean < 30 | Insufficient records for SDM or occupancy modelling | Warn user; suggest removing country/taxon filters; proceed only with explicit user confirmation |
+| Duplicate records > 20% of raw dataset | Strong collection bias or data ingestion error | Investigate source before proceeding; document deduplication method in `qa_report.md` |
+| Coordinate uncertainty > threshold (e.g., > 10 km) | Spatial precision too low for fine-scale analysis | Flag records; exclude from spatial modelling; keep for range-map validation only |
+| Taxonomic name match fails (0 results from backbone) | Synonym or spelling error in species name | Resolve synonym via GBIF backbone; halt if species identity cannot be confirmed |
+
+---
+
 ## Key Decisions to Document
 
 - Duplicate resolution strategy

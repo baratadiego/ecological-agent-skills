@@ -55,17 +55,32 @@
 
 ## 4. Discussion
 
-[Interpretation, comparison with literature, limitations, management implications.]
+[Interpretation, comparison with literature, management implications.]
 
 ---
 
-## 5. Conclusions
+## 5. Limitations and Caveats
+
+<!-- Required section. Do not omit. Conservation Biology, PLOS ONE, and Methods in Ecology and Evolution
+     require explicit treatment of limitations. Vague statements ("more data are needed") are not acceptable.
+     Each bullet must be specific and, where possible, quantified. -->
+
+- **Sample size:** [Describe how n_occurrences / n_sites / survey effort limits inference. State which conclusions would change with more data.]
+- **Spatial extent:** [Describe the calibration area and whether the model applies outside it. Note if projections extend beyond sampled environments (MESS/MOP).]
+- **Temporal scope:** [State the time period represented by the data and whether conditions may have changed.]
+- **Data quality:** [Note coordinate uncertainty, taxonomic reliability, or detection biases in the occurrence/survey data.]
+- **Model assumptions:** [List key assumptions (e.g., species at equilibrium with climate, closed population, parallel trends) and whether they were tested.]
+- **Transferability:** [State whether results should be applied to other regions, taxa, or time periods.]
+
+---
+
+## 6. Conclusions
 
 [Concise summary of main findings and recommendations.]
 
 ---
 
-## 6. References
+## 7. References
 
 [Full citations in standard format.]
 

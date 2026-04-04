@@ -90,6 +90,17 @@ Guides the agent through spatial data operations needed in quantitative ecology:
 
 ---
 
+## Decision Points
+
+| Condition | Diagnosis | Recommended Action |
+|-----------|-----------|-------------------|
+| Layers have mismatched CRS | Spatial operations will fail or produce incorrect results | Reproject all layers to a common CRS before any operation; document chosen EPSG in `decision_log.md` |
+| Rasters have different resolutions | Extraction or stacking will fail | Resample to the coarsest resolution; prefer bilinear for continuous data, nearest-neighbour for categorical |
+| Extents do not overlap | Study area definition error or wrong file | Verify study area shapefile; clip all layers to intersection; warn if intersection is < 50% of study area |
+| NoData fraction > 30% after masking | Data gap too large for reliable analysis | Report NoData extent; consult alternative data source; do not interpolate silently |
+
+---
+
 ## Key Decisions to Document
 
 - Project CRS (EPSG code)

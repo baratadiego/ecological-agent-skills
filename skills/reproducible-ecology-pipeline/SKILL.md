@@ -106,6 +106,16 @@ Evaluate each criterion as PASS / FAIL / N/A:
 
 ---
 
+## Decision Points
+
+| Condition | Diagnosis | Recommended Action |
+|-----------|-----------|-------------------|
+| `parameter_manifest.yaml` absent or incomplete | Analysis cannot be reproduced from documented parameters | Complete manifest before finalising any report; halt report generation until resolved |
+| Random seed not set for stochastic operations | Results will differ between runs | Set and document seed in `parameter_manifest.yaml`; re-run analysis with fixed seed |
+| Reproducibility checklist score < 7/9 PASS | Pipeline does not meet minimum reproducibility standard | Address failing checks before delivery; document each failure and remediation in `decision_log.md` |
+
+---
+
 ## Key Decisions to Document
 
 - Version control system and branching strategy

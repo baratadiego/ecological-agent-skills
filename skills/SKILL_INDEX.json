@@ -46,10 +46,12 @@
         "ecological-data-foundation"
       ],
       "called_by_workflows": [
-        "assess-ecological-impact",
         "analyze-community-structure",
-        "run-occupancy-analysis",
+        "assess-ecological-impact",
         "assess-ecosystem-services",
+        "produce-technical-report",
+        "run-acoustic-monitoring",
+        "run-occupancy-analysis",
         "run-population-viability"
       ],
       "decision_points": {
@@ -183,13 +185,19 @@
       ],
       "depends_on_skills": [],
       "called_by_workflows": [
-        "run-sdm-study",
-        "run-occupancy-analysis",
-        "assess-ecological-impact",
         "analyze-community-structure",
         "analyze-environmental-change",
+        "assess-ecological-impact",
         "assess-ecosystem-services",
-        "run-multispecies-screening"
+        "assess-landscape-connectivity",
+        "build-fire-risk-map",
+        "run-acoustic-monitoring",
+        "run-camera-trap-occupancy",
+        "run-conservation-prioritization",
+        "run-multispecies-screening",
+        "run-occupancy-analysis",
+        "run-population-viability",
+        "run-sdm-study"
       ],
       "decision_points": {
         "n_records_min_for_sdm": 30,
@@ -246,7 +254,9 @@
         "geoprocessing-for-ecology"
       ],
       "called_by_workflows": [
-        "assess-ecological-impact"
+        "analyze-environmental-change",
+        "assess-ecological-impact",
+        "build-fire-risk-map"
       ],
       "decision_points": {
         "n_sites_min_per_group": 5,
@@ -447,11 +457,14 @@
         "ecological-data-foundation"
       ],
       "called_by_workflows": [
-        "run-sdm-study",
+        "analyze-environmental-change",
         "assess-ecological-impact",
         "assess-ecosystem-services",
+        "assess-landscape-connectivity",
         "build-fire-risk-map",
-        "run-multispecies-screening"
+        "run-conservation-prioritization",
+        "run-multispecies-screening",
+        "run-sdm-study"
       ],
       "decision_points": {
         "action_if_crs_mismatch": "reproject all layers to common CRS before any spatial operation",
@@ -515,15 +528,16 @@
         "predictive-modeling-best-practices"
       ],
       "called_by_workflows": [
-        "run-sdm-study",
-        "run-multispecies-screening",
-        "assess-ecological-impact",
         "analyze-community-structure",
-        "build-fire-risk-map",
-        "run-occupancy-analysis",
-        "run-camera-trap-occupancy",
+        "assess-ecological-impact",
         "assess-landscape-connectivity",
-        "run-population-viability"
+        "build-fire-risk-map",
+        "run-acoustic-monitoring",
+        "run-camera-trap-occupancy",
+        "run-multispecies-screening",
+        "run-occupancy-analysis",
+        "run-population-viability",
+        "run-sdm-study"
       ],
       "decision_points": {
         "auc_min_acceptable": 0.7,
@@ -585,6 +599,7 @@
         "ecological-data-foundation"
       ],
       "called_by_workflows": [
+        "run-camera-trap-occupancy",
         "run-occupancy-analysis"
       ],
       "decision_points": {
@@ -651,8 +666,9 @@
         "geoprocessing-for-ecology"
       ],
       "called_by_workflows": [
-        "run-sdm-study",
-        "run-multispecies-screening"
+        "build-fire-risk-map",
+        "run-multispecies-screening",
+        "run-sdm-study"
       ],
       "decision_points": {
         "vif_max_acceptable": 10,
@@ -713,18 +729,18 @@
       ],
       "depends_on_skills": [],
       "called_by_workflows": [
-        "run-sdm-study",
-        "run-occupancy-analysis",
-        "assess-ecological-impact",
         "analyze-community-structure",
         "analyze-environmental-change",
+        "assess-ecological-impact",
         "assess-ecosystem-services",
-        "produce-technical-report",
-        "run-camera-trap-occupancy",
         "assess-landscape-connectivity",
-        "run-population-viability",
+        "produce-technical-report",
+        "run-acoustic-monitoring",
+        "run-camera-trap-occupancy",
         "run-conservation-prioritization",
-        "run-multispecies-screening"
+        "run-occupancy-analysis",
+        "run-population-viability",
+        "run-sdm-study"
       ],
       "decision_points": {
         "action_if_not_reproducible_from_params": "complete parameter manifest before finalising any report",
@@ -787,8 +803,9 @@
         "predictive-modeling-best-practices"
       ],
       "called_by_workflows": [
-        "run-sdm-study",
-        "run-multispecies-screening"
+        "run-conservation-prioritization",
+        "run-multispecies-screening",
+        "run-sdm-study"
       ],
       "decision_points": {
         "n_occurrences_min": 10,
