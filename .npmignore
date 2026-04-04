@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+logs/
+tests/
+setup/
+.github/
+.gitignore
+.gitattributes
