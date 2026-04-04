@@ -38,7 +38,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.spatial.distance import braycurtis
-from scipy.cluster.hierarchy import dendrogram, linkage, copshenetic
+from scipy.cluster.hierarchy import dendrogram, linkage, cophenet
 from scipy.spatial.distance import squareform
 
 try:
@@ -203,7 +203,7 @@ def main():
     log_step(6, "Hierarchical clustering")
     try:
         Z = linkage(squareform(dm), method="ward")
-        c, _ = copshenetic(Z, squareform(dm))
+        c, _ = cophenet(Z, squareform(dm))
         log_decision("linkage_method", "ward", "minimises total within-cluster variance; standard for ecology")
         logger.info("Cophenetic correlation (Ward): %.3f", c)
         if c < 0.7:
