@@ -1,7 +1,7 @@
 # Repository Statistics
 
-Generated: 2026-04-03
-Version: 3.2.0 (unreleased patch)
+Generated: 2026-04-04
+Version: 3.2.0
 
 ---
 
@@ -11,8 +11,8 @@ Version: 3.2.0 (unreleased patch)
 |----------|-------|
 | Skills | 17 |
 | Workflows | 14 |
-| R scripts | 38 |
-| Python scripts | 20 |
+| R scripts | 34 |
+| Python scripts | 26 |
 | Worked examples | 14 |
 | Resource documents | 53 |
 | Documentation files (docs/) | 8 |
@@ -70,7 +70,7 @@ Version: 3.2.0 (unreleased patch)
 
 | Section | Checks |
 |---------|--------|
-| Structure checks | 585/585 passed |
+| Structure checks | 652/652 passed |
 | Skills verified | 17 |
 | Workflows verified | 14 |
 | Global coverage | 6/6 continents |
@@ -81,7 +81,7 @@ Version: 3.2.0 (unreleased patch)
 
 | Test type | Count |
 |-----------|-------|
-| CI structural checks | 585 |
+| CI structural checks | 652 |
 | Python unit tests (pytest) | 176+ |
 | R unit tests (testthat) | 28+ |
 | Agent smoke test cases | 15 |

@@ -95,7 +95,7 @@ Guides the agent through the design and analysis of occupancy studies that accou
 
 ---
 
-## Key Decisions to Document
+## Decision Points
 
 - Closure assumption justification
 - Candidate model set rationale

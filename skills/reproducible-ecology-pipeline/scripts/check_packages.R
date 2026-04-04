@@ -15,6 +15,8 @@ log_step  <- function(n, d) log_info("-- STEP %d: %s", n, d)
 log_decision <- function(v, val, why) log_info("DECISION | %s = %s | %s", v, val, why)
 dir.create("logs", recursive = TRUE, showWarnings = FALSE)
 
+suppressPackageStartupMessages(library(utils))
+
 log_info("Script: check_packages.R | Skill: %s", SKILL_NAME)
 log_info("R version: %s", R.version.string)
 

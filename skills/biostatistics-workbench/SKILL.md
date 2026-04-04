@@ -107,7 +107,7 @@ Guides the agent through the selection, execution, and interpretation of statist
 
 ---
 
-## Key Decisions to Document
+## Decision Points
 
 - Response variable distribution and link function
 - Random effects structure and rationale

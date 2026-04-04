@@ -105,7 +105,7 @@ The BACI estimator is only valid if Control and Impact groups had parallel traje
 
 ---
 
-## Key Decisions to Document
+## Decision Points
 
 - Control site selection criteria
 - BACI model specification (fixed vs. random effects)

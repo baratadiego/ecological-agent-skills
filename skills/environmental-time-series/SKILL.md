@@ -91,7 +91,7 @@ Guides the agent through the analysis of environmental and ecological time serie
 
 ---
 
-## Key Decisions to Document
+## Decision Points
 
 - Baseline period definition
 - Gap interpolation method

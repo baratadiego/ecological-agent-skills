@@ -1,6 +1,6 @@
 # Test Suite — ecological-agent-skills
 
-Automated tests for all 12 skills using **pytest** (Python) and **testthat** (R).
+Automated tests for all 17 skills using **pytest** (Python) and **testthat** (R).
 
 ---
 
@@ -14,20 +14,46 @@ tests/
 │   ├── pytest.ini                ← pytest configuration
 │   ├── run_all_tests.sh          ← run full suite
 │   ├── test_data_integrity.py    ← validates all test datasets first
-│   ├── test_ecological_data_foundation.py
-│   ├── test_model_validation.py
-│   ├── test_environmental_time_series.py
+│   ├── test_acoustic_monitoring.py
+│   ├── test_biostatistics_workbench.py
+│   ├── test_camera_trap.py
 │   ├── test_community_ecology.py
-│   ├── test_predictive_modeling.py
+│   ├── test_download_sources.py
+│   ├── test_ecological_data_foundation.py
 │   ├── test_ecosystem_services.py
-│   └── test_occupancy.py
+│   ├── test_environmental_time_series.py
+│   ├── test_geoprocessing.py
+│   ├── test_integration.py
+│   ├── test_landscape_connectivity.py
+│   ├── test_logging_and_errors.py
+│   ├── test_model_validation.py
+│   ├── test_occupancy.py
+│   ├── test_population_viability.py
+│   ├── test_predictive_modeling.py
+│   ├── test_reproducible_pipeline.py
+│   ├── test_spatial_prioritization.py
+│   └── test_species_distribution_modeling.py
 └── r/
     ├── run_all_tests.R           ← run full suite
-    ├── test-ecological-data-foundation.R
+    ├── test-acoustic-monitoring.R
+    ├── test-baci-impact.R
     ├── test-biostatistics-workbench.R
+    ├── test-camera-trap.R
     ├── test-community-ecology.R
+    ├── test-download-sources.R
+    ├── test-ecological-data-foundation.R
+    ├── test-ecosystem-services.R
+    ├── test-environmental-time-series.R
+    ├── test-geoprocessing.R
+    ├── test-landscape-connectivity.R
+    ├── test-logging-and-errors.R
+    ├── test-model-validation.R
     ├── test-occupancy.R
-    └── test-baci-impact.R
+    ├── test-population-viability.R
+    ├── test-predictive-modeling.R
+    ├── test-reproducible-ecology-pipeline.R
+    ├── test-spatial-prioritization.R
+    └── test-species-distribution-modeling.R
 ```
 
 ---

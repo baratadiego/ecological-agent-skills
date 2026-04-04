@@ -100,7 +100,7 @@ Guides the agent through rigorous evaluation of any fitted model: computing perf
 
 ---
 
-## Key Decisions to Document
+## Decision Points
 
 - Primary and secondary metrics chosen and rationale
 - Threshold selection method

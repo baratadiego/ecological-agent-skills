@@ -315,7 +315,22 @@ for (fold_i in seq_len(cv_k)) {
   }
 
   if (length(preds_fold) > 0) {
-    ens_pred <- rowMeans(do.call(cbind, preds_fold), na.rm = TRUE)
+    pred_mat <- do.call(cbind, preds_fold)
+
+    # Compute per-algorithm AUC for this fold
+    fold_aucs <- vapply(names(preds_fold), function(a) {
+      compute_auc(preds_fold[[a]][te_pa == 1], preds_fold[[a]][te_pa == 0])
+    }, numeric(1))
+    fold_aucs[is.na(fold_aucs)] <- 0
+
+    # AUC-weighted ensemble (fall back to equal weights if all AUCs are zero)
+    if (sum(fold_aucs) > 0) {
+      w <- fold_aucs / sum(fold_aucs)
+      ens_pred <- as.numeric(pred_mat %*% w)
+    } else {
+      ens_pred <- rowMeans(pred_mat, na.rm = TRUE)
+    }
+
     p1 <- ens_pred[te_pa == 1]
     p0 <- ens_pred[te_pa == 0]
 
@@ -345,6 +360,23 @@ log_info("Written: cv_performance.csv")
 log_info("CV AUC mean: %.3f (SD: %.3f) | TSS mean: %.3f (SD: %.3f)",
          mean(cv_df$auc_ensemble, na.rm = TRUE), sd(cv_df$auc_ensemble, na.rm = TRUE),
          mean(cv_df$tss_ensemble, na.rm = TRUE), sd(cv_df$tss_ensemble, na.rm = TRUE))
+
+# ── Compute AUC-based ensemble weights from CV results ────────────────────────
+algo_aucs <- c(
+  maxent = mean(cv_df$auc_maxent, na.rm = TRUE),
+  brt    = mean(cv_df$auc_brt,    na.rm = TRUE),
+  rf     = mean(cv_df$auc_rf,     na.rm = TRUE)
+)
+algo_aucs <- algo_aucs[!is.na(algo_aucs)]
+if (length(algo_aucs) > 0 && sum(algo_aucs) > 0) {
+  auc_weights <- algo_aucs / sum(algo_aucs)
+} else {
+  auc_weights <- setNames(rep(1 / length(active_algos), length(active_algos)), active_algos)
+}
+log_decision("ensemble_weighting", "AUC-weighted",
+             "Weights proportional to mean CV AUC per algorithm — avoids mixing incompatible output scales equally")
+log_info("Ensemble weights: %s",
+         paste(sprintf("%s=%.3f", names(auc_weights), auc_weights), collapse = ", "))
 
 auc_mean <- mean(cv_df$auc_ensemble, na.rm = TRUE)
 auc_min  <- p$decision_points$auc_min_acceptable %||% 0.7
@@ -406,8 +438,9 @@ if (length(active_algos) == 0) {
 }
 log_info("Final models fitted: %s", paste(active_algos, collapse = ", "))
 
-saveRDS(final_models, file.path(output_dir, "ensemble_models.rds"))
-log_info("Written: ensemble_models.rds")
+saveRDS(list(models = final_models, auc_weights = auc_weights),
+        file.path(output_dir, "ensemble_models.rds"))
+log_info("Written: ensemble_models.rds (with AUC weights)")
 
 # ── 10. Predict over study area ───────────────────────────────────────────────
 log_step(10, "Predict ensemble suitability over study area raster")
@@ -434,7 +467,9 @@ if (length(pred_rasters) == 0) {
 }
 
 pred_stack <- terra::rast(pred_rasters)
-ens_mean   <- terra::app(pred_stack, mean, na.rm = TRUE)
+w_raster   <- auc_weights[names(pred_rasters)]
+w_raster   <- w_raster / sum(w_raster)  # re-normalise in case an algo failed
+ens_mean   <- terra::app(pred_stack, fun = function(x) weighted.mean(x, w_raster, na.rm = TRUE))
 ens_sd     <- if (terra::nlyr(pred_stack) > 1)
                 terra::app(pred_stack, sd, na.rm = TRUE) else
                 ens_mean * 0
@@ -658,7 +693,7 @@ report_lines <- c(
   "| `response_curves.png` | Partial dependence response curves |",
   "| `cv_performance.csv` | AUC and TSS per cross-validation fold |",
   "| `prediction_summary.csv` | Suitable area statistics |",
-  "| `ensemble_models.rds` | Fitted model objects for downstream projection |",
+  "| `ensemble_models.rds` | Fitted model objects with AUC weights for downstream projection |",
   "",
   "---",
   "",
