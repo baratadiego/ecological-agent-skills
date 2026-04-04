@@ -73,3 +73,6 @@ plots/
 
 # Docs build
 _site/
+
+# Claude Code
+.claude/
