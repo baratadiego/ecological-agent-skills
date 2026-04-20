@@ -1,5 +1,11 @@
 # ecological-agent-skills
 
+[![CI](https://github.com/baratadiego/ecological-agent-skills/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/baratadiego/ecological-agent-skills/actions/workflows/ci.yml)
+[![Version](https://img.shields.io/badge/version-3.2.1-informational)](CHANGELOG.md)
+[![Skills](https://img.shields.io/badge/skills-17-blue)](CATALOG.md)
+[![Workflows](https://img.shields.io/badge/workflows-14-blue)](#workflows-14)
+[![CI checks](https://img.shields.io/badge/CI%20checks-677-brightgreen)](tests/ci_check.sh)
+[![SKILL.md lint](https://img.shields.io/badge/SKILL.md%20lint-204%2F204-brightgreen)](tests/lint_skill_md.sh)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 Teach your AI agent to do rigorous ecology.
@@ -8,7 +14,7 @@ Teach your AI agent to do rigorous ecology.
 
 Works with Claude Code, Gemini CLI, Cursor, GitHub Copilot, and any agent that reads Markdown.
 
-**17 modular skills** | **14 multi-step workflows** | **58 R/Python scripts** | **14 worked examples across 6 continents**
+**17 modular skills** | **14 multi-step workflows** | **66 R/Python scripts** | **14 worked examples across 6 continents**
 
 ---
 
@@ -316,7 +322,7 @@ ecological-agent-skills/
 ├── templates/                    ← reusable prompts, reports, checklists
 ├── examples/                     ← 14 worked examples (6 continents)
 ├── docs/                         ← theoretical foundations, comparisons
-├── tests/                        ← pytest + testthat + 585 CI checks
+├── tests/                        ← pytest + testthat + 677 CI checks
 │   ├── ci_check.sh               ← structural integrity checker
 │   ├── python/                   ← 19 pytest test files
 │   ├── r/                        ← 18 testthat test files
