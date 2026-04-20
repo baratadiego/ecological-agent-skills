@@ -1,0 +1,14 @@
+{
+  "_description": "Accepted h2 heading synonyms for SKILL.md files. Each key is the canonical heading (first entry in its array). A skill passes the section check if any synonym in its group appears as an h2 (## ...) line. Reason for this design: prior incidents where semantically equivalent but textually distinct headings (e.g. 'Key Decisions to Document' vs 'Decision Points') broke the linter. Keep additions conservative and documented.",
+  "sections": {
+    "Purpose":             ["Purpose", "Overview", "Summary"],
+    "When to Invoke":      ["When to Invoke", "When to Use", "Triggers"],
+    "Inputs":              ["Inputs", "Input Data", "Required Inputs"],
+    "Outputs":             ["Outputs", "Output Data", "Deliverables"],
+    "Steps":               ["Steps", "Procedure", "Workflow"],
+    "Decision Points":     ["Decision Points", "Key Decisions", "Key Decisions to Document"],
+    "Tools and Libraries": ["Tools and Libraries", "Tooling", "Dependencies"],
+    "Resources":           ["Resources", "References", "Additional Resources"],
+    "Notes":               ["Notes", "Caveats", "Additional Notes"]
+  }
+}
