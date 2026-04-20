@@ -45,6 +45,12 @@ maps/
 # Keep test CSVs (explicitly tracked)
 !tests/data/*.csv
 
+# Keep synthetic raster fixtures and regression reference rasters
+!tests/data/rasters/
+!tests/data/rasters/**
+!tests/regression/reference_outputs/
+!tests/regression/reference_outputs/**
+
 # Logs and temp files
 *.log
 *.tmp
@@ -78,3 +84,13 @@ _site/
 .claude/
 ANALYSIS_AND_ROADMAP.md
 RELEASE_CHECKLIST.md
+
+# Test artifacts (generated at runtime)
+logs/
+tests/regression/regression_report.txt
+tests/regression/.tmp_current/
+tests/regression/.tmp_update/
+
+# Local analysis scratchpads (never commit)
+analises_*.md
+CLAUDE.local.md

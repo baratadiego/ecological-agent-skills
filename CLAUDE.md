@@ -15,14 +15,18 @@ Read `AGENT_CONTEXT.md` before any task. All agent routing rules are there.
 - `tests/` — CI, Python pytest, R testthat, regression, and agent smoke tests
 
 ## Testing
-- Full CI: `bash tests/ci_check.sh`
+- **Start with**: `make verify-env` (or `bash tests/verify_env.sh`) — functional
+  geospatial smoke test. Catches GDAL/GEOS/PROJ native-lib mismatches before
+  they surface as confusing errors deep inside `terra::project()` /
+  `rasterio.warp.reproject()`.
+- Full CI: `make ci` or `bash tests/ci_check.sh`
+- Full suite: `make test` (verify-env + ci + lint + pytest + regression + testthat)
 - Python: `python3 -m pytest tests/python/`
 - R: `Rscript tests/r/run_all_tests.R`
 - Validate SKILL_INDEX: `python3 -m json.tool skills/SKILL_INDEX.json > /dev/null`
-- Regression suite: `bash tests/regression/run_regression_tests.sh` (35 checks).
-  On Git Bash/Windows prefix with `LC_ALL=C.UTF-8` to avoid locale errors in
-  `tests/generate_stats.sh` and the regression scripts.
-- Regenerate regression references: `bash tests/regression/update_references.sh --confirm-update`
+- Regression suite: `make regression` (35 checks).
+  On Git Bash/Windows prefix with `LC_ALL=C.UTF-8` if not using make.
+- Regenerate regression references: `make regression-update`
 
 ## Known Environment Issues
 - **Python 3.14**: `skbio` does not yet install (blocks `community_analysis.py`
