@@ -3,6 +3,38 @@
 All notable changes to this repository are documented here.
 Format: [version] — date — description
 
+## [Unreleased] — Post-3.2.1 quality pass
+
+Follow-ups on the v3.2.1 post-release analysis plan. No skill API changes;
+no scientific output changes for runnable scripts.
+
+### Added — Infrastructure
+- **`tests/verify_env.sh`** + **`tests/verify_env.py`** + **`tests/verify_env.R`** — Functional geospatial smoke test covering imports, GDAL/GEOS/PROJ bindings, vector reprojection + GPKG round-trip, and rasterio/terra reproject against the `bio1.tif` fixture. Exit code 1 on any functional failure.
+- **`Makefile`** — Thin wrapper exposing `verify-env`, `test`, `ci`, `lint`, `regression`, `regression-update`, `stats`, `stats-check`, `test-python`, `test-r`, and `clean` for users without `make` on Windows (each target forwards to the existing bash script).
+- **`.github/workflows/ci.yml`** — New `verify-env` job that installs the Python + R geospatial stack on `ubuntu-latest` and runs `tests/verify_env.sh` on every push/PR.
+- **Regression reference baseline** — `tests/regression/run_regression_tests.sh` now covers 35 checks (was 25). Added fixtures `tests/data/carbon_pools.csv` and `tests/data/patches.csv`; enabled previously-commented `landscape-connectivity`, `fragmentation_analysis`, and `ecological-impact-assessment` cases; stripped `Date:`/`Time:` from text diffs to eliminate statsmodels timestamp drift.
+- **`tests/allowed_headings.json`** — Declarative synonym map for the SKILL.md linter (`Decision Points` / `Key Decisions` / `Key Decisions to Document`, etc.) to prevent regressions of the "Key Decisions to Document" false-positive class.
+- **6 quality badges in `README.md`** — CI (dynamic via GitHub Actions), version, skills, workflows, CI checks, and SKILL.md lint count.
+
+### Added — Documentation
+- **`docs/theoretical-foundations.md` §11** — Rank-transformation as an opt-in complement to the AUC-weighted ensemble (references: Marmion 2009, Crimmins 2013, Hao 2019). Current default behavior is unchanged; implementation sketch provided for users who need discrimination-only aggregation.
+- **`CLAUDE.md`** — Documented `make verify-env` as the recommended first step, the `LC_ALL=C.UTF-8` caveat for Git Bash on Windows, Python 3.14 skbio/biom limitation, and the fact that regression fixtures are synthetic.
+
+### Fixed
+- **Raster fixture gitignore hole** — `*.tif` rule was silently blocking `tests/data/rasters/{bio1,bio12,landcover}.tif` and the regression reference raster from being committed. Fresh clones had broken fixtures; added explicit whitelists.
+- **`tests/lint_skill_md.sh`** — Replaced brittle exact-match heading check with synonym-aware matcher (reads `tests/allowed_headings.json`).
+- **`tests/ci_check.sh` job name** — GitHub Actions job renamed from `Structural integrity (585 checks)` (stale) to `Structural integrity` (avoids re-drift as checks grow).
+- **`skills/predictive-modeling-best-practices/scripts/spatial_cv.py`** — `collinearity_report` now constructs its DataFrame with explicit columns so `.sort_values('spearman_r')` works on empty results under Python 3.14's stricter semantics.
+- **Example convention** — Renamed `examples/impact/ecosystem_services_atlantic_forest.md` → `ecosystem_services_atlantic_example.md` to match the `*_example.md` pattern; CI now correctly counts 14/14 examples (was 13/14 with one orphan).
+- **`skills/community-ecology-ordination/scripts/community_analysis.py`** — Removed dead `beta_diversity` import from the `skbio` block; updated docstring to mark `scikit-bio` as optional and explain the graceful-skip path on Python versions without wheels.
+
+### Changed
+- Structural CI check count: 676 → 679 thresholds after adding new fixtures and the renamed example file (`Structure checks: 680/679 passed`).
+- `README.md` total script count corrected (58 → 66) to match `ci_check.sh` output (34 R + 32 Python).
+- `.gitignore` — Added whitelists for the rasters + regression reference trees, and explicit ignore for `analises_*.md`, `CLAUDE.local.md`, `logs/`, and regression temp directories.
+
+---
+
 ## [3.2.1] — 2026-04-04 — DevContainer, SKILL.md linter, R/Python parity, scientific fixes
 
 ### Added — Infrastructure

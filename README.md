@@ -4,7 +4,7 @@
 [![Version](https://img.shields.io/badge/version-3.2.1-informational)](CHANGELOG.md)
 [![Skills](https://img.shields.io/badge/skills-17-blue)](CATALOG.md)
 [![Workflows](https://img.shields.io/badge/workflows-14-blue)](#workflows-14)
-[![CI checks](https://img.shields.io/badge/CI%20checks-677-brightgreen)](tests/ci_check.sh)
+[![CI checks](https://img.shields.io/badge/CI%20checks-680-brightgreen)](tests/ci_check.sh)
 [![SKILL.md lint](https://img.shields.io/badge/SKILL.md%20lint-204%2F204-brightgreen)](tests/lint_skill_md.sh)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
@@ -322,7 +322,7 @@ ecological-agent-skills/
 ├── templates/                    ← reusable prompts, reports, checklists
 ├── examples/                     ← 14 worked examples (6 continents)
 ├── docs/                         ← theoretical foundations, comparisons
-├── tests/                        ← pytest + testthat + 677 CI checks
+├── tests/                        ← pytest + testthat + 680 CI checks
 │   ├── ci_check.sh               ← structural integrity checker
 │   ├── python/                   ← 19 pytest test files
 │   ├── r/                        ← 18 testthat test files
