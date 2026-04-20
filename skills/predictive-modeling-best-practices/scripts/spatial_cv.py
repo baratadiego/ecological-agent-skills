@@ -57,7 +57,8 @@ def collinearity_report(df: pd.DataFrame, predictors: list, r_thresh=0.7) -> pd.
             r = cor.iloc[i, j]
             if r > r_thresh:
                 pairs.append({"var1": predictors[i], "var2": predictors[j], "spearman_r": round(r, 4)})
-    return pd.DataFrame(pairs).sort_values("spearman_r", ascending=False)
+    out = pd.DataFrame(pairs, columns=["var1", "var2", "spearman_r"])
+    return out.sort_values("spearman_r", ascending=False) if not out.empty else out
 
 def main():
     data_file     = sys.argv[1] if len(sys.argv) > 1 else "data/processed/points_with_env.csv"

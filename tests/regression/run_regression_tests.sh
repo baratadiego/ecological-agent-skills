@@ -386,26 +386,35 @@ declare -A SKILL_SCRIPTS
 SKILL_SCRIPTS["ecological-data-foundation/py"]="python:skills/ecological-data-foundation/scripts/clean_occurrences.py:tests/data/occurrences_raw.csv $TMP_DIR/ecological-data-foundation"
 
 # --- biostatistics-workbench ---
-SKILL_SCRIPTS["biostatistics-workbench/py"]="python:skills/biostatistics-workbench/scripts/glm_pipeline.py:tests/data/points_with_env.csv richness $TMP_DIR/biostatistics-workbench"
+SKILL_SCRIPTS["biostatistics-workbench/py"]="python:skills/biostatistics-workbench/scripts/glm_pipeline.py:tests/data/points_with_env.csv pa $TMP_DIR/biostatistics-workbench"
 
 # --- community-ecology-ordination ---
 SKILL_SCRIPTS["community-ecology-ordination/py"]="python:skills/community-ecology-ordination/scripts/community_analysis.py:tests/data/species_site_matrix.csv tests/data/site_metadata.csv $TMP_DIR/community-ecology-ordination"
 
 # --- environmental-time-series ---
 SKILL_SCRIPTS["environmental-time-series/trend"]="python:skills/environmental-time-series/scripts/trend_analysis.py:tests/data/ndvi_monthly_series.csv $TMP_DIR/environmental-time-series/trend"
-SKILL_SCRIPTS["environmental-time-series/recovery"]="python:skills/environmental-time-series/scripts/recovery_trajectory.py:tests/data/ndvi_monthly_series.csv $TMP_DIR/environmental-time-series/recovery"
+SKILL_SCRIPTS["environmental-time-series/recovery"]="python:skills/environmental-time-series/scripts/recovery_trajectory.py:tests/data/ndvi_monthly_series.csv 2015-01-01 $TMP_DIR/environmental-time-series/recovery"
 
 # --- model-validation-and-uncertainty ---
 SKILL_SCRIPTS["model-validation-and-uncertainty/py"]="python:skills/model-validation-and-uncertainty/scripts/validate_model.py:tests/data/model_predictions.csv $TMP_DIR/model-validation-and-uncertainty"
 
 # --- occupancy-and-detection ---
-SKILL_SCRIPTS["occupancy-and-detection/py"]="python:skills/occupancy-and-detection/scripts/occupancy_analysis.py:tests/data/detection_history.csv tests/data/occ_site_covariates.csv $TMP_DIR/occupancy-and-detection"
+SKILL_SCRIPTS["occupancy-and-detection/py"]="python:skills/occupancy-and-detection/scripts/occupancy_analysis.py:tests/data/detection_history.csv $TMP_DIR/occupancy-and-detection"
 
 # --- population-viability-analysis ---
-SKILL_SCRIPTS["population-viability-analysis/py"]="python:skills/population-viability-analysis/scripts/pva_analysis.py:tests/data/richness_data.csv $TMP_DIR/population-viability-analysis"
+SKILL_SCRIPTS["population-viability-analysis/py"]="python:skills/population-viability-analysis/scripts/pva_analysis.py:tests/data/vital_rates.csv $TMP_DIR/population-viability-analysis"
 
 # --- ecosystem-services-assessment ---
-SKILL_SCRIPTS["ecosystem-services-assessment/py"]="python:skills/ecosystem-services-assessment/scripts/compute_es.py:tests/data/es_summary_table.csv $TMP_DIR/ecosystem-services-assessment"
+SKILL_SCRIPTS["ecosystem-services-assessment/py"]="python:skills/ecosystem-services-assessment/scripts/compute_es.py:tests/data/rasters/landcover.tif tests/data/carbon_pools.csv $TMP_DIR/ecosystem-services-assessment"
+
+# --- predictive-modeling-best-practices ---
+SKILL_SCRIPTS["predictive-modeling-best-practices/py"]="python:skills/predictive-modeling-best-practices/scripts/spatial_cv.py:tests/data/points_with_env.csv $TMP_DIR/predictive-modeling-best-practices"
+
+# --- landscape-connectivity ---
+SKILL_SCRIPTS["landscape-connectivity/py"]="python:skills/landscape-connectivity/scripts/connectivity_analysis.py:tests/data/patches.csv $TMP_DIR/landscape-connectivity"
+
+# --- ecological-impact-assessment ---
+SKILL_SCRIPTS["ecological-impact-assessment/py"]="python:skills/ecological-impact-assessment/scripts/fragmentation_analysis.py:tests/data/rasters/landcover.tif 1 $TMP_DIR/ecological-impact-assessment"
 
 
 # Step 2: Walk reference files and run comparisons
@@ -463,12 +472,16 @@ while IFS= read -r -d '' ref_file; do
       compare_png "$ref_file" "$cur_file" "$rel_path"
       ;;
     md|txt|log)
-      # Text files: exact comparison (ignoring trailing whitespace)
+      # Text files: exact comparison (ignoring trailing whitespace and
+      # volatile metadata lines like Date:/Time: in statsmodels summaries)
       if [[ ! -f "$cur_file" ]]; then
         echo "  [FAIL] $rel_path — current output file not found"
         FAIL=$((FAIL + 1))
         DETAILS+=("[FAIL] $rel_path — file not found")
-      elif diff -q <(sed 's/[[:space:]]*$//' "$ref_file") <(sed 's/[[:space:]]*$//' "$cur_file") > /dev/null 2>&1; then
+      elif diff -q \
+          <(sed -E 's/[[:space:]]*$//; /^(Date|Time):[[:space:]]/d' "$ref_file") \
+          <(sed -E 's/[[:space:]]*$//; /^(Date|Time):[[:space:]]/d' "$cur_file") \
+          > /dev/null 2>&1; then
         echo "  [PASS] $rel_path — text matches reference"
         PASS=$((PASS + 1))
         DETAILS+=("[PASS] $rel_path — text matches reference")

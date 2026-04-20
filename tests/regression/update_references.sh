@@ -160,7 +160,7 @@ run_and_save \
   "skills/biostatistics-workbench/scripts/glm_pipeline.py" \
   "biostatistics-workbench" \
   "$TEST_DATA/points_with_env.csv" \
-  "richness" \
+  "pa" \
   "__OUTPUT__"
 
 # --- community-ecology-ordination: community_analysis.py ---
@@ -190,7 +190,7 @@ run_and_save \
 
 # --- environmental-time-series: recovery_trajectory.py ---
 # Requires: pandas, numpy, scipy, matplotlib
-# Inputs: ndvi_monthly_series.csv
+# Inputs: ndvi_monthly_series.csv, disturbance_date
 # Outputs: recovery metrics CSV, plots
 run_and_save \
   "environmental-time-series/recovery_trajectory.py" \
@@ -198,6 +198,7 @@ run_and_save \
   "skills/environmental-time-series/scripts/recovery_trajectory.py" \
   "environmental-time-series/recovery" \
   "$TEST_DATA/ndvi_monthly_series.csv" \
+  "2015-01-01" \
   "__OUTPUT__"
 
 # --- model-validation-and-uncertainty: validate_model.py ---
@@ -214,7 +215,7 @@ run_and_save \
 
 # --- occupancy-and-detection: occupancy_analysis.py ---
 # Requires: pandas, numpy, scipy, matplotlib
-# Inputs: detection_history.csv, occ_site_covariates.csv
+# Inputs: detection_history.csv
 # Outputs: occupancy estimates CSV, detection summary
 run_and_save \
   "occupancy-and-detection/occupancy_analysis.py" \
@@ -222,31 +223,31 @@ run_and_save \
   "skills/occupancy-and-detection/scripts/occupancy_analysis.py" \
   "occupancy-and-detection" \
   "$TEST_DATA/detection_history.csv" \
-  "$TEST_DATA/occ_site_covariates.csv" \
   "__OUTPUT__"
 
 # --- population-viability-analysis: pva_analysis.py ---
 # Requires: pandas, numpy, matplotlib
-# Inputs: richness_data.csv (used as demographic proxy for testing)
+# Inputs: vital_rates.csv (stage-structured demographic matrix)
 # Outputs: PVA results CSV, trajectory plots
 run_and_save \
   "population-viability-analysis/pva_analysis.py" \
   "$PYTHON_CMD" \
   "skills/population-viability-analysis/scripts/pva_analysis.py" \
   "population-viability-analysis" \
-  "$TEST_DATA/richness_data.csv" \
+  "$TEST_DATA/vital_rates.csv" \
   "__OUTPUT__"
 
 # --- ecosystem-services-assessment: compute_es.py ---
-# Requires: pandas, numpy, matplotlib
-# Inputs: es_summary_table.csv
-# Outputs: ES valuation CSV, summary plots
+# Requires: pandas, numpy, rasterio, geopandas
+# Inputs: rasters/landcover.tif, carbon_pools.csv
+# Outputs: carbon/erosion/pollination rasters, es_summary_table.csv
 run_and_save \
   "ecosystem-services-assessment/compute_es.py" \
   "$PYTHON_CMD" \
   "skills/ecosystem-services-assessment/scripts/compute_es.py" \
   "ecosystem-services-assessment" \
-  "$TEST_DATA/es_summary_table.csv" \
+  "$TEST_DATA/rasters/landcover.tif" \
+  "$TEST_DATA/carbon_pools.csv" \
   "__OUTPUT__"
 
 # --- predictive-modeling-best-practices: spatial_cv.py ---
@@ -275,29 +276,29 @@ run_and_save \
 #   "__OUTPUT__"
 
 # --- landscape-connectivity: connectivity_analysis.py ---
-# Requires: rasterio, networkx, scipy, numpy
-# NOTE: Requires raster input files not available in test data
-# TODO: Add when raster test fixtures are created
-# run_and_save \
-#   "landscape-connectivity/connectivity_analysis.py" \
-#   "$PYTHON_CMD" \
-#   "skills/landscape-connectivity/scripts/connectivity_analysis.py" \
-#   "landscape-connectivity" \
-#   "<resistance_raster>" \
-#   "<patches_vector>" \
-#   "__OUTPUT__"
+# Requires: networkx, numpy, matplotlib
+# Inputs: patches.csv (patch_id, x, y, area_ha)
+# Outputs: patch_metrics.csv, landscape_summary.csv, connectivity_graph.png
+run_and_save \
+  "landscape-connectivity/connectivity_analysis.py" \
+  "$PYTHON_CMD" \
+  "skills/landscape-connectivity/scripts/connectivity_analysis.py" \
+  "landscape-connectivity" \
+  "$TEST_DATA/patches.csv" \
+  "__OUTPUT__"
 
 # --- ecological-impact-assessment: fragmentation_analysis.py ---
 # Requires: rasterio, numpy, matplotlib
-# NOTE: Requires raster input files not available in test data
-# TODO: Add when raster test fixtures are created
-# run_and_save \
-#   "ecological-impact-assessment/fragmentation_analysis.py" \
-#   "$PYTHON_CMD" \
-#   "skills/ecological-impact-assessment/scripts/fragmentation_analysis.py" \
-#   "ecological-impact-assessment" \
-#   "<landcover_raster>" \
-#   "__OUTPUT__"
+# Inputs: rasters/landcover.tif, habitat_class (e.g. 1 = forest)
+# Outputs: fragmentation metrics CSV, plots
+run_and_save \
+  "ecological-impact-assessment/fragmentation_analysis.py" \
+  "$PYTHON_CMD" \
+  "skills/ecological-impact-assessment/scripts/fragmentation_analysis.py" \
+  "ecological-impact-assessment" \
+  "$TEST_DATA/rasters/landcover.tif" \
+  "1" \
+  "__OUTPUT__"
 
 # --- species-distribution-modeling: sdm_pipeline.py ---
 # Requires: scikit-learn, rasterio, geopandas, etc.

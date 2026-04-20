@@ -1,0 +1,4 @@
+metric,value
+AUC-ROC,0.8515
+MaxTSS,0.5375
+Threshold_MaxTSS,0.99

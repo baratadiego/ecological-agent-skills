@@ -1,0 +1,4 @@
+occurrenceID,scientificName,decimalLatitude,decimalLongitude,eventDate,countryCode,basisOfRecord,coordinateUncertaintyInMeters,QA_issue,QA_status
+bad_001,Panthera onca,0.0,0.0,2019-03-10,BR,HumanObservation,,zero_coords,COORD_ZERO
+bad_004,Panthera onca,-12.5,-55.3,2030-01-01,BR,HumanObservation,200.0,future_date,DATE_FUTURE
+bad_003,Panthera onca,999.0,-50.0,2018-01-01,BR,HumanObservation,,coord_out_of_range,COORD_OUT_OF_RANGE

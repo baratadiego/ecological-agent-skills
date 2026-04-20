@@ -1,0 +1,11 @@
+metric,value
+n_simulations,1000
+n_init,1000
+quasi_ext_threshold,50.0
+t_max,100
+p_extinction,0.0
+mte_mean_yr,inf
+mte_CI_2.5,nan
+mte_CI_97.5,nan
+lambda_s,1.0136
+iucn_category,LC/NT

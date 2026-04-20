@@ -1,0 +1,7 @@
+lucode,LULC_name,C_above,C_below,C_soil,C_dead
+1,forest,120.0,30.0,80.0,15.0
+2,grassland,5.0,8.0,60.0,1.0
+3,cropland,3.0,2.0,45.0,0.5
+4,urban,1.0,0.5,20.0,0.0
+5,bare,0.0,0.0,10.0,0.0
+6,water,0.0,0.0,0.0,0.0
