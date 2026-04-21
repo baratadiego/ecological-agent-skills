@@ -49,11 +49,19 @@ record <- function(name, ok, detail = "") {
 }
 
 try_require <- function(pkg) {
-  ok <- suppressWarnings(suppressMessages(
+  installed <- pkg %in% rownames(installed.packages())
+  load_err  <- NULL
+  ok <- suppressWarnings(suppressMessages(tryCatch({
     requireNamespace(pkg, quietly = TRUE)
-  ))
-  if (!ok) {
-    record(sprintf("library(%s)", pkg), FALSE, "package not installed")
+  }, error = function(e) {
+    load_err <<- conditionMessage(e)
+    FALSE
+  })))
+  if (!isTRUE(ok)) {
+    detail <- if (!installed) "package not installed"
+              else if (!is.null(load_err)) sprintf("installed but failed to load: %s", load_err)
+              else "installed but requireNamespace() returned FALSE (likely missing shared lib — check libgdal/libgeos/libproj)"
+    record(sprintf("library(%s)", pkg), FALSE, detail)
     return(FALSE)
   }
   ver <- tryCatch(as.character(packageVersion(pkg)), error = function(e) "?")
