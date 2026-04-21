@@ -123,6 +123,17 @@ def main():
         )
         raise
 
+    # Drop any non-numeric columns (e.g. a 'group' label accidentally left in
+    # the species matrix — grouping belongs in the metadata file, not here).
+    non_numeric = sp.select_dtypes(exclude="number").columns.tolist()
+    if non_numeric:
+        logger.warning(
+            "Dropping non-numeric columns from species matrix: %s "
+            "(grouping metadata belongs in the metadata file)",
+            non_numeric,
+        )
+        sp = sp.drop(columns=non_numeric)
+
     logger.info("Sites: %d | Species: %d", len(sp), len(sp.columns))
 
     if (sp < 0).any().any():
