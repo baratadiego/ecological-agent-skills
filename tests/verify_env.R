@@ -17,6 +17,16 @@ suppressPackageStartupMessages({
   # no-op — we import per-check so missing packages report individually
 })
 
+# Ensure R_LIBS_USER is on .libPaths(). Rscript normally honours it, but when
+# setup-r writes R_LIBS_USER via $GITHUB_ENV on Actions runners, the target
+# directory occasionally doesn't exist at the moment Rscript inspects it
+# (--no-init means no ~/.Rprofile to fix this). Prepend it defensively so the
+# verify step always sees packages installed by the previous install step.
+.r_libs_user <- Sys.getenv("R_LIBS_USER", unset = "")
+if (nzchar(.r_libs_user) && dir.exists(.r_libs_user)) {
+  .libPaths(unique(c(.r_libs_user, .libPaths())))
+}
+
 results <- list()
 
 record <- function(name, ok, detail = "") {
