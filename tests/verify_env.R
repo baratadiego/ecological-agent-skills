@@ -23,9 +23,20 @@ suppressPackageStartupMessages({
 # (--no-init means no ~/.Rprofile to fix this). Prepend it defensively so the
 # verify step always sees packages installed by the previous install step.
 .r_libs_user <- Sys.getenv("R_LIBS_USER", unset = "")
-if (nzchar(.r_libs_user) && dir.exists(.r_libs_user)) {
+if (nzchar(.r_libs_user)) {
   .libPaths(unique(c(.r_libs_user, .libPaths())))
 }
+
+# Diagnostic dump (quiet when everything passes; invaluable when it doesn't).
+message(sprintf("  R_LIBS_USER     : %s", Sys.getenv("R_LIBS_USER", unset = "<unset>")))
+message(sprintf("  .libPaths()     : %s", paste(.libPaths(), collapse = " | ")))
+.installed <- tryCatch(
+  rownames(installed.packages()),
+  error = function(e) character(0)
+)
+message(sprintf("  installed (n=%d): %s",
+                length(.installed),
+                paste(head(.installed, 30), collapse = ", ")))
 
 results <- list()
 
