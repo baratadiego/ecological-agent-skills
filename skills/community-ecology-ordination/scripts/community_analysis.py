@@ -4,9 +4,12 @@
 
 """
 community_analysis.py
-Beta diversity, ordination (PCoA), and group comparison (PERMANOVA via skbio).
+Beta diversity, ordination (PCoA), and group comparison (PERMANOVA).
+
 Usage: python community_analysis.py <species_matrix_csv> <metadata_csv> <output_dir>
-Requires: pandas, numpy, scipy, skbio, matplotlib
+Requires: pandas, numpy, scipy, matplotlib
+Optional: scikit-bio (enables PCoA + PERMANOVA; skipped with a warning
+          when unavailable — e.g. Python versions without published wheels).
 """
 import logging
 import sys
@@ -42,13 +45,16 @@ from scipy.cluster.hierarchy import dendrogram, linkage, cophenet
 from scipy.spatial.distance import squareform
 
 try:
-    from skbio.diversity import beta_diversity
     from skbio.stats.ordination import pcoa
     from skbio.stats.distance import permanova, DistanceMatrix
     HAS_SKBIO = True
 except ImportError:
     HAS_SKBIO = False
-    logger.warning("scikit-bio not installed. PCoA and PERMANOVA will be skipped. pip install scikit-bio")
+    logger.warning(
+        "scikit-bio not installed — PCoA and PERMANOVA will be skipped. "
+        "Install with `pip install scikit-bio` on Python <=3.13 "
+        "(3.14 wheels not yet published as of 2026-04)."
+    )
 
 
 def bray_curtis_matrix(sp: pd.DataFrame) -> np.ndarray:
@@ -116,6 +122,17 @@ def main():
             e
         )
         raise
+
+    # Drop any non-numeric columns (e.g. a 'group' label accidentally left in
+    # the species matrix — grouping belongs in the metadata file, not here).
+    non_numeric = sp.select_dtypes(exclude="number").columns.tolist()
+    if non_numeric:
+        logger.warning(
+            "Dropping non-numeric columns from species matrix: %s "
+            "(grouping metadata belongs in the metadata file)",
+            non_numeric,
+        )
+        sp = sp.drop(columns=non_numeric)
 
     logger.info("Sites: %d | Species: %d", len(sp), len(sp.columns))
 

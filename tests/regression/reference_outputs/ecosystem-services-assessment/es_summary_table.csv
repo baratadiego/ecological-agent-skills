@@ -1,0 +1,7 @@
+lulc_code,lulc_name,n_pixels,mean_es,total_es,erosion_control_mean,pollination_mean
+1,forest,7734,245.0,1894830.0,0.999,1.0
+2,grassland,936,74.0,69264.0,0.995,0.8
+3,cropland,700,50.5,35350.0,0.99,0.7
+4,urban,305,21.5,6557.5,0.85,0.3
+5,bare,244,10.0,2440.0,0.7,0.1
+6,water,81,0.0,0.0,0.0,0.0

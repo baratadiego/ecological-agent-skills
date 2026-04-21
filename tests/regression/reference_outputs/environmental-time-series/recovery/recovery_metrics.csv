@@ -1,0 +1,2 @@
+baseline_mean,baseline_sd,disturbance_date,post_minimum_value,post_minimum_date,magnitude_decline_pct,RI_current,slope_linear,r2_linear,t_to_80pct_months,t_to_100pct_months
+0.6544,0.0544,2015-01-01,0.6297,2015-09-01,3.77,6.1044,0.075262,0.2193,-29.4,-26.8

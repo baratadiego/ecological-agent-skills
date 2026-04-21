@@ -32,7 +32,9 @@ Reference document justifying the methodological decisions embedded in the ecolo
 
 **Weighting guidance**: TSS-weighted ensemble outperforms equal-weight when model performance varies substantially (TSS range > 0.15 among algorithms). Equal-weight is safer when all models perform similarly and sample size is small (n < 50 presences).
 
-**Repository implementation**: `skills/species-distribution-modeling/SKILL.md` Step 7; ensemble weights are computed from spatial CV metrics stored in validation outputs.
+**Aggregation note**: Section 11 discusses how to *combine* the weighted predictions — weighted mean of raw scores (repo default) versus rank-transformation before weighting (opt-in complement for heterogeneously-calibrated ensembles).
+
+**Repository implementation**: `skills/species-distribution-modeling/SKILL.md` Step 7; ensemble weights are computed from spatial CV metrics stored in validation outputs. The fitted ensemble uses AUC-weighted averaging in `scripts/run_ensemble_sdm.R` (pixel-level: `pred_mat %*% w` with `w = auc / sum(auc)`).
 
 ---
 
@@ -151,6 +153,55 @@ Reference document justifying the methodological decisions embedded in the ecolo
 
 ---
 
+## 11. Ensemble Aggregation: AUC-Weighted Mean vs Rank-Transformation
+
+**Problem**: The decision to ensemble (Section 2) does not specify *how* to combine predictions. The repository default — weighted mean of raw suitability scores — implicitly assumes the underlying scales are comparable across algorithms. This assumption is routinely violated:
+
+- **MaxEnt cloglog** outputs ∈ [0, 1] with a probability-like interpretation tied to the chosen sampling prevalence.
+- **Random Forest** vote proportions or class probabilities are well-calibrated on training data but typically compressed toward 0.5.
+- **GLM/GAM logistic** outputs are calibrated probabilities under the fitted model's prevalence assumption.
+- **BRT** logistic outputs behave similarly to GLM but with boosting-induced bias correction.
+
+When a model systematically outputs higher scores (e.g., MaxEnt cloglog saturating near 1.0 in suitable cells) it dominates the weighted mean even when its *discrimination* (AUC-equivalent rank quality) is no better than peers. The result: the ensemble inherits scale idiosyncrasies rather than consensus.
+
+**Solution (opt-in complement)**: Rank-transform each model's predictions before the weighted mean. For each algorithm `a` with predictions `p_a` over `N` prediction cells, replace `p_a` with `rank(p_a) / N` (or `(rank(p_a) − 0.5) / N` to center on (0, 1)). The weighted ensemble then averages *relative suitability ranks* rather than raw scores:
+
+```
+ensemble_rank(i) = Σ_a w_a · (rank_a(i) / N)
+```
+
+Rank-transformation preserves each model's discrimination while neutralizing calibration heterogeneity — the property that distinguishes AUC from probability-based metrics applied at the ensemble step.
+
+**When rank-transformation helps**:
+- Algorithms disagree in output scale (MaxEnt cloglog vs RF votes vs GLM logit).
+- Downstream use is *relative prioritization* (top-10% cells, reserve ranking, connectivity nodes) where absolute probability is not needed.
+- AUC varies substantially (> 0.1) across constituent models, giving the weighted mean a strong incentive to over-fit to the best-scaled (not best-discriminating) model.
+
+**When to prefer raw-score weighted mean (repo default)**:
+- Downstream use requires *thresholded probability* (OR10, MTP — see Section 8) with ecologically-meaningful cut-offs.
+- Algorithms share a calibration target (e.g., all logistic with matched prevalence).
+- Calibration plots show the models are mutually well-calibrated; rank-transformation then discards useful information.
+
+**Primary reference**: Marmion, M., Parviainen, M., Luoto, M., Heikkinen, R.K. & Thuiller, W. (2009). Evaluation of consensus methods in predictive species distribution modelling. *Diversity and Distributions*, 15(1), 59–69. doi:10.1111/j.1472-4642.2008.00491.x
+
+**Supporting reference**: Crimmins, S.M., Dobrowski, S.Z. & Mynsberge, A.R. (2013). Evaluating ensemble forecasts of plant species distributions under climate change. *Ecological Modelling*, 266, 126–130. doi:10.1016/j.ecolmodel.2013.07.006
+
+**Supporting reference**: Hao, T., Elith, J., Guillera-Arroita, G. & Lahoz-Monfort, J.J. (2019). A review of evidence about use and performance of species distribution modelling ensembles like BIOMOD. *Diversity and Distributions*, 25(5), 839–852. doi:10.1111/ddi.12892
+
+**Trade-off**: Rank-transformed ensembles lose the absolute-probability interpretation. Thresholds derived from training presences (OR10, MTP, max-TSS) are no longer directly comparable across ensemble runs with different prediction grids, because `rank / N` depends on the cell count `N`. When reporting ranks, always report the threshold percentile alongside the rank score.
+
+**Repository implementation**: Current default in `skills/species-distribution-modeling/scripts/run_ensemble_sdm.R` is AUC-weighted raw-score averaging (committed as the v3.2.1 fix replacing the earlier unweighted `rowMeans`). Rank-transformation is documented as an opt-in complement; an implementation sketch is:
+
+```r
+# Pseudocode — add between algorithm-level predictions and the weighted mean
+rank_mat <- apply(pred_mat, 2, function(v) rank(v, na.last = "keep") / sum(!is.na(v)))
+ens_rank <- as.numeric(rank_mat %*% w)   # same AUC weights as before
+```
+
+Users who need rank-ensemble output today can apply this transformation post-hoc to the stacked per-algorithm predictions saved by `run_ensemble_sdm.R` (object `pred_mat` in the returned list). A first-class `--aggregation {mean,rank}` flag is tracked as future work rather than retrofitted here, to avoid changing the default behavior that downstream thresholding relies on.
+
+---
+
 ## Recommended Citation
 
 When using ecological-agent-skills in a publication, cite as:
@@ -172,9 +223,12 @@ In the Methods section, reference specific methodological justifications:
 - Araújo, M.B. & New, M. (2007). *Trends in Ecology & Evolution*, 22, 42–47. doi:10.1016/j.tree.2006.09.010
 - Barve, N. et al. (2011). *Ecological Modelling*, 222, 1810–1819. doi:10.1016/j.ecolmodel.2011.02.011
 - Cobos, M.E. et al. (2019). *PeerJ*, 7, e6281. doi:10.7717/peerj.6281
+- Crimmins, S.M. et al. (2013). *Ecological Modelling*, 266, 126–130. doi:10.1016/j.ecolmodel.2013.07.006
 - Faith, D.P. et al. (1987). *Vegetatio*, 69, 57–68. doi:10.1007/BF00045575
+- Hao, T. et al. (2019). *Diversity and Distributions*, 25, 839–852. doi:10.1111/ddi.12892
 - Jaeger, J.A.G. (2000). *Landscape Ecology*, 15, 115–130. doi:10.1023/A:1008129329289
 - Legendre, P. & Legendre, L. (2012). *Numerical Ecology*, 3rd edn. Elsevier.
+- Marmion, M. et al. (2009). *Diversity and Distributions*, 15, 59–69. doi:10.1111/j.1472-4642.2008.00491.x
 - Muscarella, R. et al. (2014). *Methods in Ecology and Evolution*, 5, 1198–1205. doi:10.1111/2041-210X.12261
 - Peterson, A.T. et al. (2008). *Ecological Modelling*, 213, 63–72. doi:10.1016/j.ecolmodel.2007.11.008
 - Phillips, S.J. et al. (2006). *Ecological Modelling*, 190, 231–259. doi:10.1016/j.ecolmodel.2005.03.026

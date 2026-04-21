@@ -1,0 +1,2 @@
+label,formula,AIC,deviance,df_resid,deltaAIC,weight
+null,pa ~ 1,383.38846332151115,159.58136554232865,279,0.0,1.0

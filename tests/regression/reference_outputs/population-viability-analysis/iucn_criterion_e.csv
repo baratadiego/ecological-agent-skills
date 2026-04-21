@@ -1,0 +1,4 @@
+category,threshold,time_horizon,p_extinction,qualifies
+CR,0.5,60,0.0,False
+EN,0.2,100,0.0,False
+VU,0.1,100,0.0,False

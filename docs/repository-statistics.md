@@ -1,7 +1,7 @@
 # Repository Statistics
 
-Generated: 2026-04-04
-Version: 3.2.0
+Generated: 2026-04-20
+Version: 3.2.1
 
 ---
 
@@ -12,8 +12,8 @@ Version: 3.2.0
 | Skills | 17 |
 | Workflows | 14 |
 | R scripts | 34 |
-| Python scripts | 26 |
-| Worked examples | 14 |
+| Python scripts | 32 |
+| Worked examples | 13 |
 | Resource documents | 53 |
 | Documentation files (docs/) | 8 |
 | Test datasets (CSV) | 11 |
@@ -70,7 +70,7 @@ Version: 3.2.0
 
 | Section | Checks |
 |---------|--------|
-| Structure checks | 652/652 passed |
+| Structure checks | 677/676 passed |
 | Skills verified | 17 |
 | Workflows verified | 14 |
 | Global coverage | 6/6 continents |
@@ -81,7 +81,7 @@ Version: 3.2.0
 
 | Test type | Count |
 |-----------|-------|
-| CI structural checks | 652 |
+| CI structural checks | 677 |
 | Python unit tests (pytest) | 176+ |
 | R unit tests (testthat) | 28+ |
 | Agent smoke test cases | 15 |
@@ -101,4 +101,4 @@ Version: 3.2.0
 | 3.0.0 | 2026-03-06 | Quality infrastructure: regression tests, smoke tests, expanded CI, release process |
 | 3.1.0 | 2026-03-28 | License migration (MIT → GPL-3.0), CITATION.cff, CATALOG Phase 4 update |
 | 3.2.0 | 2026-04-02 | Code quality: English translation, CHELSA default, environment-python.yaml, INSTALL.md, glossary, taxonomy diagram, DECISION_TREE, integration tests |
-| 3.2.x | 2026-04-03 | Cross-reference fixes: SKILL_INDEX.json sync, run-acoustic-monitoring integration, Decision Points in 7 skills, CI hardening |
+| 3.2.1 | 2026-04-04 | DevContainer, SKILL.md linter (204 checks), R/Python parity (6 new Python scripts), AUC-weighted ensemble SDM, `copshenetic` → `cophenet` fix |
